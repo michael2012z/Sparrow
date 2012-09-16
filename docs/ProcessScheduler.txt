@@ -1,0 +1,53 @@
+Scheduler principle:
+1. Each task has "priority" property, the value is between 1~10; 10 is the highest, 1 is the lowest;
+2. The interval between continous timer timeouts is defined as a scheduling peroid. Priority is also the continous scheduling period the process can occupy;
+3. At each timer timeout, check current process, compare it's priority value and how many period it has lived. If the former is more, go on running; else, switch it out.
+4. An idle process is defined. It does nothing, just a empty kernel thread to guarantee there is something running.
+
+The cubic is used to denote a thread:
+  /----\
+  |    |
+  |    |
+  \----/
+
+
+
+Initially, there is only one thread, it's the idle kernel thread.
+
+   current process
+         ||
+         ||
+         \/
+      /------\
+      | idle |
+      |      |
+      \------/
+
+
+
+When there is some user process launched, the process list is like this:
+
+                                 current process
+                                       ||
+                                       ||
+                                       \/
+      /------\      /--------\      /--------\      /--------\
+      | idle |      | demo 1 |      | demo 2 |      | demo 3 |
+  +-> |      | ---> |        | ---> |        | ---> |        | ---+
+  |   \------/      \--------/      \--------/      \--------/    |
+  |                                                               |
+  +---------------------------------------------------------------+
+
+
+
+Finally, after all user program exit, idle process remains, it never exit:
+
+   current process
+         ||
+         ||
+         \/
+      /------\
+      | idle |
+      |      |
+      \------/
+

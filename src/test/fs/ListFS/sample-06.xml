@@ -1,0 +1,47 @@
+<!--1024-->
+<dir>
+ <dir>
+  <name>
+   bin
+  </name>
+  <file>
+   <name>
+    file1.txt
+   </name>
+   <date>
+    2011-10-11 08:43:36.372
+   </date>
+   <offset>
+    688362
+   </offset>
+   <size>
+    688362
+   </size>
+  </file>
+  <date>
+   2011-11-10 08:43:36.372
+  </date>
+ </dir>
+ <dir>
+  <name>
+   data
+  </name>
+  <date>
+   2011-11-10 08:43:36.372
+  </date>
+ </dir>
+ <dir>
+  <name>
+   doc
+  </name>
+  <date>
+   2011-11-10 08:43:36.372
+  </date>
+ </dir>
+ <name>
+  root
+ </name>
+ <date>
+  2011-10-11 08:43:36.372
+ </date>
+</dir>
