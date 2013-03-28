@@ -15,8 +15,8 @@ CU_SuiteInfo fs_test_suite = {
   "File System test suite",
   test_suite_init, 
   test_suite_clean, 
-  test_suite_setup,
-  test_suite_teardown,
+  //  test_suite_setup,
+  //  test_suite_teardown,
   test_cases_array
 };
 
