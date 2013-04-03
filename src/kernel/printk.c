@@ -250,14 +250,13 @@ void printk(int ss, int level, const char *fmt, ...)
 	  break;
 	case PR_SS_FS:
 	  leading_ss = "FS] ";
-	  break;
 	  return;
 	case PR_SS_MM:
 	  leading_ss = "MM] ";
-	  break;
 	  return;
 	case PR_SS_PROC:
 	  leading_ss = "PROC] ";
+	  break;
 	  return;
 	case PR_SS_IRQ:
 	  leading_ss = "IRQ] ";

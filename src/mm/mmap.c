@@ -68,9 +68,9 @@ bool remove_vma(struct mm_struct *mm, struct vm_area_struct *vma) {
 }
 
 
-
-unsigned long mmap_region(struct mm_struct *mm, struct file *filep, unsigned long addr, unsigned long len, unsigned long pgoff)
+unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long addr, unsigned long len, unsigned long offset)
 {
+  unsigned long pgoff = offset >> PAGE_SHIFT;
   struct vm_area_struct *vma;
   int error;
 
@@ -78,15 +78,16 @@ unsigned long mmap_region(struct mm_struct *mm, struct file *filep, unsigned lon
   static struct vm_area_struct vma1, vma2, vmab1, vmab2;
   // test ~
 
-  printk(PR_SS_MM, PR_LVL_DBG6, "mmap_region():\n");
-
   // test
   //  vma = (struct vm_area_struct *)kmalloc(sizeof(struct vm_area_struct));
+
+  printk(PR_SS_MM, PR_LVL_DBG6, "do_mmap():\n");
+  printk(PR_SS_MM, PR_LVL_DBG6, "mm = %x, addr = %x, len = %x, offset = %x, pgoff = %x\n", mm, addr, len, offset, pgoff);
 
   if(NULL != filep) {
 	if (filep->buf == (void *)0xc4040000) // demo 1
 	  vma = &vma1;
-	if (filep->buf == (void *)0xc4080000) // demo 1
+	if (filep->buf == (void *)0xc4080000) // demo 2
 	  vma = &vma2;
   } else {
 	if (NULL == vmab1.vm_mm)
@@ -112,19 +113,10 @@ unsigned long mmap_region(struct mm_struct *mm, struct file *filep, unsigned lon
   return addr;
 }
 
-unsigned long do_mmap(struct mm_struct *mm, struct file *file, unsigned long addr, unsigned long len, unsigned long offset)
-{
-  unsigned long pgoff = offset >> PAGE_SHIFT;
-
-  printk(PR_SS_MM, PR_LVL_DBG6, "do_mmap():\n");
-  printk(PR_SS_MM, PR_LVL_DBG6, "mm = %x, addr = %x, len = %x, offset = %x, pgoff = %x\n", mm, addr, len, offset, pgoff);
-  return mmap_region(mm, file, addr, len, pgoff);
-}
-
 
 unsigned long do_brk(struct mm_struct *mm, unsigned long addr, unsigned long len)
 {
-  return mmap_region(mm, NULL, addr, len, 0);
+  return do_mmap(mm, NULL, addr, len, 0);
 }
 
 void add_page_anon_vma(struct page *page, struct vm_area_struct *vma, unsigned long address) {

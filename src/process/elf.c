@@ -92,6 +92,7 @@ static unsigned long elf_map(struct mm_struct *mm, struct file *filep, unsigned 
 {
 	unsigned long map_addr;
 	unsigned long size = eppnt->p_filesz + ELF_PAGEOFFSET(eppnt->p_vaddr);
+	/* This is to calculate the offset in from the beginning of page, because the content of file will be mapped in page by page. */
 	unsigned long off = eppnt->p_offset - ELF_PAGEOFFSET(eppnt->p_vaddr);
 
 	printk(PR_SS_PROC, PR_LVL_INF, "elf_map():\n");
@@ -226,6 +227,7 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
 	retval = -EINVAL;
 	goto out;
   }
+  printk(PR_SS_PROC, PR_LVL_INF, " elf_entry = %x\n", elf_entry);
 
   mm->end_code = end_code;
   mm->start_code = start_code;
