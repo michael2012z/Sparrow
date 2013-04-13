@@ -26,5 +26,6 @@ typedef int			int32_t;
 
 typedef unsigned int __u32;
 typedef unsigned int u32;
+typedef unsigned long long u64;
 
 #endif

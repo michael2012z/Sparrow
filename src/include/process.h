@@ -5,6 +5,18 @@
 #include <mmap.h>
 #include <time.h>
 #include <type.h>
+#include <sched.h>
+
+
+
+extern union thread_union init_thread_union;
+
+struct sched_entity {
+  u64 exec_start;
+  u64 sum_exec_runtime;
+  u64 vruntime;
+  struct list_head queue_entry;
+};
 
 
 struct task_struct {
@@ -25,7 +37,19 @@ struct task_struct {
   int pid;
 
   struct timespec start_time; 		/* monotonic time */
+  struct sched_entity sched_en;
 };
+
+/* scheduler interface */
+struct sched_class {
+  void (*init) ();
+  void (*enqueue_task) (struct task_struct *p);
+  void (*dequeue_task) (struct task_struct *p);
+  void (*check_preempt_curr) (struct task_struct *p);
+  struct task_struct * (*pick_next_task) ();
+  void (*task_tick) (struct task_struct *p);
+};
+
 
 struct cpu_context_save {
 	__u32	r4;
@@ -50,6 +74,12 @@ struct thread_info {
 
 
 #define task_thread_info(task)	((struct thread_info *)(task)->stack)
+
+
+union thread_union {
+	struct thread_info thread_info;
+	unsigned long stack[THREAD_SIZE/sizeof(long)];
+};
 
 
 void process_test();

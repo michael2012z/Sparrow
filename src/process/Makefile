@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= process.o elf.o pid.o schedule.o
+objects	:= process.o elf.o pid.o schedule.o scheduler_cfs.o scheduler_cfs_queue.o
 
 all: $(BUILTIN)
 
