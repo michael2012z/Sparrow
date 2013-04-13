@@ -29,7 +29,7 @@ context_switch(struct task_struct *prev,
 }
 
 void schedule() {
-
+  /*
   if (list_empty(task_list)) {
 	context_switch(NULL, &idle_task);
   } else {
@@ -44,5 +44,5 @@ void schedule() {
 	  context_switch(old_task, current_task);
 	}
   }
-
+  */
 }

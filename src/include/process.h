@@ -15,6 +15,7 @@ struct sched_entity {
   u64 exec_start;
   u64 sum_exec_runtime;
   u64 vruntime;
+  u64 ticks;
   struct list_head queue_entry;
 };
 
@@ -28,7 +29,7 @@ struct task_struct {
 
   bool kernel_thread;
 
-  int prio, past;
+  int priority;
 
   struct list_head list;
 
@@ -40,11 +41,24 @@ struct task_struct {
   struct sched_entity sched_en;
 };
 
+enum sched_enqueue_flag {
+  sched_enqueue_flag_new,
+  sched_enqueue_flag_timeout,
+  sched_enqueue_flag_sleep
+};
+
+enum sched_dequeue_flag {
+  sched_dequeue_flag_exit,
+  sched_dequeue_flag_chosen,
+  sched_dequeue_flag_wakeup
+};
+
 /* scheduler interface */
 struct sched_class {
   void (*init) ();
-  void (*enqueue_task) (struct task_struct *p);
+  void (*enqueue_task) (struct task_struct *p, enum sched_enqueue_flag flag);
   void (*dequeue_task) (struct task_struct *p);
+  int (*need_to_reschedule) (struct task_struct *p);
   void (*check_preempt_curr) (struct task_struct *p);
   struct task_struct * (*pick_next_task) ();
   void (*task_tick) (struct task_struct *p);
