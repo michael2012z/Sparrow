@@ -1,7 +1,7 @@
 #include <linkage.h>
 #include <interrupt.h>
 #include <irq.h>
-
+#include <printk.h>
 
 /* We assume the IRQ_TIMER0..IRQ_TIMER4 range is continuous. */
 
@@ -79,7 +79,8 @@ s3c6410_timer_interrupt(int irq, void *dev_id)
   /*
 	timer_tick();
   */
-  //  printk(PR_SS_IRQ, PR_LVL_INF, "%s, irq = %d\n", __func__, irq);
+  printk(PR_SS_IRQ, PR_LVL_INF, "%s, irq = %d\n", __func__, irq);
+  on_timer();
   return IRQ_HANDLED;
 }
 

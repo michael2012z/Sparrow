@@ -7,15 +7,14 @@
 #include <type.h>
 #include <sched.h>
 
-
-
 extern union thread_union init_thread_union;
 
 struct sched_entity {
   u64 exec_start;
   u64 sum_exec_runtime;
   u64 vruntime;
-  u64 ticks;
+  u64 continuous_ticks;
+  u64 accumulated_ticks;
   struct list_head queue_entry;
 };
 
@@ -100,5 +99,10 @@ void process_test();
 void initialize_process();
 int create_process(struct file *filep);
 void destroy_process(struct task_struct *task);
+
+bool is_scheduler_ready();
+void update_task_on_tick();
+bool check_should_schedule();
+
 
 #endif /* _PROCESS_H_ */

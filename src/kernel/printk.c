@@ -260,6 +260,7 @@ void printk(int ss, int level, const char *fmt, ...)
 	  return;
 	case PR_SS_IRQ:
 	  leading_ss = "IRQ] ";
+	  break;
 	  return;
 	default:
 	  return;

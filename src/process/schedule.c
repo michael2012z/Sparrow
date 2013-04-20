@@ -4,10 +4,20 @@
 struct task_struct idle_task;
 struct list_head *task_list = &idle_task.list;
 struct task_struct *current_task = &idle_task;
+struct sched_class *scheduler = NULL;
+
+extern struct sched_class sched_class_cfs;
+
+bool is_scheduler_ready() {
+  return (scheduler != NULL);
+}
 
 void schedule_initialize() {
+  struct sched_class *tmp_scheduler = &sched_class_cfs;
   INIT_LIST_HEAD(task_list);
   current_task = &idle_task;
+  tmp_scheduler->init();
+  scheduler = tmp_scheduler;
 }
 
 static void switch_pgd(unsigned long pgd, int pid) {
@@ -26,6 +36,14 @@ context_switch(struct task_struct *prev,
 
 	switch_pgd(next->pgd, next->pid);
 	switch_to(prev, next);
+}
+
+void update_task_on_tick() {
+  scheduler->task_tick(current_task);
+}
+
+bool check_should_schedule() {
+  return scheduler->need_to_reschedule(current_task);
 }
 
 void schedule() {
