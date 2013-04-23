@@ -29,6 +29,7 @@ void process_test() {
 
 void initialize_process() {
   initialize_pid();
+  schedule_initialize();
 }
 
 int create_process(struct file *filep) {

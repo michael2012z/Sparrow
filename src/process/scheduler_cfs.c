@@ -1,6 +1,7 @@
 #include <type.h>
 #include <process.h>
 #include <sched.h>
+#include <printk.h>
 #include "scheduler_cfs_queue.h"
 
 #define TASK_LEAST_CONTINUOUS_TICKS_CFS 4
@@ -50,10 +51,12 @@ static void dequeue_task_cfs (struct task_struct *p) {
 static bool need_to_reschedule_cfs (struct task_struct *p) {
   struct sched_entity* task_en = &p->sched_en;
   struct sched_entity* first_en = NULL;
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current: pid = %d, continuous_ticks = %d\n", __func__, p->pid, task_en->continuous_ticks);
   if (task_en->continuous_ticks < TASK_LEAST_CONTINUOUS_TICKS_CFS)
 	return 0;
   
   first_en = cfs_queue_find_first();
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, first: pid = %d, continuous_ticks = %d\n", __func__, container_of(first_en, struct task_struct, sched_en)->pid, first_en->continuous_ticks);
   return first_en->vruntime < calculate_vruntime(task_en);
 }
 
@@ -74,6 +77,7 @@ static struct task_struct * pick_next_task_cfs () {
 static void task_tick_cfs (struct task_struct *p) {
   struct sched_entity* task_en = &p->sched_en;
   task_en->continuous_ticks ++;
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, pid = %d, continuous_ticks = %d\n", __func__, p->pid, task_en->continuous_ticks);
 }
 
 const struct sched_class sched_class_cfs = {

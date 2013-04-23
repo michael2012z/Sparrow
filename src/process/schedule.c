@@ -1,5 +1,6 @@
 #include <type.h>
 #include <process.h>
+#include <printk.h>
 
 struct task_struct idle_task;
 struct list_head *task_list = &idle_task.list;
