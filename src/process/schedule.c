@@ -2,9 +2,7 @@
 #include <process.h>
 #include <printk.h>
 
-struct task_struct idle_task;
-struct list_head *task_list = &idle_task.list;
-struct task_struct *current_task = &idle_task;
+struct task_struct *current_task = NULL;
 struct sched_class *scheduler = NULL;
 
 extern struct sched_class sched_class_cfs;
@@ -15,8 +13,6 @@ bool is_scheduler_ready() {
 
 void schedule_initialize() {
   struct sched_class *tmp_scheduler = &sched_class_cfs;
-  INIT_LIST_HEAD(task_list);
-  current_task = &idle_task;
   tmp_scheduler->init();
   scheduler = tmp_scheduler;
 }
@@ -39,29 +35,37 @@ context_switch(struct task_struct *prev,
 	switch_to(prev, next);
 }
 
+void enqueue_task(struct task_struct *task, enum sched_enqueue_flag flag) {
+  scheduler->enqueue_task(task, flag);
+}
+
 void update_task_on_tick() {
-  scheduler->task_tick(current_task);
+  if (NULL != current_task)
+	scheduler->task_tick(current_task);
 }
 
 bool check_should_schedule() {
-  return scheduler->need_to_reschedule(current_task);
+  if (NULL != current_task)  
+	return scheduler->need_to_reschedule(current_task);
+  else 
+	return true;
 }
 
 void schedule() {
-  /*
-  if (list_empty(task_list)) {
-	context_switch(NULL, &idle_task);
+  struct task_struct *next_task = scheduler->pick_next_task();
+  if (current_task == next_task) {
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task == next_task\n", __func__);
+	return;
+  } else if (NULL == next_task) {
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, NULL == next_task\n", __func__);
+	return;
+  } else if (NULL == current_task) {
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, NULL ==current_task\n", __func__);
+	current_task = next_task;
   } else {
-	current_task->past ++;
-	if (current_task->past >= current_task->prio) {  // time is out
-	  struct task_struct *old_task = current_task;
-	  struct list_head *next = current_task->list.next; // get the next task
-	  if (next == task_list) // if this is the idle task, skip it
-		next = next->next;
-	  current_task = list_entry(next, struct task_struct, list);
-	  current_task->past = 0;
-	  context_switch(old_task, current_task);
-	}
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task != next_task\n", __func__);
+	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
+	current_task = next_task;
   }
-  */
+  //context_switch(current_task, next_task);
 }

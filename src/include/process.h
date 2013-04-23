@@ -30,8 +30,6 @@ struct task_struct {
 
   int priority;
 
-  struct list_head list;
-
   struct mm_struct mm;
 
   int pid;
@@ -103,6 +101,6 @@ void destroy_process(struct task_struct *task);
 bool is_scheduler_ready();
 void update_task_on_tick();
 bool check_should_schedule();
-
+void enqueue_task(struct task_struct *task, enum sched_enqueue_flag flag);
 
 #endif /* _PROCESS_H_ */

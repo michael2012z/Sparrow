@@ -10,8 +10,8 @@ static void print_elf_file(struct file *filep) {
   unsigned char c;
   static unsigned char hex_sym[] = "0123456789abcdef";
 
-  printk(PR_SS_PROC, PR_LVL_INF, "\nprint_elf_file():\n");
-  printk(PR_SS_PROC, PR_LVL_INF, "          00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff ");
+  printk(PR_SS_PROC, PR_LVL_DBG1, "\nprint_elf_file():\n");
+  printk(PR_SS_PROC, PR_LVL_DBG1, "          00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff ");
   for (i=0; i<filep->size; i++) {
 	// now only print several lines
 	if (i >= 16 * 8)
@@ -19,7 +19,7 @@ static void print_elf_file(struct file *filep) {
 
 	if (0 == i%16) {
 	  // print line number
-	  printk(PR_SS_PROC, PR_LVL_INF, "\n");
+	  printk(PR_SS_PROC, PR_LVL_DBG1, "\n");
 	  tmp = row;
 	  digits = 0;
 	  do {
@@ -27,35 +27,35 @@ static void print_elf_file(struct file *filep) {
 		digits ++;
 	  }	while(0 != tmp);
 	  for (j = 0; j < (7-digits); j++)
-		printk(PR_SS_PROC, PR_LVL_INF, "0");
+		printk(PR_SS_PROC, PR_LVL_DBG1, "0");
 	  for (j = digits; j >0; j--) {
 		tmp = 0x0f << (4 * (j-1));
 		tmp = row & tmp;
 		tmp = tmp >> (4 * (j-1));
-		printk(PR_SS_PROC, PR_LVL_INF, "%c", hex_sym[tmp]);
+		printk(PR_SS_PROC, PR_LVL_DBG1, "%c", hex_sym[tmp]);
 	  }
-	  printk(PR_SS_PROC, PR_LVL_INF, "0: ");
+	  printk(PR_SS_PROC, PR_LVL_DBG1, "0: ");
 	  row++;
 	}
 	c = ((unsigned char *)filep->buf)[i];
 	// print first digit
-	printk(PR_SS_PROC, PR_LVL_INF, "%c", hex_sym[(c&0x0f0) >> 4]);
-	printk(PR_SS_PROC, PR_LVL_INF, "%c", hex_sym[(c&0x0f)]);
-	printk(PR_SS_PROC, PR_LVL_INF, " ");
+	printk(PR_SS_PROC, PR_LVL_DBG1, "%c", hex_sym[(c&0x0f0) >> 4]);
+	printk(PR_SS_PROC, PR_LVL_DBG1, "%c", hex_sym[(c&0x0f)]);
+	printk(PR_SS_PROC, PR_LVL_DBG1, " ");
   }
 }
 
 static void print_elf_phdr(struct elf_phdr *x) {
-  printk(PR_SS_PROC, PR_LVL_INF, "\nprint_elf_phdr():\n");
-  printk(PR_SS_PROC, PR_LVL_INF, " p_type = %x \n p_offset = %x \n p_vaddr = %x \n p_paddr = %x \n p_filesz = %x \n p_memsz = %x \n p_flags = %x \n p_align = %x \n", x->p_type, x->p_offset, x->p_vaddr, x->p_paddr, x->p_filesz, x->p_memsz, x->p_flags, x->p_align);
+  printk(PR_SS_PROC, PR_LVL_DBG1, "\nprint_elf_phdr():\n");
+  printk(PR_SS_PROC, PR_LVL_DBG1, " p_type = %x \n p_offset = %x \n p_vaddr = %x \n p_paddr = %x \n p_filesz = %x \n p_memsz = %x \n p_flags = %x \n p_align = %x \n", x->p_type, x->p_offset, x->p_vaddr, x->p_paddr, x->p_filesz, x->p_memsz, x->p_flags, x->p_align);
 }
 
 static void print_elf_hdr(struct elf_hdr *x) {
   int i;
-  printk(PR_SS_PROC, PR_LVL_INF, "\nprint_elf_hdr():\n");
+  printk(PR_SS_PROC, PR_LVL_DBG1, "\nprint_elf_hdr():\n");
   for (i=0; i<4; i++)
-	printk(PR_SS_PROC, PR_LVL_INF, " e_ident[%d] = %c(%x)\n", i, x->e_ident[i], x->e_ident[i]);
-  printk(PR_SS_PROC, PR_LVL_INF, " e_type = %x \n e_machine = %x \n e_version = %x \n e_entry = %x \n e_phoff = %x \n e_shoff = %x \n e_flags = %x \n e_ehsize = %x \n e_phentsize = %x \n e_phnum = %x \n e_shentsize = %x \n e_shnum = %x \n e_shstrndx = %x \n", x->e_type, x->e_machine, x->e_version, x->e_entry, x->e_phoff, x->e_shoff, x->e_flags, x->e_ehsize, x->e_phentsize, x->e_phnum, x->e_shentsize, x->e_shnum, x->e_shstrndx);
+	printk(PR_SS_PROC, PR_LVL_DBG1, " e_ident[%d] = %c(%x)\n", i, x->e_ident[i], x->e_ident[i]);
+  printk(PR_SS_PROC, PR_LVL_DBG1, " e_type = %x \n e_machine = %x \n e_version = %x \n e_entry = %x \n e_phoff = %x \n e_shoff = %x \n e_flags = %x \n e_ehsize = %x \n e_phentsize = %x \n e_phnum = %x \n e_shentsize = %x \n e_shnum = %x \n e_shstrndx = %x \n", x->e_type, x->e_machine, x->e_version, x->e_entry, x->e_phoff, x->e_shoff, x->e_flags, x->e_ehsize, x->e_phentsize, x->e_phnum, x->e_shentsize, x->e_shnum, x->e_shstrndx);
 
 }
 
@@ -63,7 +63,7 @@ static int elf_check_structure(struct elf_hdr *x)
 {
   int retval = ENOERROR;
 
-  printk(PR_SS_PROC, PR_LVL_INF, "\nelf_check_structure():\n");
+  printk(PR_SS_PROC, PR_LVL_DBG1, "\nelf_check_structure():\n");
 
   /* Check magic number. */
   if (memcmp(x->e_ident, ELFMAG, SELFMAG) != 0) {
@@ -84,7 +84,7 @@ static int elf_check_structure(struct elf_hdr *x)
   }
 
 out:
-  printk(PR_SS_PROC, PR_LVL_INF, " retval = %x\n", retval);
+  printk(PR_SS_PROC, PR_LVL_DBG1, " retval = %x\n", retval);
   return retval;
 }
 
@@ -95,13 +95,13 @@ static unsigned long elf_map(struct mm_struct *mm, struct file *filep, unsigned 
 	/* This is to calculate the offset in from the beginning of page, because the content of file will be mapped in page by page. */
 	unsigned long off = eppnt->p_offset - ELF_PAGEOFFSET(eppnt->p_vaddr);
 
-	printk(PR_SS_PROC, PR_LVL_INF, "elf_map():\n");
-	printk(PR_SS_PROC, PR_LVL_INF, " addr = %x, size = %x\n", addr, size);
+	printk(PR_SS_PROC, PR_LVL_DBG1, "elf_map():\n");
+	printk(PR_SS_PROC, PR_LVL_DBG1, " addr = %x, size = %x\n", addr, size);
 
 	addr = ELF_PAGESTART(addr);
 	size = ELF_PAGEALIGN(size);
 
-	printk(PR_SS_PROC, PR_LVL_INF, " addr = %x, size = %x, off = %x\n", addr, size, off);
+	printk(PR_SS_PROC, PR_LVL_DBG1, " addr = %x, size = %x, off = %x\n", addr, size, off);
 
 	/* mmap() will return -EINVAL if given a zero size, but a
 	 * segment with zero filesize is perfectly valid */
@@ -115,13 +115,13 @@ static unsigned long elf_map(struct mm_struct *mm, struct file *filep, unsigned 
 
 static int set_brk(struct mm_struct *mm, unsigned long start, unsigned long end)
 {
-  printk(PR_SS_PROC, PR_LVL_INF, "\nset_brk():\n");
-  printk(PR_SS_PROC, PR_LVL_INF, " start = %x, end = %x\n", start, end);
+  printk(PR_SS_PROC, PR_LVL_DBG1, "\nset_brk():\n");
+  printk(PR_SS_PROC, PR_LVL_DBG1, " start = %x, end = %x\n", start, end);
 
   start = ELF_PAGEALIGN(start);
   end = ELF_PAGEALIGN(end);
 
-  printk(PR_SS_PROC, PR_LVL_INF, " start = %x, end = %x\n", start, end);
+  printk(PR_SS_PROC, PR_LVL_DBG1, " start = %x, end = %x\n", start, end);
 
   if (end > start) {
 	unsigned long addr;
@@ -145,7 +145,7 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
   struct elf_hdr elf_header;
   struct elf_phdr *elf_ppnt, *elf_phdata;
 
-  printk(PR_SS_PROC, PR_LVL_INF, "\nload_elf_binary():\n");
+  printk(PR_SS_PROC, PR_LVL_DBG1, "\nload_elf_binary():\n");
 
   print_elf_file(filep);
 
@@ -170,7 +170,7 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
   start_data = 0;
   end_data = 0;
 
-  printk(PR_SS_PROC, PR_LVL_INF, " e_phnum = %x\n", elf_header.e_phnum);
+  printk(PR_SS_PROC, PR_LVL_DBG1, " e_phnum = %x\n", elf_header.e_phnum);
 
   /* Map the ELF file into virtual memory space. */
   elf_ppnt = elf_phdata;
@@ -183,13 +183,13 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
 	if (elf_ppnt->p_type != PT_LOAD)
 	  continue;
 	else
-	  printk(PR_SS_PROC, PR_LVL_INF, " loadable program header found\n");
+	  printk(PR_SS_PROC, PR_LVL_DBG1, " loadable program header found\n");
 
 	vaddr = elf_ppnt->p_vaddr;
 
 	error = elf_map(mm, filep, vaddr, elf_ppnt);
 
-	printk(PR_SS_PROC, PR_LVL_INF, "  elf_map = %x\n", error);
+	printk(PR_SS_PROC, PR_LVL_DBG1, "  elf_map = %x\n", error);
 
 	if (BAD_ADDR(error)) {
 	  goto out;
@@ -214,11 +214,11 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
 
   }
 
-  printk(PR_SS_PROC, PR_LVL_INF, " elf_bss = %x, elf_brk = %x, start_code = %x, end_code = %x, start_data = %x, end_data = %x\n",elf_bss, elf_brk, start_code, end_code, start_data, end_data);
+  printk(PR_SS_PROC, PR_LVL_DBG1, " elf_bss = %x, elf_brk = %x, start_code = %x, end_code = %x, start_data = %x, end_data = %x\n",elf_bss, elf_brk, start_code, end_code, start_data, end_data);
 
   /* Allocate space for BSS segment, and map it. */
   retval = set_brk(mm, elf_bss, elf_brk);
-  printk(PR_SS_PROC, PR_LVL_INF, " set_brk = %x\n", retval);
+  printk(PR_SS_PROC, PR_LVL_DBG1, " set_brk = %x\n", retval);
   if (retval)
 	goto out;
 
@@ -227,7 +227,7 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
 	retval = -EINVAL;
 	goto out;
   }
-  printk(PR_SS_PROC, PR_LVL_INF, " elf_entry = %x\n", elf_entry);
+  printk(PR_SS_PROC, PR_LVL_DBG1, " elf_entry = %x\n", elf_entry);
 
   mm->end_code = end_code;
   mm->start_code = start_code;

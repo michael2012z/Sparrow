@@ -32,7 +32,7 @@ void initialize_process() {
   schedule_initialize();
 }
 
-int create_process(struct file *filep) {
+static int create_process_demo(struct file *filep) {
   int pid;
   struct task_struct *task = NULL;
   // test 
@@ -62,12 +62,37 @@ int create_process(struct file *filep) {
   //  task->mm.pgd = (unsigned long)kmalloc(PAGE_SIZE * 4);
   //  memcpy((void *)task->mm.pgd, (void *)mm_pgd, PAGE_SIZE * 4);
 
-  list_add_tail(&task->list, task_list);
+  //  list_add_tail(&task->list, task_list);
 
   load_elf_binary(filep, NULL, &task->mm);
 
   return pid;
   
+}
+
+int create_process(struct file *filep) {
+  int pid;
+  struct task_struct *task = NULL;
+  pid = allocate_pid();
+  if (pid < 0)
+	return pid;
+  
+  task = (struct task_struct *)kmalloc(sizeof(struct task_struct));
+
+  if (NULL == task)
+	return -1;
+
+  task->pid = pid;
+
+  INIT_LIST_HEAD(&(task->mm.mmap.list));
+  task->mm.pgd = (unsigned long)kmalloc(PAGE_SIZE * 4);
+  memcpy((void *)task->mm.pgd, (void *)mm_pgd, PAGE_SIZE * 4);
+
+  load_elf_binary(filep, NULL, &task->mm);
+
+  enqueue_task(task, sched_enqueue_flag_new);
+
+  return pid;
 }
 
 void destroy_process(struct task_struct *task) {
