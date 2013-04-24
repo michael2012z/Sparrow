@@ -88,6 +88,8 @@ int create_process(struct file *filep) {
   task->mm.pgd = (unsigned long)kmalloc(PAGE_SIZE * 4);
   memcpy((void *)task->mm.pgd, (void *)mm_pgd, PAGE_SIZE * 4);
 
+  INIT_LIST_HEAD(&(task->sched_en.queue_entry));
+
   load_elf_binary(filep, NULL, &task->mm);
 
   enqueue_task(task, sched_enqueue_flag_new);

@@ -1,6 +1,7 @@
 #include <type.h>
 #include <process.h>
 #include <sched.h>
+#include <printk.h>
 #include "scheduler_cfs_queue.h"
 
 static struct list_head* queue=NULL;
@@ -15,12 +16,17 @@ void cfs_queue_enqueue (struct sched_entity *en) {
   struct list_head *pos = NULL, *head = queue;
   struct sched_entity *current;
 
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s\n", __func__);
   list_for_each(pos, head) {
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s 1\n", __func__);
 	current = list_entry(pos, struct sched_entity, queue_entry);
 	if (en->vruntime < current->vruntime) {
-	  list_add(&en->queue_entry, pos);
+	  printk(PR_SS_PROC, PR_LVL_DBG3, "%s 2\n", __func__);
+	  list_add_tail(&en->queue_entry, pos);
+	  return;
 	}
   }
+  list_add_tail(&en->queue_entry, queue);
   return;
 }
 

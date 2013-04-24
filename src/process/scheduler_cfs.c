@@ -36,9 +36,11 @@ static void enqueue_task_cfs (struct task_struct *p, enum sched_enqueue_flag fla
   else {
 	task_en->vruntime += calculate_delta_vruntime(task_en);
   }
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, pid = %d, task_en->vruntime = %d\n", __func__, p->pid, task_en->vruntime);
   cfs_queue_enqueue(task_en);
   first_en = cfs_queue_find_first();
   update_min_vruntime(first_en->vruntime);
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, min_vruntime = %d\n", __func__, min_vruntime);
 }
 
 static void dequeue_task_cfs (struct task_struct *p) {
@@ -52,11 +54,15 @@ static bool need_to_reschedule_cfs (struct task_struct *p) {
   struct sched_entity* task_en = &p->sched_en;
   struct sched_entity* first_en = NULL;
   printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current: pid = %d, continuous_ticks = %d\n", __func__, p->pid, task_en->continuous_ticks);
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current: pid = %d, vruntime = %d\n", __func__, p->pid, task_en->vruntime);
   if (task_en->continuous_ticks < TASK_LEAST_CONTINUOUS_TICKS_CFS)
-	return 0;
+	return false;
   
   first_en = cfs_queue_find_first();
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, first: pid = %d, continuous_ticks = %d\n", __func__, container_of(first_en, struct task_struct, sched_en)->pid, first_en->continuous_ticks);
+  if (NULL == first_en)
+	return true;
+
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, first: pid = %d, vruntime = %d\n", __func__, container_of(first_en, struct task_struct, sched_en)->pid, first_en->vruntime);
   return first_en->vruntime < calculate_vruntime(task_en);
 }
 

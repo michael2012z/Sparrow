@@ -52,7 +52,16 @@ bool check_should_schedule() {
 }
 
 void schedule() {
-  struct task_struct *next_task = scheduler->pick_next_task();
+  struct task_struct *next_task = NULL;
+  if (current_task)
+	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
+  next_task = scheduler->pick_next_task();
+
+  if (current_task)
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task->pid = %d\n", __func__, current_task->pid);
+  if (next_task)
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, next_task->pid = %d\n", __func__, next_task->pid);
+
   if (current_task == next_task) {
 	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task == next_task\n", __func__);
 	return;
@@ -60,11 +69,10 @@ void schedule() {
 	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, NULL == next_task\n", __func__);
 	return;
   } else if (NULL == current_task) {
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, NULL ==current_task\n", __func__);
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, NULL == current_task\n", __func__);
 	current_task = next_task;
   } else {
 	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task != next_task\n", __func__);
-	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
 	current_task = next_task;
   }
   //context_switch(current_task, next_task);
