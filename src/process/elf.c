@@ -3,15 +3,18 @@
 #include <mmap.h>
 #include "elf.h"
 #include <printk.h>
+#include <string.h>
 
 static void print_elf_file(struct file *filep) {
   int row=0, i, j, tmp;
   int digits;
   unsigned char c;
   static unsigned char hex_sym[] = "0123456789abcdef";
+  unsigned char lineContent[60] = {0};
+  int lineIndex = 0;
 
   printk(PR_SS_PROC, PR_LVL_DBG1, "\nprint_elf_file():\n");
-  printk(PR_SS_PROC, PR_LVL_DBG1, "          00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff ");
+  printk(PR_SS_PROC, PR_LVL_DBG1, "          00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff \n");
   for (i=0; i<filep->size; i++) {
 	// now only print several lines
 	if (i >= 16 * 8)
@@ -19,30 +22,44 @@ static void print_elf_file(struct file *filep) {
 
 	if (0 == i%16) {
 	  // print line number
-	  printk(PR_SS_PROC, PR_LVL_DBG1, "\n");
+	  if (0 != lineContent[0]) {
+		lineContent[lineIndex++] = '\n';		
+		printk(PR_SS_PROC, PR_LVL_DBG1, lineContent);
+	  }
+	  memset(lineContent, 0, 60);
+	  lineIndex = 0;
 	  tmp = row;
 	  digits = 0;
 	  do {
 		tmp = tmp / 16;
 		digits ++;
 	  }	while(0 != tmp);
-	  for (j = 0; j < (7-digits); j++)
-		printk(PR_SS_PROC, PR_LVL_DBG1, "0");
+	  for (j = 0; j < (7-digits); j++) {
+		lineContent[lineIndex++] = '0';
+	  }
+
 	  for (j = digits; j >0; j--) {
 		tmp = 0x0f << (4 * (j-1));
 		tmp = row & tmp;
 		tmp = tmp >> (4 * (j-1));
-		printk(PR_SS_PROC, PR_LVL_DBG1, "%c", hex_sym[tmp]);
+		lineContent[lineIndex++] = hex_sym[tmp];
 	  }
-	  printk(PR_SS_PROC, PR_LVL_DBG1, "0: ");
+	  lineContent[lineIndex++] = '0';
+	  lineContent[lineIndex++] = ':';
+	  lineContent[lineIndex++] = ' ';
 	  row++;
 	}
 	c = ((unsigned char *)filep->buf)[i];
 	// print first digit
-	printk(PR_SS_PROC, PR_LVL_DBG1, "%c", hex_sym[(c&0x0f0) >> 4]);
-	printk(PR_SS_PROC, PR_LVL_DBG1, "%c", hex_sym[(c&0x0f)]);
-	printk(PR_SS_PROC, PR_LVL_DBG1, " ");
+	lineContent[lineIndex++] = hex_sym[(c&0x0f0) >> 4];
+	lineContent[lineIndex++] = hex_sym[(c&0x0f)];
+	lineContent[lineIndex++] = ' ';
   }
+  if (0 != lineContent[0]) {
+	lineContent[lineIndex++] = '\n';
+	printk(PR_SS_PROC, PR_LVL_DBG1, lineContent);
+  }
+
 }
 
 static void print_elf_phdr(struct elf_phdr *x) {

@@ -32,43 +32,6 @@ void initialize_process() {
   schedule_initialize();
 }
 
-static int create_process_demo(struct file *filep) {
-  int pid;
-  struct task_struct *task = NULL;
-  // test 
-  static struct task_struct task1, task2;  
-
-  pid = allocate_pid();
-
-  if (pid < 0)
-	return pid;
-
-  if (filep->buf == (void *)0xc4040000) // demo 1
-	task = &task1;
-
-  if (filep->buf == (void *)0xc4080000) // demo 1
-	task = &task2;
-
-  // for test
-  //  task = (struct task_struct *)kmalloc(sizeof(struct task_struct));
-  // test ~
-
-  if (NULL == task)
-	return -1;
-
-  task->pid = pid;
-
-  INIT_LIST_HEAD(&(task->mm.mmap.list));
-  //  task->mm.pgd = (unsigned long)kmalloc(PAGE_SIZE * 4);
-  //  memcpy((void *)task->mm.pgd, (void *)mm_pgd, PAGE_SIZE * 4);
-
-  //  list_add_tail(&task->list, task_list);
-
-  load_elf_binary(filep, NULL, &task->mm);
-
-  return pid;
-  
-}
 
 int create_kernel_thread(int (*fn)(void *)) {
   int pid;
@@ -119,7 +82,7 @@ int create_process(struct file *filep) {
 
   INIT_LIST_HEAD(&(task->sched_en.queue_entry));
 
-  load_elf_binary(filep, NULL, &task->mm);
+  load_elf_binary(filep, &task->regs, &task->mm);
 
   enqueue_task(task, sched_enqueue_flag_new);
 

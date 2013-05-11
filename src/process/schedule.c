@@ -75,5 +75,6 @@ void schedule() {
 	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task != next_task\n", __func__);
 	current_task = next_task;
   }
-  //context_switch(current_task, next_task);
+  
+  //  context_switch(current_task, next_task);
 }

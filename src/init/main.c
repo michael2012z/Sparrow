@@ -27,7 +27,6 @@ void __init store_registers() {
 extern struct file_system_type listfs_file_system_type;
 
 static int __init kernel_init(void *unused) {
-  bootmem_finalize();
 	/*
 	if (!run_init_process("/bin/init"))
 	  return 0;
@@ -40,7 +39,8 @@ static int __init kernel_init(void *unused) {
 }
 
 static int __init kernel_demo(void *unused) {
-	return 0;
+  process_test();
+  return 0;
 }
 
 static void __init rest_init(void) {
@@ -70,8 +70,6 @@ void __init start_kernel(void) {
   printk(PR_SS_INI, PR_LVL_INF, "FS initialization finish.\n");
 
   initialize_process();
-
-  process_test();
 
   printk(PR_SS_INI, PR_LVL_INF, "Process initialization finish.\n");
 
