@@ -6,6 +6,7 @@
 #include <time.h>
 #include <type.h>
 #include <sched.h>
+#include <ptrace.h>
 
 extern union thread_union init_thread_union;
 
@@ -23,6 +24,8 @@ struct task_struct {
   volatile long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
   void *stack;
   unsigned int flags;	/* per process flags, defined below */
+
+  struct pt_regs regs;
 
   unsigned long pgd;
 
@@ -95,6 +98,7 @@ union thread_union {
 
 void process_test();
 void initialize_process();
+int create_kernel_thread(int (*fn)(void *));
 int create_process(struct file *filep);
 void destroy_process(struct task_struct *task);
 

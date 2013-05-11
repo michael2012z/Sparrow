@@ -17,7 +17,7 @@ void __init helloworld(void){
 }
 
 extern unsigned int _kernel_end;
-void store_registers() {
+void __init store_registers() {
 
   asm("mov %0, r7\n"
 	  : "=r"(_kernel_end)
@@ -25,6 +25,29 @@ void store_registers() {
 }
 
 extern struct file_system_type listfs_file_system_type;
+
+static int __init kernel_init(void *unused) {
+  bootmem_finalize();
+	/*
+	if (!run_init_process("/bin/init"))
+	  return 0;
+	else {
+	  printk(PR_SS_INI, PR_LVL_ERR, "Init process can't be created, kernel is killed.\n");
+	  while(1);
+	}
+	*/
+	return 0;
+}
+
+static int __init kernel_demo(void *unused) {
+	return 0;
+}
+
+static void __init rest_init(void) {
+  create_kernel_thread(kernel_init);
+  create_kernel_thread(kernel_demo);
+  cpu_idle();
+}
 
 void __init start_kernel(void) {
   store_registers();
@@ -51,6 +74,8 @@ void __init start_kernel(void) {
   process_test();
 
   printk(PR_SS_INI, PR_LVL_INF, "Process initialization finish.\n");
+
+  rest_init();
 
   printk(PR_SS_INI, PR_LVL_INF, "Kernel is running ...\n");
   while(1);

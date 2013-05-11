@@ -260,8 +260,8 @@ void printk(int ss, int level, const char *fmt, ...)
 	  return;
 	case PR_SS_IRQ:
 	  leading_ss = "IRQ] ";
-	  break;
 	  return;
+	  break;
 	default:
 	  return;
 	}
@@ -277,10 +277,14 @@ void printk(int ss, int level, const char *fmt, ...)
 	  leading_lvl = "[WRN-";
 	  return;
 	  break;
-	case PR_LVL_DBG3:
-	  leading_lvl = "[DBG3-";
+	case PR_LVL_DBG1:
+	  leading_lvl = "[DBG1-";
 	  break;
 	  return;
+	case PR_LVL_DBG3:
+	  leading_lvl = "[DBG3-";
+	  return;
+	  break;
 	default:
 	  return;
 	}
