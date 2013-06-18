@@ -56,6 +56,32 @@ void map_memory_bank(struct membank *bank)
 	flush_mmu();
 }
 
+static inline void clean_pgd_entry(pgd_t *pgd)
+{
+		asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
+			: : "r" (pgd) : "cc");
+
+		asm("mcr	p15, 1, %0, c15, c9, 1  @ L2 flush_pmd"
+			: : "r" (pgd) : "cc");
+}
+
+void pgd_clear(pgd_t *pgdp) {
+  *pgdp = 0;
+  clean_pgd_entry(pgdp);
+}
+
+void prepare_page_table() {
+  /* Map the space before kernel: 0 ~ 3G */
+  for (addr = 0; addr < PAGE_OFFSET; addr += PGDIR_SIZE) {
+    pgd_clear(pgd_offset(addr));
+  }
+  /* The 1st megabytes is not cleared. This is the space that kernel binary is running, it has been mapped by assembly code in the beginning. */
+  for (addr = PAGE_OFFSET + 0x100000; addr <= 0xffe00000; addr += PGDIR_SIZE) {
+    pgd_clear(pgd_offset(addr));
+  }
+
+}
+
 
 /* Page mapping. */
 extern struct page* pages_map;

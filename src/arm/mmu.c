@@ -5,12 +5,13 @@
 #include <printk.h>
 
 
-void flush_pmd_entry(pmd_t *pmd)
+void flush_pgd_entry(pgd_t *pgd)
 {
   asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
-	  : : "r" (pmd) : "cc");
+	  : : "r" (pgd) : "cc");
   asm("mcr p15, 0, %0, c7, c10, 4"
 	  : : "r" (0) : "memory");
+
 }
 
 
