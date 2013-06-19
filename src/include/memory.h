@@ -2,7 +2,12 @@
 #define _MEMORY_H_
 
 #define PAGE_SHIFT		12
-#define PAGE_SIZE		(1<<PAGE_SHIFT)
+#define PAGE_SIZE		(1UL<<PAGE_SHIFT)
+#define PAGE_MASK		(~(PAGE_SIZE-1))
+
+#define SECTION_SHIFT		20
+#define SECTION_SIZE		(1UL<<SECTION_SHIFT)
+#define SECTION_MASK		(~(SECTION_SIZE-1))
 
 #define THREAD_SIZE		8192
 #define THREAD_START_SP		(THREAD_SIZE - 8)
@@ -92,7 +97,9 @@ typedef u32 phys_addr_t;
 /*
  * Tools.
  */
-#define KILOBYTE_SIZE		(1 << 10)
-#define MEGABYTE_SIZE		(1 << 20)
+#define KILOBYTES_SIZE		(1UL << 10)
+#define KILOBYTES_MASK		(~(KILOBYTES_SIZE-1))
+#define MEGABYTES_SIZE		(1UL << 20)
+#define MEGABYTES_MASK		(~(MEGABYTES_SIZE-1))
 
 #endif
