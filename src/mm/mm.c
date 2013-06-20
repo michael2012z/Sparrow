@@ -29,23 +29,28 @@ static void create_mapping_section (unsigned long physical, unsigned long virtua
   flush_pgd_entry();
 }
 
+/* Each PT contains 256 items, and take 1K memory. But the size of each page is 4K, so each page hold 4 page table.
+ * Here we're different from Linux, in which a page contains 2 linux tables and 2 hardware tables. As we don't support page swap in/out, so we don't need any extra information besides the hardware pagetable.
+ */
 static void create_mapping_page (unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(mm, virtual);
   pte_t *pte;
   if (NULL == *pgd) {
     /* populate pgd */
     pte == alloc one page memory;
-    /* As 2 continuous pgd points to a same page table, so need to differ is current pgd the 1st one or 2nd.  */
-    pgd_t *aligned_pgd = pgd;
-    if (virtual & SECTION_SIZE)
-      aligned_pgd -= 1;
+    /* 4 continuous page table fall in the same page. */
+    pgd_t *aligned_pgd = pgd & PAGE_MASK;
 
-    aligned_pgd[0] = __pa(pte) | property;
-    aligned_pgd[1] = (__pa(pte) + 256 * sizeof(pte_t)) | property;
-    flush_pgd_entry(aligned_pgd);
+	int i = 0;
+	for (; i < 4; i++) {
+	  aligned_pgd[i] = (__pa(pte) + i * 256 * sizeof(pte_t)) | property;
+	  flush_pgd_entry(aligned_pgd[i]);
+	}
   }
   
   /* populate pte */
+  pte = pte_offset_kernel(pmd, addr);
+  *pte = ;
 
 }
 
@@ -53,7 +58,7 @@ static void create_mapping(struct map_desc *md) {
   switch(md->type) {
   case MAP_DESC_TYPE_SECTION:
     /* Physical/virtual address and length have to be aligned to 1M. */
-    if ((md->physical & SECTION_MASK) || (md->virtual & SECTION_MASK) || (md->length & SECTION_MASK)) {
+    if ((md->physical & (~SECTION_MASK)) || (md->virtual & (~SECTION_MASK)) || (md->length & (~SECTION_MASK))) {
       /* error */
       return;
     } else {
@@ -68,7 +73,7 @@ static void create_mapping(struct map_desc *md) {
     break;
   case MAP_DESC_TYPE_PAGE:
     /* Physical/virtual address and length have to be aligned to 4K. */
-    if ((md->physical & PAGE_MASK) || (md->virtual & PAGE_MASK) || (md->length & PAGE_MASK)) {
+    if ((md->physical & (~PAGE_MASK)) || (md->virtual & (~PAGE_MASK)) || (md->length & (~PAGE_MASK))) {
       /* error */
       return;
     } else {
@@ -95,6 +100,27 @@ static void map_low_memory() {
   map.type = MAP_DESC_TYPE_SECTION;
   create_mapping(&map);
 }
+
+static void map_vector_memory() {
+  struct map_desc map;
+  /* Alloc a page from bootmem, and get the physical address. */
+  map.physical = ;
+  map.virtual = EXCEPTION_BASE;
+  map.length = PAGE_SIZE;
+  map.type = MAP_DESC_TYPE_PAGE;
+  create_mapping(&map);
+}
+
+static void map_debug_memory() {
+  struct map_desc map;
+  /* Alloc a page from bootmem, and get the physical address. */
+  map.physical = ;
+  map.virtual = ;
+  map.length = PAGE_SIZE;
+  map.type = MAP_DESC_TYPE_PAGE;
+  create_mapping(&map);
+}
+
 
 void mm_init() {
   mm_pgd = PAGE_OFFSET + PAGE_TABLE_OFFSET;
