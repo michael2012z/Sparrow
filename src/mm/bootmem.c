@@ -7,7 +7,10 @@
  * Each byte stands for a 4K page.
  * Totally (0x50004000 - 0x50000000) * 4K= 64M can be mapped.
  * If the byte is 0x00, the page is free.
- * If the byte is 0xff, the page is reserved.
+ * If the byte is non zero, the page is reserved:
+ *   If the value is between (0 ~ 0xff), this is the beginning byte of a continuous allocation, 
+ *      the value is the number of allocated pages.
+ *   If the value is 0xff, this is not the beginning byte of the continuous allocation.
  */
 
 unsigned int _kernel_end = 0;
@@ -34,7 +37,7 @@ void bootmem_initialize() {
   for (; i < BOOTMEM_MAP_SIZE; i++) {
 	map_item[i] = (unsigned char)0xff;
   }
-  
+
 }
 
 /* size = count of pages */
@@ -56,15 +59,17 @@ void *bootmem_alloc(int pages) {
 	  for (; cont>0; cont--) {
 		map_item[i - pages + cont] = 0xff;
 	  }
+	  map_item[i - pages + 1] = 0xff & pages;
 	  return (void*)(PAGE_OFFSET + (i - (pages - 1)) * PAGE_SIZE);
 	}
   }
   return NULL;
 }
 
-void bootmem_free(void *addr, int pages) {
+void bootmem_free(void *addr) {
   int page_index = ((unsigned long)addr - PAGE_OFFSET)/PAGE_SIZE;
   unsigned char *map_item = (unsigned char *)PAGE_OFFSET; 
+  int pages = map_item[page_index];
   for (; pages>0; pages--) {
 	map_item[page_index + pages - 1] = 0x00;
   }

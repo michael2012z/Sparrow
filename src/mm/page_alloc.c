@@ -114,6 +114,7 @@ void page_alloc_init() {
 	nr_free += pages;
   }
   printk(PR_SS_MM, PR_LVL_DBG2, "total pages in free list: %x\n", nr_free);
+
 }
 
 

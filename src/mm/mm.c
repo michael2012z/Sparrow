@@ -1,8 +1,7 @@
 #include <type.h>
 #include "mem_bank.h"
 #include "mem_map.h"
-#include "bootmem.h"
-#include "page_alloc.h"
+#include "alloc.h"
 
 unsigned long mm_pgd;
 
@@ -123,12 +122,17 @@ static void map_debug_memory() {
 
 
 void mm_init() {
+  boot_alloc_ready = false;
+  page_alloc_ready = false;
+  slab_alloc_ready = false;
+
   mm_pgd = PAGE_OFFSET + PAGE_TABLE_OFFSET;
   /* clear the page table at first*/
   prepare_page_table();
   /* map main memory, lowmem in linux */
   map_low_memory();
   bootmem_initialize();
+  boot_alloc_ready = true;
   
   /* map vector page */
   map_vector_page();
@@ -140,10 +144,13 @@ void mm_init() {
 
   page_alloc_init();
   //  pages_alloc_test();
+  page_alloc_ready = true;
 
   bootmem_finalize();
+  boot_alloc_ready = false;
 
   slab_alloc_init();
+  slab_alloc_ready = true;
   //  slab_alloc_test();
 
 

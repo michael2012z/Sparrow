@@ -108,6 +108,7 @@ void slab_alloc_init() {
 	slabset_grow(&(kcache_array[i].empty_set));
 #endif
   }
+
 }
 
 /* get the first slab of slabs */

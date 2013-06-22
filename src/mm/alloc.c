@@ -1,7 +1,5 @@
 #include <type.h>
 #include <mm.h>
-#include "page_alloc.h"
-#include "slab_alloc.h"
 #include <printk.h>
 #ifdef __ARCH_X86__
 #include <stdio.h>
@@ -12,7 +10,11 @@
 void* kmalloc(int size) {
   if (size <= 0)
 	return NULL;
-  else if (size <= (PAGE_SIZE/2)) {
+  else if ((boot_alloc_ready == true) && (page_alloc_ready == false) && (slab_alloc_ready ==false)) {
+	printk(PR_SS_MM, PR_LVL_DBG4, "boot allocator is choosen to allocate %d bytes\n", size);
+	int n = (size + PAGE_SIZE - 1)/PAGE_SIZE;
+	return bootmem_alloc(n);
+  } else if (size <= (PAGE_SIZE/2)) {
 	printk(PR_SS_MM, PR_LVL_DBG4, "slab allocator is choosen to allocate %d bytes\n", size);
 	return (void*)slab_alloc(size);
   } else {
@@ -38,15 +40,19 @@ void kfree(void *p) {
 	return;
   }
   else {
-	struct page *pg, *buddy;
-	pg = (struct page*)virtual_to_page(p);
-	buddy = (struct page*)page_to_buddy(pg);
-	if ((NULL == buddy->manage.prev) && (NULL == buddy->manage.next)) {
-	  printk(PR_SS_MM, PR_LVL_DBG3, "returned memory %x was allocated by page allocator\n", (unsigned int)p);
-	  pages_free(buddy);
+	if ((boot_alloc_ready == true) && (page_alloc_ready == false) && (slab_alloc_ready ==false)) {
+	  bootmem_free(p);
 	} else {
-	  printk(PR_SS_MM, PR_LVL_DBG5, "returned memory %x was allocated by slab allocator\n", (unsigned int)p);
-	  slab_free(p);
+	  struct page *pg, *buddy;
+	  pg = (struct page*)virtual_to_page(p);
+	  buddy = (struct page*)page_to_buddy(pg);
+	  if ((NULL == buddy->manage.prev) && (NULL == buddy->manage.next)) {
+		printk(PR_SS_MM, PR_LVL_DBG3, "returned memory %x was allocated by page allocator\n", (unsigned int)p);
+		pages_free(buddy);
+	  } else {
+		printk(PR_SS_MM, PR_LVL_DBG5, "returned memory %x was allocated by slab allocator\n", (unsigned int)p);
+		slab_free(p);
+	  }
 	}
   }
 }
