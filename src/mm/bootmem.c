@@ -24,18 +24,15 @@ void bootmem_initialize() {
   printk(PR_SS_MM, PR_LVL_DBG0, "_kernel_end = %x, kernel_end_pages = %d, BOOTMEM_MAP_SIZE = %d\n", _kernel_end, kernel_end_pages, BOOTMEM_MAP_SIZE);
 
   /* kernel image, occupied */
-  for (i = 0; i < kernel_end_pages; i++) {
+  i = 0;
+  map_item[i++] = (unsigned char)kernel_end_pages;
+  for (; i < kernel_end_pages; i++) {
 	map_item[i] = (unsigned char)0xff;
   }
 
   /* free area */
-  for (; i < (BOOTMEM_MAP_SIZE - EXCEPTION_PAGES); i++) {
+  for (; i < (BOOTMEM_MAP_SIZE); i++) {
 	map_item[i] = (unsigned char)0x00;
-  }
-
-  /* last section is for exception, occupied */
-  for (; i < BOOTMEM_MAP_SIZE; i++) {
-	map_item[i] = (unsigned char)0xff;
   }
 
 }
@@ -49,19 +46,19 @@ void *bootmem_alloc(int pages) {
 	return NULL;
   
   for (i=0; i<BOOTMEM_MAP_SIZE; i++) {
-	if (0x00 == map_item[i]) {
-	  cont ++;
-	} else {
-	  cont = 0;
-	}
-	if (cont == pages) {
-	  printk(PR_SS_MM, PR_LVL_DBG0, "i = %d, cont = %d\n", i ,cont);
-	  for (; cont>0; cont--) {
-		map_item[i - pages + cont] = 0xff;
-	  }
-	  map_item[i - pages + 1] = 0xff & pages;
-	  return (void*)(PAGE_OFFSET + (i - (pages - 1)) * PAGE_SIZE);
-	}
+    if (0x00 == ((unsigned char))map_item[i]) {
+      cont ++;
+    } else {
+      cont = 0;
+    }
+    if (cont == pages) {
+      printk(PR_SS_MM, PR_LVL_DBG0, "i = %d, cont = %d\n", i ,cont);
+      for (; cont>0; cont--) {
+	map_item[i - pages + cont] = (unsigned char)0xff;
+      }
+      map_item[i - pages + 1] = (unsigned char)(0xff & pages);
+      return (void*)(PAGE_OFFSET + (i - (pages - 1)) * PAGE_SIZE);
+    }
   }
   return NULL;
 }
