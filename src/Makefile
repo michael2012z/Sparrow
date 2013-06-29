@@ -9,7 +9,7 @@ NM	:= $(CROSS_COMPILE)nm
 
 IFLAGS	:= -I$(CURDIR)/include -isystem $(shell $(CC) -print-file-name=include)
 IFLAGS	+= -I$(CURDIR)/arm/include -I$(CURDIR)
-CFLAGS	:= -c -Werror -g -nostdinc -D__KERNEL__ -mlittle-endian -D__LINUX_ARM_ARCH__=6 
+CFLAGS	:= -c -Werror -Wall -g -nostdinc -D__KERNEL__ -mlittle-endian -D__LINUX_ARM_ARCH__=6 
 #-DSLAB_OPTIMIZE
 # -D__LINUX_ARM_ARCH__=6 -march=armv6k -mtune=arm1136j-s -mabi=aapcs-linux -mno-thumb-interwork -msoft-float 
 AFLAGS	:= $(CFLAGS) -D__ASSEMBLY__

@@ -153,6 +153,112 @@ __create_page_tables:
 	.endif
 	str	r6, [r0]
 
+
+
+
+	/*
+	 * Map 64M memory:
+	 * Physical memory between 0x5000 0000 ~ 0x5400 0000
+	 * Virtual memory between  0xC000 0000 ~ 0xC400 0000
+	 */
+	mov r3, #0 /* r3 is index*/
+1:	mov r0, r3, lsl #20
+	add r0, r0, #PAGE_OFFSET
+	mov r0, r0, lsr #18
+	add	r0, r0, r4
+	/* r0 hold the address of mapping table item for target section */
+	mov r6, r3, lsl #20
+	add r6, r6, #PHYS_OFFSET
+	/* r6 hold the section address */
+	orr	r6, r7, r6
+	str	r6, [r0]
+	add r3, #1
+	teq r3, #64
+	bne 1b
+
+
+	/* Last megabytes was mapped twice, it's also mapped to 0xfff00000 */
+	/* Map 64th M memory to 0xfff00000, it's for interrupt vector table.
+	 */
+	/* now r3 equals 63, it's the index of last section  */
+	mov r3, #63 /* r3 is index*/
+	mov r0, #0xff000000
+	orr r0, r0, #0xf00000 /* don't know why can't mov 0xfff00000 to r6 directly */
+	mov r0, r0, lsr #18
+	add	r0, r0, r4
+	/* r0 hold the address of mapping table item for target section */
+	mov r6, r3, lsl #20
+	add r6, r6, #PHYS_OFFSET
+	/* r6 hold the section address */
+	orr	r6, r7, r6
+	str	r6, [r0]
+
+
+	/*
+	 * Map another 64M memory for ListFS archived file:
+	 * Physical memory between 0x5800 0000 ~ 0x5C00 0000
+	 * Virtual memory between  0xC800 0000 ~ 0xCC00 0000
+	 * The mapping section index is between 128 ~ 191
+	 */
+	mov r3, #128 /* r3 is index*/
+1:	mov r0, r3, lsl #20
+	add r0, r0, #PAGE_OFFSET
+	mov r0, r0, lsr #18
+	add	r0, r0, r4
+	/* r0 hold the address of mapping table item for target section */
+	mov r6, r3, lsl #20
+	add r6, r6, #PHYS_OFFSET
+	/* r6 hold the section address */
+	orr	r6, r7, r6
+	str	r6, [r0]
+	add r3, #1
+	teq r3, #191
+	bne 1b
+
+
+
+	/*
+	 * Map the 1M from 0x71200000 to 0xe1200000, that is for VIC0.
+	 */
+	ldr	r0, =((0xe1200000) >> 18)
+	add	r0, r4, r0
+	/* r0 hold the address of mapping item for 0xe1200000 */
+	ldr r6, =(0x71200000)
+	orr	r6, r7, r6
+	str	r6, [r0]
+
+	/*
+	 * Map the 1M from 0x71300000 to 0xe1300000, that is for VIC1.
+	 */
+	ldr	r0, =((0xe1300000) >> 18)
+	add	r0, r4, r0
+	/* r0 hold the address of mapping item for 0xe1300000 */
+	ldr r6, =(0x71300000)
+	orr	r6, r7, r6
+	str	r6, [r0]
+
+
+	/* Note: Map 1M more to store user program.
+	 * This is the 64th Megabytes.
+	 * Map from 0x54000000 to 0xc4000000
+	 */
+	ldr	r0, =((0xc4000000) >> 18)
+	add	r0, r4, r0
+	/* r0 hold the address of mapping item for 0xc4000000 */
+	ldr r6, =(0x54000000)
+	orr	r6, r7, r6
+	str	r6, [r0]
+
+
+	/*
+	 * Map the 1M contains 0x7f005020 to debug.
+	 */
+	add	r0, r4, #((0xef005020) >> 18)
+	/* r0 hold the address of mapping item for 0xef000000 */
+	orr	r6, r7, #0x7f000000
+	str	r6, [r0]
+
+
 	/* Mapping result:
 	 * 0xC000 0000  ->  0x5000 0000 (size = kernel size)
 	 * 0x5000 0000  ->  0x5000 0000 (size = 1M)

@@ -194,6 +194,7 @@ int set_irq_flags(unsigned int irq, unsigned int iflags);
 
 
 int setup_irq(unsigned int irq, struct irqaction *act);
+void generic_handle_irq(unsigned int irq);
 void handle_level_irq(unsigned int irq, struct irq_desc *desc);
 
 

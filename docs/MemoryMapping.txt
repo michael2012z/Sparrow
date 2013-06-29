@@ -7,7 +7,48 @@ Layout of physical memory:
     Physical                               Virtual
     Memory                                 Memory
 
-    0x5C000000  +----------------+    ---> ListFS Image End(0xCC000000)
+// draft
+
+    0xXXXXXXXX  +----------------+    ---> Debug Page End (0x)
+                |                |
+                |  Vector Page   |
+                |       4K       |
+                |                |
+    0xXXXXXXXX  +----------------+    ---> Debug Page Start (0x)
+
+    0xXXXXXXXX  +----------------+    ---> VIC Page End (0x)
+                |                |
+                |  Vector Page   |
+                |       4K       |
+                |                |
+    0xXXXXXXXX  +----------------+    ---> VIC Page Start (0x)
+
+
+// draft ~
+
+
+
+
+
+
+    0xXXXXXXXX  +----------------+    ---> Vector Page End (0xFFFF1000)
+                |                |
+                |  Vector Page   |
+                |       4K       |
+                |                |
+    0xXXXXXXXX  +----------------+    ---> Vector Page Start (0xFFFF0000)
+                |................|
+                |................|
+                |................|
+                |................|
+                |................|
+                |     ......     |
+                |................|
+                |................|
+                |................|
+                |................|
+                |................|
+    0x5C000000  +----------------+    ---> ListFS Image End (0xCC000000)
                 |                |
                 |                |
                 |                |

@@ -68,8 +68,8 @@ static void __init s3c6410_init_irq(void)
   printk(PR_SS_IRQ, PR_LVL_INF, "%s: initialising interrupts\n", __func__);
 
   /* initialise the pair of VICs */
-  vic_init(VA_VIC0, IRQ_VIC0_BASE, vic0_valid);
-  vic_init(VA_VIC1, IRQ_VIC1_BASE, vic1_valid);
+  vic_init((void *)VA_VIC0, IRQ_VIC0_BASE, vic0_valid);
+  vic_init((void *)VA_VIC1, IRQ_VIC1_BASE, vic1_valid);
 
   /* add the timer sub-irqs */
   /* comment out timer 0 ~ 3 */

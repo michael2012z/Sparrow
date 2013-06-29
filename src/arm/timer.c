@@ -2,6 +2,7 @@
 #include <interrupt.h>
 #include <irq.h>
 #include <printk.h>
+#include <timer.h>
 
 /* We assume the IRQ_TIMER0..IRQ_TIMER4 range is continuous. */
 

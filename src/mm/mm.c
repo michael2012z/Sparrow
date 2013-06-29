@@ -24,8 +24,15 @@ static inline void flush_pgd_entry(pgd_t *pgd)
 
 static void create_mapping_section (unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(mm, virtual);
-  *pgd = (pgd_t)(physical | 0x40e);
+  *pgd = (pgd_t)(physical | 0x031);
   flush_pgd_entry();
+}
+
+
+static pte_t *pte_offset(pgd_t *pgd, unsigned long virtual) {
+  pte_t *pt_base = *pgd & KILOBYTES_MASK;
+  int index = (virtual & SECTION_MASK) >> PAGE_SHIFT;
+  return (pt_base + index);
 }
 
 /* Each PT contains 256 items, and take 1K memory. But the size of each page is 4K, so each page hold 4 page table.
@@ -36,20 +43,20 @@ static void create_mapping_page (unsigned long physical, unsigned long virtual) 
   pte_t *pte;
   if (NULL == *pgd) {
     /* populate pgd */
-    pte == alloc one page memory;
+    pte == kmalloc(PAGE_SIZE);
     /* 4 continuous page table fall in the same page. */
     pgd_t *aligned_pgd = pgd & PAGE_MASK;
 
 	int i = 0;
 	for (; i < 4; i++) {
-	  aligned_pgd[i] = (__pa(pte) + i * 256 * sizeof(pte_t)) | property;
+	  aligned_pgd[i] = (__pa(pte) + i * 256 * sizeof(pte_t)) | 0x01;
 	  flush_pgd_entry(aligned_pgd[i]);
 	}
   }
   
   /* populate pte */
-  pte = pte_offset_kernel(pmd, addr);
-  *pte = ;
+  pte = pte_offset(pgd, virtual);
+  *pte = (physical & (~PAGE_MASK)) | 0x032;
 
 }
 
@@ -64,9 +71,9 @@ static void create_mapping(struct map_desc *md) {
       unsigned long physical = md->physical; 
       unsigned long virtual = md->virtual;
       while (virtual < (md->virtual + md->length)) {
-	create_mapping_section(physical, virtual);
-	physical += SECTION_SIZE;
-	virtual += SECTION_SIZE;
+		create_mapping_section(physical, virtual);
+		physical += SECTION_SIZE;
+		virtual += SECTION_SIZE;
       }
     }
     break;
@@ -79,9 +86,9 @@ static void create_mapping(struct map_desc *md) {
       unsigned long physical = md->physical; 
       unsigned long virtual = md->virtual;
       while (virtual < (md->virtual + md->length)) {
-	create_mapping_page(physical, virtual);
-	physical += PAGE_SIZE;
-	virtual += PAGE_SIZE;
+		create_mapping_page(physical, virtual);
+		physical += PAGE_SIZE;
+		virtual += PAGE_SIZE;
       }
     }
     break;
@@ -103,21 +110,40 @@ static void map_low_memory() {
 static void map_vector_memory() {
   struct map_desc map;
   /* Alloc a page from bootmem, and get the physical address. */
-  map.physical = ;
+  map.physical = _pa(kmalloc(PAGE_SIZE));
   map.virtual = EXCEPTION_BASE;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
   create_mapping(&map);
 }
 
+extern void * _debug_output_io;
+
 static void map_debug_memory() {
   struct map_desc map;
-  /* Alloc a page from bootmem, and get the physical address. */
-  map.physical = ;
-  map.virtual = ;
+  map.physical = 0x7f005020 & (~PAGE_MASK);
+  map.virtual = kmalloc(PAGE_SIZE);
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
   create_mapping(&map);
+  _debug_output_to = (map.virtual & (~PAGE_MASK)) | (0x7f005020 & PAGE_MASK);
+}
+
+static void map_vic_memory() {
+  struct map_desc map;
+  /* VIC0 */
+  map.physical = 0x71200000;
+  map.virtual = 0xe1200000;
+  map.length = SECTION_SIZE;
+  map.type = MAP_DESC_TYPE_SECTION;
+  create_mapping(&map);
+  /* VIC1 */
+  map.physical = 0x71300000;
+  map.virtual = 0xe1300000;
+  map.length = SECTION_SIZE;
+  map.type = MAP_DESC_TYPE_SECTION;
+  create_mapping(&map);
+
 }
 
 
@@ -138,6 +164,8 @@ void mm_init() {
   map_vector_page();
   /* map debug page */
   map_debug_page();
+  /* map VIC page */
+  map_vic_page();
 
   //  bootmem_test();
   init_pages_map();
