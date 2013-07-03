@@ -51,8 +51,15 @@ static void __init rest_init(void) {
 }
 
 void __init start_kernel(void) {
+
+  printk(PR_SS_INI, PR_LVL_INF, "Enter start_kernel().\n");
+
   store_registers();
+  printk(PR_SS_INI, PR_LVL_INF, "Enter registers stored.\n");
+
   exception_disable();
+  printk(PR_SS_INI, PR_LVL_INF, "Enter irq diabled.\n");
+
   mm_init();
 
   printk(PR_SS_INI, PR_LVL_INF, "MM initialization finish.\n");

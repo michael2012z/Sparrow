@@ -72,7 +72,8 @@ void __put_char(char *p,int num){
 #else
 void __put_char(char *p,int num){
 	while(*p&&num--){
-		*(volatile unsigned int *)0xef005020=*p++;
+	  /* *(volatile unsigned int *)_debug_output_io=*p++; */
+	  *(volatile unsigned int *)0xef005020=*p++; 
 	};
 }
 #endif
@@ -255,6 +256,7 @@ void printk(int ss, int level, const char *fmt, ...)
 	  return;
 	case PR_SS_MM:
 	  leading_ss = "MM] ";
+	  break;
 	  return;
 	case PR_SS_PROC:
 	  leading_ss = "PROC] ";
@@ -286,6 +288,9 @@ void printk(int ss, int level, const char *fmt, ...)
 	case PR_LVL_DBG3:
 	  leading_lvl = "[DBG3-";
 	  return;
+	  break;
+	case PR_LVL_DBG7:
+	  leading_lvl = "[DBG7-";
 	  break;
 	default:
 	  return;

@@ -32,7 +32,8 @@
  *   DBG3 -- Page Allocator de-allocation
  *   DBG4 -- Slab Allocator initialization and allocation
  *   DBG5 -- Slab Allocator de-allocation
- *   DBG6 -- Memory Mapping
+ *   DBG6 -- Paging
+ *   DBG7 -- Memory Mapping/MMU operation
  *
  * File System (FS):
  *   DBG0 -- Mount

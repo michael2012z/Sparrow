@@ -153,6 +153,14 @@ __create_page_tables:
 	.endif
 	str	r6, [r0]
 
+
+	/* This is for temp use.
+	 * Map the 1M contains 0x7f005020 to debug.
+	 */
+	add	r0, r4, #((0xef005020) >> 18)
+	/* r0 hold the address of mapping item for 0xef000000 */
+	orr	r6, r7, #0x7f000000
+	str	r6, [r0]
 	/* Mapping result:
 	 * 0xC000 0000  ->  0x5000 0000 (size = kernel size)
 	 * 0x5000 0000  ->  0x5000 0000 (size = 1M)

@@ -3,6 +3,7 @@
 #include "mem_map.h"
 #include "alloc.h"
 #include <mm.h>
+#include <printk.h>
 
 unsigned long mm_pgd;
 
@@ -28,7 +29,7 @@ static inline void flush_pgd_entry(pgd_t *pgd)
 }
 
 static void create_mapping_section (unsigned long physical, unsigned long virtual) {
-  pgd_t *pgd = pgd_offset(mm_pgd, virtual);
+  pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
   *pgd = (pgd_t)(physical | 0x031);
   flush_pgd_entry(pgd);
 }
@@ -44,7 +45,7 @@ static pte_t *pte_offset(pgd_t *pgd, unsigned long virtual) {
  * Here we're different from Linux, in which a page contains 2 linux tables and 2 hardware tables. As we don't support page swap in/out, so we don't need any extra information besides the hardware pagetable.
  */
 static void create_mapping_page (unsigned long physical, unsigned long virtual) {
-  pgd_t *pgd = pgd_offset(mm_pgd, virtual);
+  pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
   pte_t *pte;
   if (NULL == *pgd) {
     /* populate pgd */
@@ -65,12 +66,20 @@ static void create_mapping_page (unsigned long physical, unsigned long virtual) 
 
 }
 
+static void print_map_desc(struct map_desc *map) {
+  printk(PR_SS_MM, PR_LVL_DBG7, "print_map_desc(): md = %x\n", map);  
+  printk(PR_SS_MM, PR_LVL_DBG7, "physical = %x, virtual = %x, length = %x, type = %x\n", map->physical, map->virtual, map->length, map->type);  
+}
+
 static void create_mapping(struct map_desc *md) {
+  printk(PR_SS_MM, PR_LVL_DBG7, "create_mapping():\n");
+  print_map_desc(md);
   switch(md->type) {
   case MAP_DESC_TYPE_SECTION:
     /* Physical/virtual address and length have to be aligned to 1M. */
     if ((md->physical & (~SECTION_MASK)) || (md->virtual & (~SECTION_MASK)) || (md->length & (~SECTION_MASK))) {
       /* error */
+	  printk(PR_SS_MM, PR_LVL_ERROR, "create_mapping(): section map_desc data not aligned \n");
       return;
     } else {
       unsigned long physical = md->physical; 
@@ -86,6 +95,7 @@ static void create_mapping(struct map_desc *md) {
     /* Physical/virtual address and length have to be aligned to 4K. */
     if ((md->physical & (~PAGE_MASK)) || (md->virtual & (~PAGE_MASK)) || (md->length & (~PAGE_MASK))) {
       /* error */
+	  printk(PR_SS_MM, PR_LVL_ERROR, "create_mapping(): page map_desc data not aligned \n");
       return;
     } else {
       unsigned long physical = md->physical; 
@@ -158,11 +168,18 @@ void mm_init() {
   slab_alloc_ready = false;
 
   mm_pgd = PAGE_OFFSET + PAGE_TABLE_OFFSET;
+  printk(PR_SS_MM, PR_LVL_DBG7, "mm_init(): mm_pgd = %x\n", mm_pgd);
   /* clear the page table at first*/
   prepare_page_table();
+  printk(PR_SS_MM, PR_LVL_DBG7, "mm_init(): page table prepared\n");
+
   /* map main memory, lowmem in linux */
   map_low_memory();
+  printk(PR_SS_MM, PR_LVL_DBG7, "mm_init(): low memory mapped\n");
+
   bootmem_initialize();
+  printk(PR_SS_MM, PR_LVL_DBG7, "mm_init(): boot memory allocator initialized\n");
+
   boot_alloc_ready = true;
   
   /* map vector page */

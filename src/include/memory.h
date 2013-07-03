@@ -89,7 +89,7 @@ typedef u32 phys_addr_t;
 
 /* to find an entry in a page-table-directory */
 #define pgd_index(addr)		((addr) >> PGDIR_SHIFT)
-#define pgd_offset(pgd, addr)	((pgd_t *)(pgd + pgd_index(addr)))
+#define pgd_offset(pgd, addr)	((pgd_t *)(((pgd_t *)pgd) + pgd_index(addr)))
 
 #define pte_index(addr)		(((addr) >> PAGE_SHIFT) & (PTRS_PER_PTE - 1))
 

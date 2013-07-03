@@ -28,11 +28,16 @@ void prepare_page_table() {
   unsigned long addr;
   /* Map the space before kernel: 0 ~ 3G */
   for (addr = 0; addr < PAGE_OFFSET; addr += PGDIR_SIZE) {
-    pgd_clear(pgd_offset(mm_pgd, addr));
+    pgd_clear(pgd_offset(((pgd_t *)mm_pgd), addr));
   }
   /* The 1st megabytes is not cleared. This is the space that kernel binary is running, it has been mapped by assembly code in the beginning. */
   for (addr = PAGE_OFFSET + 0x100000; addr <= 0xffe00000; addr += PGDIR_SIZE) {
-    pgd_clear(pgd_offset(mm_pgd, addr));
+	/* As temporary solution, so must jump over debug io mapping here. */
+	if (addr == 0xef000000) {
+	  printk(PR_SS_MM, PR_LVL_DBG7, "prepare_page_table(): jump over debug io section: %x\n", addr);
+	  continue;
+	}
+    pgd_clear(pgd_offset(((pgd_t *)mm_pgd), addr));
   }
 
 }
