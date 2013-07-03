@@ -3,7 +3,7 @@
 
 void bootmem_initialize();
 void *bootmem_alloc(int pages);
-void bootmem_free(void *addr, int pages);
+void bootmem_free(void *addr);
 void bootmem_finalize();
 void bootmem_test();
 

@@ -15,6 +15,7 @@ struct page {
 
 
 void mm_init();
+void prepare_page_table();
 
 void* kmalloc(int size);
 

@@ -6,6 +6,8 @@
 #include "bootmem.h"
 #include <printk.h>
 
+extern unsigned long mm_pgd;
+
 static inline void clean_pgd_entry(pgd_t *pgd)
 {
   asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
@@ -23,13 +25,14 @@ void pgd_clear(pgd_t *pgdp) {
 }
 
 void prepare_page_table() {
+  unsigned long addr;
   /* Map the space before kernel: 0 ~ 3G */
   for (addr = 0; addr < PAGE_OFFSET; addr += PGDIR_SIZE) {
-    pgd_clear(pgd_offset(addr));
+    pgd_clear(pgd_offset(mm_pgd, addr));
   }
   /* The 1st megabytes is not cleared. This is the space that kernel binary is running, it has been mapped by assembly code in the beginning. */
   for (addr = PAGE_OFFSET + 0x100000; addr <= 0xffe00000; addr += PGDIR_SIZE) {
-    pgd_clear(pgd_offset(addr));
+    pgd_clear(pgd_offset(mm_pgd, addr));
   }
 
 }

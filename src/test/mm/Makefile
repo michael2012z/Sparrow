@@ -2,7 +2,7 @@
 CFLAGS	+= -I$(CURDIR)/../../mm
 src_dir := ../../mm
 
-objects	:= test.o page.o alloc-test-common.o page_alloc.o page_alloc-test.o slab_alloc.o slab_alloc-test.o alloc.o alloc-test.o
+objects	:= test.o page.o alloc-test-common.o bootmem.o page_alloc.o page_alloc-test.o slab_alloc.o slab_alloc-test.o alloc.o alloc-test.o
 
 all: $(BUILTIN)
 

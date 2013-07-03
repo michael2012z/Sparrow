@@ -1,10 +1,16 @@
 #include <type.h>
 #include <mm.h>
 #include <printk.h>
+#include "alloc.h"
+#include "page.h"
 #ifdef __ARCH_X86__
 #include <stdio.h>
 #include <stdlib.h>
 #endif
+
+bool boot_alloc_ready = false;
+bool page_alloc_ready = false;
+bool slab_alloc_ready = false;
 
 
 void* kmalloc(int size) {

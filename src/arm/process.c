@@ -1,6 +1,7 @@
 #include <ptrace.h>
 #include <string.h>
 #include "head.h"
+#include <printk.h>
 
 void start_thread(struct pt_regs *regs, unsigned long pc, unsigned long sp) {
 	unsigned long *stack = (unsigned long *)sp;
@@ -48,7 +49,8 @@ void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs
 
 
 void cpu_idle() {
-
+  printk(PR_SS_INI, PR_LVL_ERROR, "cpu_idle() \n");
+  while(1) {}
   /* Should call cpu founction:
 ENTRY(cpu_v6_do_idle)
 	mov	r1, #0

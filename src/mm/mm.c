@@ -1,9 +1,14 @@
 #include <type.h>
-#include "mem_bank.h"
+#include <memory.h>
 #include "mem_map.h"
 #include "alloc.h"
+#include <mm.h>
 
 unsigned long mm_pgd;
+
+extern bool boot_alloc_ready;
+extern bool page_alloc_ready;
+extern bool slab_alloc_ready;
 
 
 #define dsb() __asm__ __volatile__ ("mcr p15, 0, %0, c7, c10, 4" \
@@ -23,14 +28,14 @@ static inline void flush_pgd_entry(pgd_t *pgd)
 }
 
 static void create_mapping_section (unsigned long physical, unsigned long virtual) {
-  pgd_t *pgd = pgd_offset(mm, virtual);
+  pgd_t *pgd = pgd_offset(mm_pgd, virtual);
   *pgd = (pgd_t)(physical | 0x031);
-  flush_pgd_entry();
+  flush_pgd_entry(pgd);
 }
 
 
 static pte_t *pte_offset(pgd_t *pgd, unsigned long virtual) {
-  pte_t *pt_base = *pgd & KILOBYTES_MASK;
+  pte_t *pt_base = (pte_t *)(*pgd & KILOBYTES_MASK);
   int index = (virtual & SECTION_MASK) >> PAGE_SHIFT;
   return (pt_base + index);
 }
@@ -39,18 +44,18 @@ static pte_t *pte_offset(pgd_t *pgd, unsigned long virtual) {
  * Here we're different from Linux, in which a page contains 2 linux tables and 2 hardware tables. As we don't support page swap in/out, so we don't need any extra information besides the hardware pagetable.
  */
 static void create_mapping_page (unsigned long physical, unsigned long virtual) {
-  pgd_t *pgd = pgd_offset(mm, virtual);
+  pgd_t *pgd = pgd_offset(mm_pgd, virtual);
   pte_t *pte;
   if (NULL == *pgd) {
     /* populate pgd */
-    pte == kmalloc(PAGE_SIZE);
+    pte = kmalloc(PAGE_SIZE);
     /* 4 continuous page table fall in the same page. */
-    pgd_t *aligned_pgd = pgd & PAGE_MASK;
+    pgd_t *aligned_pgd = (pgd_t *)((unsigned long)pgd & PAGE_MASK);
 
 	int i = 0;
 	for (; i < 4; i++) {
-	  aligned_pgd[i] = (__pa(pte) + i * 256 * sizeof(pte_t)) | 0x01;
-	  flush_pgd_entry(aligned_pgd[i]);
+	  aligned_pgd[i] = ((unsigned long)(__virt_to_phys(pte) + i * 256 * sizeof(pte_t))) | 0x01;
+	  flush_pgd_entry(&aligned_pgd[i]);
 	}
   }
   
@@ -110,7 +115,7 @@ static void map_low_memory() {
 static void map_vector_memory() {
   struct map_desc map;
   /* Alloc a page from bootmem, and get the physical address. */
-  map.physical = _pa(kmalloc(PAGE_SIZE));
+  map.physical = __virt_to_phys((unsigned long)kmalloc(PAGE_SIZE));
   map.virtual = EXCEPTION_BASE;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
@@ -122,11 +127,11 @@ extern void * _debug_output_io;
 static void map_debug_memory() {
   struct map_desc map;
   map.physical = 0x7f005020 & (~PAGE_MASK);
-  map.virtual = kmalloc(PAGE_SIZE);
+  map.virtual = (unsigned long)kmalloc(PAGE_SIZE);
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
   create_mapping(&map);
-  _debug_output_to = (map.virtual & (~PAGE_MASK)) | (0x7f005020 & PAGE_MASK);
+  _debug_output_io = (void *)((map.virtual & (~PAGE_MASK)) | (0x7f005020 & PAGE_MASK));
 }
 
 static void map_vic_memory() {
@@ -161,11 +166,11 @@ void mm_init() {
   boot_alloc_ready = true;
   
   /* map vector page */
-  map_vector_page();
+  map_vector_memory();
   /* map debug page */
-  map_debug_page();
+  map_debug_memory();
   /* map VIC page */
-  map_vic_page();
+  map_vic_memory();
 
   //  bootmem_test();
   init_pages_map();

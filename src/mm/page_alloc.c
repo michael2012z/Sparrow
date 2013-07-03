@@ -174,7 +174,7 @@ static struct page* pages_split_recur(int order) {
 	  free_list[order] = pages_from_upper;
 	  /* set the order of these pages */
 	  current_page = pages_from_upper;
-	  for(i = 0; i < _order_of(order+1); i++) {
+	  for(i = 0; i < _order_of((order+1)); i++) {
 		current_page->order = order;
 		current_page = container_of((current_page->list.next), struct page, list);
 	  }
@@ -199,8 +199,6 @@ static struct page* pages_split_recur(int order) {
 
 static struct page* pages_alloc_by_order(int order) {
   struct page* ret = 0;
-  struct page* current_page = 0;
-  int i;
 
   if (order >= BUDDY_MAX_ORDER)
 	return NULL;
@@ -286,7 +284,7 @@ static void pages_combine_recur(struct page* page) {
 		  free_list[order] = remove_first_nth_order_buddy_from_frag_list(order);
 		/* set the order of these pages */
 		current_page = upper_buddy;
-		for(i = 0; i < _order_of(order + 1); i++) {
+		for(i = 0; i < _order_of((order + 1)); i++) {
 		  current_page->order = order + 1;
 		  current_page = container_of((current_page->list.next), struct page, list);
 		}
@@ -347,7 +345,7 @@ static void pages_combine_recur(struct page* page) {
 
 			/* set the order of these pages */
 			current_page = upper_buddy;
-			for(i = 0; i < _order_of(order + 1); i++) {
+			for(i = 0; i < _order_of((order + 1)); i++) {
 			  current_page->order = order + 1;
 			  current_page = container_of((current_page->list.next), struct page, list);
 			}

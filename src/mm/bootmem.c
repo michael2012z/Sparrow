@@ -1,6 +1,10 @@
 #include <type.h>
 #include <memory.h>
 #include <printk.h>
+#ifdef __ARCH_X86__
+#include <stdio.h>
+#include <stdlib.h>
+#endif
 
 /* 
  * Use physical address 0x50000000 ~ 0x50004000 as a map.
@@ -46,7 +50,7 @@ void *bootmem_alloc(int pages) {
 	return NULL;
   
   for (i=0; i<BOOTMEM_MAP_SIZE; i++) {
-    if (0x00 == ((unsigned char))map_item[i]) {
+    if (0x00 == (unsigned char)map_item[i]) {
       cont ++;
     } else {
       cont = 0;
@@ -91,14 +95,14 @@ void bootmem_test() {
   printk(PR_SS_MM, PR_LVL_DBG1, "mem2 = %x\n", mem2);
   mem3 = bootmem_alloc(pages3);
   printk(PR_SS_MM, PR_LVL_DBG1, "mem3 = %x\n", mem3);
-  bootmem_free(mem2, pages2);
+  bootmem_free(mem2);
   mem4 = bootmem_alloc(pages4);
   printk(PR_SS_MM, PR_LVL_DBG1, "mem4 = %x\n", mem4);
-  bootmem_free(mem4, pages4);
-  bootmem_free(mem1, pages1);
+  bootmem_free(mem4);
+  bootmem_free(mem1);
   mem5 = bootmem_alloc(pages5);
   printk(PR_SS_MM, PR_LVL_DBG1, "mem5 = %x\n", mem5);
-  bootmem_free(mem3, pages3);
-  bootmem_free(mem5, pages5);
+  bootmem_free(mem3);
+  bootmem_free(mem5);
 }
 

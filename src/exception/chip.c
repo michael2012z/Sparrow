@@ -1,7 +1,7 @@
 #include <linkage.h>
 #include <interrupt.h>
 #include <irq.h>
-
+#include <printk.h>
 
 
 static inline void mask_ack_irq(struct irq_desc *desc, int irq)
@@ -105,7 +105,7 @@ int set_irq_handler(unsigned int irq, irq_flow_handler_t handle)
 {
 	struct irq_desc *desc = irq_to_desc(irq);
 
-	printk("%s, irq = %d, desc = %x\n", __func__, irq, desc);
+	printk(PR_SS_IRQ, PR_LVL_INF, "%s, irq = %d, desc = %x\n", __func__, irq, desc);
 
 	desc->handle_irq = handle;
 
@@ -116,7 +116,6 @@ int set_irq_handler(unsigned int irq, irq_flow_handler_t handle)
 int set_irq_flags(unsigned int irq, unsigned int iflags)
 {
   struct irq_desc *desc = irq_to_desc(irq);
-  unsigned long flags;
 
   desc->status |= IRQ_NOREQUEST | IRQ_NOPROBE | IRQ_NOAUTOEN;
   if (iflags & IRQF_VALID)

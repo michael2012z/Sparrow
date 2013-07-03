@@ -314,5 +314,6 @@ struct linux_binprm {
 
 void start_thread(struct pt_regs *regs, unsigned long new_ip, unsigned long new_sp);
 
+int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *mm);
 
 #endif

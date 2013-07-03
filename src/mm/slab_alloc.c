@@ -350,6 +350,7 @@ void slab_free(void* addr) {
 }
 
 
+/* Debug methods.
 static void print_slab(struct page* slab, int objects_per_slab) {
   int i = 0, free_count = 0;
   unsigned char* map = (unsigned char*)slab->virtual;
@@ -396,3 +397,4 @@ static void print_all_kcache() {
   }
 }
 
+*/

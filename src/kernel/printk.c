@@ -62,7 +62,7 @@ static char print_buf[1024];
 	__res; })
 
 
-void * _debug_output_io = 0x7f005020; /* This initial value is the physical address, meaningless. */
+void * _debug_output_io = (void *)0x7f005020; /* This initial value is the physical address, meaningless. */
  
 #ifdef __ARCH_X86__
 void __put_char(char *p,int num){

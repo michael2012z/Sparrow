@@ -1,5 +1,7 @@
+#include <type.h>
 #include <timer.h>
 #include <printk.h>
+#include <process.h>
 
 void init_timer() {
   arm_init_timer();
