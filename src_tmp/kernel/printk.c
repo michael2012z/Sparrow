@@ -62,6 +62,8 @@ static char print_buf[1024];
 	__res; })
 
 
+void * _debug_output_io = (void *)0xef005020; /* This initial value is the physical address, meaningless. */
+ 
 #ifdef __ARCH_X86__
 void __put_char(char *p,int num){
   while(*p&&num--)
@@ -70,7 +72,8 @@ void __put_char(char *p,int num){
 #else
 void __put_char(char *p,int num){
 	while(*p&&num--){
-		*(volatile unsigned int *)0xef005020=*p++;
+	  *(volatile unsigned int *)_debug_output_io=*p++;
+	  /*	  *(volatile unsigned int *)0xef005020=*p++; */
 	};
 }
 #endif
@@ -238,11 +241,23 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list args){
 }
 #endif
 
+static int printk_disabled_flag = 0;
+void printk_disable() {
+  printk_disabled_flag = 1;
+}
+
+void printk_enable() {
+  printk_disabled_flag = 0;
+}
+
 void printk(int ss, int level, const char *fmt, ...)
 {
 	va_list args;
 	unsigned int i;
 	char *leading_ss, *leading_lvl;
+
+	if (printk_disabled_flag)
+	  return;
 
 	switch (ss) {
 	case PR_SS_INI:
@@ -253,6 +268,7 @@ void printk(int ss, int level, const char *fmt, ...)
 	  return;
 	case PR_SS_MM:
 	  leading_ss = "MM] ";
+	  break;
 	  return;
 	case PR_SS_PROC:
 	  leading_ss = "PROC] ";
@@ -283,6 +299,10 @@ void printk(int ss, int level, const char *fmt, ...)
 	case PR_LVL_DBG3:
 	  leading_lvl = "[DBG3-";
 	  return;
+	  break;
+	case PR_LVL_DBG7:
+	  leading_lvl = "[DBG7-";
+	  //	  return;
 	  break;
 	default:
 	  return;
