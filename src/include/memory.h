@@ -78,7 +78,7 @@ typedef unsigned long 		addr;
 typedef unsigned long pte_t;
 typedef unsigned long pgd_t;
 
-typedef struct page *pgtable_t;
+//typedef struct page *pgtable_t;
 typedef u32 phys_addr_t;
 #endif
 

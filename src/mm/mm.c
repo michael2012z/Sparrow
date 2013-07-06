@@ -30,15 +30,16 @@ static inline void flush_pgd_entry(pgd_t *pgd)
 
 static void create_mapping_section (unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
-  *pgd = (pgd_t)(physical | 0x031);
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pgd = %x, *pgd = %x\n", __func__, pgd, (physical | 0x0c02));  
+  //  *pgd = (pgd_t)(physical | 0x031);
+  *pgd = (pgd_t)(physical | 0x0c02);
   flush_pgd_entry(pgd);
 }
 
 
-static pte_t *pte_offset(pgd_t *pgd, unsigned long virtual) {
-  pte_t *pt_base = (pte_t *)(*pgd & KILOBYTES_MASK);
-  int index = (virtual & SECTION_MASK) >> PAGE_SHIFT;
-  return (pt_base + index);
+static pte_t *pte_offset(pte_t *pt, unsigned long virtual) {
+  int index = (virtual & ~SECTION_MASK) >> PAGE_SHIFT;
+  return (pt + index);
 }
 
 /* Each PT contains 256 items, and take 1K memory. But the size of each page is 4K, so each page hold 4 page table.
@@ -46,24 +47,39 @@ static pte_t *pte_offset(pgd_t *pgd, unsigned long virtual) {
  */
 static void create_mapping_page (unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
-  pte_t *pte;
+  pte_t *pte, pte_value, *pt = NULL;
+
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pgd = %x, virtual = %x\n", __func__, pgd, virtual);  
+
   if (NULL == *pgd) {
     /* populate pgd */
     pte = kmalloc(PAGE_SIZE);
+	printk(PR_SS_MM, PR_LVL_DBG7, "%s: populating pgd: allocated page table: virt = %x, phys = %x\n", __func__, pte, __virt_to_phys((unsigned long)pte));  
     /* 4 continuous page table fall in the same page. */
-    pgd_t *aligned_pgd = (pgd_t *)((unsigned long)pgd & PAGE_MASK);
+    pgd_t *aligned_pgd = (pgd_t *)((unsigned long)pgd & 0xfffffff0);
 
 	int i = 0;
 	for (; i < 4; i++) {
-	  aligned_pgd[i] = ((unsigned long)(__virt_to_phys(pte) + i * 256 * sizeof(pte_t))) | 0x01;
+	  pgd_t pgd_value = ((unsigned long)(__virt_to_phys((unsigned long)pte) + i * 256 * sizeof(pte_t))) | 0x01;
+	  if (*pgd == aligned_pgd[i])
+		pt = (pte_t *)((unsigned long)((unsigned long)pte + i * 256 * sizeof(pte_t)));
+	  printk(PR_SS_MM, PR_LVL_DBG7, "%s: populating pgd: pgd = %x, *pgd = %x\n", __func__, &aligned_pgd[i], pgd_value);  
+	  aligned_pgd[i] = pgd_value;
 	  flush_pgd_entry(&aligned_pgd[i]);
 	}
-  }
-  
-  /* populate pte */
-  pte = pte_offset(pgd, virtual);
-  *pte = (physical & (~PAGE_MASK)) | 0x032;
+  } 
 
+  /* populate pte */
+  if (NULL == pt) {
+	printk(PR_SS_MM, PR_LVL_ERR, "%s: page table not found: %x\n", __func__, pt);
+	while(1);
+  }
+
+  pte = pte_offset(pt, virtual);
+  pte_value = (physical & PAGE_MASK) | 0x032;
+  //pte_value = (physical & PAGE_MASK) | 0x02a;
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pte = %x, *pte = %x\n", __func__, pte, pte_value);  
+  *pte = pte_value;
 }
 
 static void print_map_desc(struct map_desc *map) {
@@ -136,12 +152,21 @@ extern void * _debug_output_io;
 
 static void map_debug_memory() {
   struct map_desc map;
-  map.physical = 0x7f005020 & (~PAGE_MASK);
-  map.virtual = (unsigned long)kmalloc(PAGE_SIZE);
+  map.physical = 0x7f005020 & PAGE_MASK;
+  map.virtual = 0xef005020 & PAGE_MASK;//(unsigned long)kmalloc(PAGE_SIZE);
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
+
+  /* Have to disable printk, otherwise any printing before mapping finish will lead to mapping fault. */
+  printk_disable();
+  /* Remove existing section mapping: */
+  pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), map.virtual);
+  *pgd = 0;
+  /* Create new mapping. */
   create_mapping(&map);
-  _debug_output_io = (void *)((map.virtual & (~PAGE_MASK)) | (0x7f005020 & PAGE_MASK));
+  _debug_output_io = (void *)((map.virtual & PAGE_MASK) | (0x7f005020 & ~PAGE_MASK));
+  printk_enable();
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: debug io is mapped to %x\n", __func__, _debug_output_io);
 }
 
 static void map_vic_memory() {

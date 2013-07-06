@@ -45,4 +45,7 @@ void printk(int a, int b, const char *fmt, ...);
 void __printk(const char *fmt, ...);
 void test_printk(void);
 
+void printk_disable();
+void printk_enable();
+
 #endif

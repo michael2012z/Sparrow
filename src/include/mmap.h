@@ -6,6 +6,7 @@
 #include <list.h>
 
 
+struct page;
 struct mm_struct;
 struct vm_area_struct;
 
