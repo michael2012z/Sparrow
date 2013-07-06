@@ -16,9 +16,9 @@ struct page {
 
 void mm_init();
 void prepare_page_table();
+void map_fs_to_ram();
 
 void* kmalloc(int size);
-
 void kfree(void *p);
 
 

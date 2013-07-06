@@ -41,6 +41,8 @@ static struct irq_chip s3c_irq_timer = {
 static void __init s3c6410_timer_setup(int timer_irq) {
   unsigned long tcon, tcfg0, tcfg1, tcnt;
 
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, timer_irq = %d\n", __func__, timer_irq);
+
   /* Original config and control is read, but not used. */
   tcon = __raw_readl(S3C6410_TIMER_TCON);
   tcfg0 = __raw_readl(S3C6410_TIMER_TCFG0);

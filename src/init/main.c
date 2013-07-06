@@ -63,16 +63,19 @@ void __init start_kernel(void) {
   mm_init();
 
   printk(PR_SS_INI, PR_LVL_INF, "MM initialization finish.\n");
+
   exception_init();
-
   init_IRQ();
-
   init_timer();
 
-  exception_enable();
+  //exception_enable();
+
   printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
 
   register_file_system(&listfs_file_system_type);
+
+  map_fs_to_ram();
+
   mount_file_system("ListFS");
 
   printk(PR_SS_INI, PR_LVL_INF, "FS initialization finish.\n");

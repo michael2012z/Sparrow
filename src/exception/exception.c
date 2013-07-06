@@ -18,7 +18,12 @@ void exception_disable(void) {
 }
 
 void exception_enable(void) {
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, flag 1\n", __func__);
+
   asm("cpsie i	@ __sti" : : : "memory", "cc");
+
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, flag 2\n", __func__);
+
   /*
 	asm volatile (
 		"mrs r4,cpsr\n\t"
@@ -46,6 +51,6 @@ void exception_init() {
 	 */
 	memcpy((void *)vectors, __vectors_start, __vectors_end - __vectors_start);
 	memcpy((void *)vectors + 0x200, __stubs_start, __stubs_end - __stubs_start);
-
+	printk(PR_SS_IRQ, PR_LVL_INF, "xxxxxxxxxxxxxxxxxxxxx\n");
 }
 

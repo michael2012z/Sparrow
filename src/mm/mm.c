@@ -1,5 +1,7 @@
 #include <type.h>
 #include <memory.h>
+#include <linkage.h>
+#include <interrupt.h>
 #include "mem_map.h"
 #include "alloc.h"
 #include <mm.h>
@@ -48,27 +50,27 @@ static pte_t *pte_offset(pte_t *pt, unsigned long virtual) {
 static void create_mapping_page (unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
   pte_t *pte, pte_value, *pt = NULL;
+  /* 4 continuous page table fall in the same page. */
+  pgd_t *aligned_pgd = (pgd_t *)((unsigned long)pgd & 0xfffffff0);
 
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: pgd = %x, virtual = %x\n", __func__, pgd, virtual);  
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: aligned_pgd = %x\n", __func__, aligned_pgd);  
 
   if (NULL == *pgd) {
     /* populate pgd */
     pte = kmalloc(PAGE_SIZE);
 	printk(PR_SS_MM, PR_LVL_DBG7, "%s: populating pgd: allocated page table: virt = %x, phys = %x\n", __func__, pte, __virt_to_phys((unsigned long)pte));  
-    /* 4 continuous page table fall in the same page. */
-    pgd_t *aligned_pgd = (pgd_t *)((unsigned long)pgd & 0xfffffff0);
 
 	int i = 0;
 	for (; i < 4; i++) {
 	  pgd_t pgd_value = ((unsigned long)(__virt_to_phys((unsigned long)pte) + i * 256 * sizeof(pte_t))) | 0x01;
-	  if (*pgd == aligned_pgd[i])
-		pt = (pte_t *)((unsigned long)((unsigned long)pte + i * 256 * sizeof(pte_t)));
 	  printk(PR_SS_MM, PR_LVL_DBG7, "%s: populating pgd: pgd = %x, *pgd = %x\n", __func__, &aligned_pgd[i], pgd_value);  
 	  aligned_pgd[i] = pgd_value;
 	  flush_pgd_entry(&aligned_pgd[i]);
 	}
   } 
 
+  pt = (pte_t *)(__phys_to_virt((unsigned long)*pgd) & KILOBYTES_MASK);
   /* populate pte */
   if (NULL == pt) {
 	printk(PR_SS_MM, PR_LVL_ERR, "%s: page table not found: %x\n", __func__, pt);
@@ -78,7 +80,7 @@ static void create_mapping_page (unsigned long physical, unsigned long virtual) 
   pte = pte_offset(pt, virtual);
   pte_value = (physical & PAGE_MASK) | 0x032;
   //pte_value = (physical & PAGE_MASK) | 0x02a;
-  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pte = %x, *pte = %x\n", __func__, pte, pte_value);  
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pt = %x, pte = %x, *pte = %x\n", __func__, pt, pte, pte_value);  
   *pte = pte_value;
 }
 
@@ -100,6 +102,12 @@ static void create_mapping(struct map_desc *md) {
     } else {
       unsigned long physical = md->physical; 
       unsigned long virtual = md->virtual;
+	  /*
+	  if (virtual == (EXCEPTION_BASE & SECTION_MASK)) {
+		create_mapping_section(physical, virtual);
+		return;
+	  }
+	  */
       while (virtual < (md->virtual + md->length)) {
 		create_mapping_section(physical, virtual);
 		physical += SECTION_SIZE;
@@ -138,9 +146,19 @@ static void map_low_memory() {
   create_mapping(&map);
 }
 
+/*
 static void map_vector_memory() {
   struct map_desc map;
-  /* Alloc a page from bootmem, and get the physical address. */
+  map.physical = PHYS_OFFSET + 63*SECTION_SIZE;
+  map.virtual = EXCEPTION_BASE & SECTION_MASK;
+  map.length = SECTION_SIZE;
+  map.type = MAP_DESC_TYPE_SECTION;
+  create_mapping(&map);
+}
+*/
+
+static void map_vector_memory() {
+  struct map_desc map;
   map.physical = __virt_to_phys((unsigned long)kmalloc(PAGE_SIZE));
   map.virtual = EXCEPTION_BASE;
   map.length = PAGE_SIZE;
@@ -186,6 +204,15 @@ static void map_vic_memory() {
 
 }
 
+static void map_timer_memory() {
+  struct map_desc map;
+  map.physical = 0x7f006000;
+  map.virtual = S3C6410_TIMER_BASE;
+  map.length = PAGE_SIZE;
+  map.type = MAP_DESC_TYPE_PAGE;
+  create_mapping(&map);
+}
+
 
 void mm_init() {
   boot_alloc_ready = false;
@@ -213,6 +240,8 @@ void mm_init() {
   map_debug_memory();
   /* map VIC page */
   map_vic_memory();
+  /* map timer IRQ page */
+  map_timer_memory();
 
   //  bootmem_test();
   init_pages_map();
@@ -228,5 +257,19 @@ void mm_init() {
   slab_alloc_ready = true;
   //  slab_alloc_test();
 
+}
 
+/*
+ * Map 64M memory for ListFS archived file:
+ * Physical memory between 0x5800 0000 ~ 0x5C00 0000
+ * Virtual memory between  0xC800 0000 ~ 0xCC00 0000
+ * The mapping section index is between 128 ~ 191
+ */
+void map_fs_to_ram() {
+  struct map_desc map;
+  map.physical = 0x58000000;
+  map.virtual = 0xC8000000;
+  map.length = SECTION_SIZE*64;
+  map.type = MAP_DESC_TYPE_SECTION;
+  create_mapping(&map);
 }

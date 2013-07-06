@@ -161,6 +161,7 @@ __create_page_tables:
 	/* r0 hold the address of mapping item for 0xef000000 */
 	orr	r6, r7, #0x7f000000
 	str	r6, [r0]
+		
 	/* Mapping result:
 	 * 0xC000 0000  ->  0x5000 0000 (size = kernel size)
 	 * 0x5000 0000  ->  0x5000 0000 (size = 1M)
