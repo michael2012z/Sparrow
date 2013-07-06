@@ -1,6 +1,7 @@
 #include <linkage.h>
 #include <interrupt.h>
 #include <irq.h>
+#include <printk.h>
 
 
 /*
@@ -34,7 +35,7 @@ struct irq_chip no_irq_chip = {
 
 void handle_bad_irq(unsigned int irq, struct irq_desc *desc)
 {
-  printk("%s, irq = %d\n", __func__, irq);
+  printk(PR_SS_IRQ, PR_LVL_INF, "%s, irq = %d\n", __func__, irq);
   return;
 }
 
@@ -49,7 +50,7 @@ struct irq_desc all_irq_desc[NR_IRQS] = {
 
 
 void vector_irq_handler(void){
-	printk("timer interrupt occured\n");
+	printk(PR_SS_IRQ, PR_LVL_INF, "timer interrupt occured\n");
 }
 
 void __init init_IRQ(void) {

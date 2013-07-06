@@ -3,6 +3,7 @@
 #include "page_alloc.h"
 #include "slab_alloc.h"
 #include <printk.h>
+#include "page.h"
 #ifdef __ARCH_X86__
 #include <stdio.h>
 #include <stdlib.h>

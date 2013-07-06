@@ -6,6 +6,7 @@
 #include <timer.h>
 #include <process.h>
 #include <vfs.h>
+#include <irq.h>
 
 #define UFCON0	((volatile unsigned int *)(0x7f005020))
 

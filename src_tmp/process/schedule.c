@@ -29,8 +29,6 @@ static void
 context_switch(struct task_struct *prev,
 	       struct task_struct *next)
 {
-	struct mm_struct *mm, *oldmm;
-
 	switch_pgd(next->pgd, next->pid);
 	switch_to(prev, next);
 }
@@ -76,5 +74,6 @@ void schedule() {
 	current_task = next_task;
   }
   
-  //  context_switch(current_task, next_task);
+  if (0)
+	context_switch(current_task, next_task);
 }

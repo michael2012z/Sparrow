@@ -10,7 +10,7 @@ static void print_elf_file(struct file *filep) {
   int digits;
   unsigned char c;
   static unsigned char hex_sym[] = "0123456789abcdef";
-  unsigned char lineContent[60] = {0};
+  char lineContent[60] = {0};
   int lineIndex = 0;
 
   printk(PR_SS_PROC, PR_LVL_DBG1, "\nprint_elf_file():\n");
@@ -192,7 +192,6 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
   /* Map the ELF file into virtual memory space. */
   elf_ppnt = elf_phdata;
   for(i = 0; i < elf_header.e_phnum; i++, elf_ppnt++) {
-	int elf_prot = 0, elf_flags;
 	unsigned long k, vaddr;
 
 	print_elf_phdr(elf_ppnt);

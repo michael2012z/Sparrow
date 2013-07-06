@@ -106,5 +106,13 @@ bool is_scheduler_ready();
 void update_task_on_tick();
 bool check_should_schedule();
 void enqueue_task(struct task_struct *task, enum sched_enqueue_flag flag);
+void schedule();
+void schedule_initialize();
+
+void cpu_idle();
+
+void cpu_v6_switch_mm(unsigned long, int);
+void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs);
+void __switch_to(struct task_struct *prev, struct thread_info *prev_thread, struct thread_info *next_thread);
 
 #endif /* _PROCESS_H_ */

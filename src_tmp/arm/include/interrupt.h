@@ -125,5 +125,12 @@
 #define IRQ_TIMER3		S3C64XX_TIMER_IRQ(3)
 #define IRQ_TIMER4		S3C64XX_TIMER_IRQ(4)
 
+#ifndef __ASSEMBLY__
+void __init vic_init(void *base, unsigned int irq_start,
+					 unsigned int vic_sources);
+void __init s3c_init_timer_irq(unsigned int parent_irq, unsigned int timer_irq);
+
+void arm_init_irq();
+#endif
 
 #endif

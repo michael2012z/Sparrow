@@ -3,6 +3,7 @@
 #include "mem_map.h"
 #include "bootmem.h"
 #include "page_alloc.h"
+#include "slab_alloc.h"
 
 struct membank membank;
 unsigned long mm_pgd;

@@ -4,6 +4,7 @@
 #include <process.h>
 #include <string.h>
 #include <printk.h>
+#include "elf.h"
 
 extern unsigned long mm_pgd;
 extern struct list_head *task_list;
@@ -11,8 +12,6 @@ extern struct list_head *task_list;
 void process_test() {
   struct file demo_1, demo_2;
   int pid_1, pid_2;
-  int i;
-  char *magic;
 
   demo_1.buf = (void *)0xc4040000;
   demo_1.size = 33807;
@@ -53,7 +52,7 @@ int create_kernel_thread(int (*fn)(void *)) {
 
   INIT_LIST_HEAD(&(task->sched_en.queue_entry));
 
-  arm_create_kernel_thread(fn, NULL, task->regs);
+  arm_create_kernel_thread(fn, NULL, &task->regs);
 
   enqueue_task(task, sched_enqueue_flag_new);
 
