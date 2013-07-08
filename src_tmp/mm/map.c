@@ -48,7 +48,7 @@ void map_memory_bank(struct membank *bank)
 
 	for (i = 0; i < items_count; i++) {
 	  physical = bank->start + map_count_to_length(i);
-	  virtual = __phys_to_virt(bank_phys_start(bank)) + i * MEGABYTE_SIZE;
+	  virtual = __phys_to_virt(bank_phys_start(bank)) + i * MEGABYTES_SIZE;
 	  printk(PR_SS_MM, PR_LVL_DBG6, "map_memory_bank() : physical = %x, virtual = %x\n", physical, virtual);
 	  create_section_map_item(physical, virtual);
 	}

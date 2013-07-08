@@ -1,10 +1,13 @@
 #ifndef _MEMORY_H_
 #define _MEMORY_H_
 
-#define PMD_SHIFT		21
-#define PGDIR_SHIFT		21
 #define PAGE_SHIFT		12
-#define PAGE_SIZE		(1<<PAGE_SHIFT)
+#define PAGE_SIZE		(1UL<<PAGE_SHIFT)
+#define PAGE_MASK		(~(PAGE_SIZE-1))
+
+#define SECTION_SHIFT		20
+#define SECTION_SIZE		(1UL<<SECTION_SHIFT)
+#define SECTION_MASK		(~(SECTION_SIZE-1))
 
 #define THREAD_SIZE		8192
 #define THREAD_START_SP		(THREAD_SIZE - 8)
@@ -45,19 +48,15 @@
 typedef unsigned long 		addr;
 #endif
 
+/* 2 level of memory mapping is defined:
+ * Level 1 table is named as PGD - page global directory;
+ * Level 2 table is named as PT  - page table. 
+ */
 
-
-
-/* Page table */
-
-#define PTRS_PER_PTE		512
-#define PTRS_PER_PMD		1
-#define PTRS_PER_PGD		2048
-
-#define PTE_HWTABLE_PTRS	(PTRS_PER_PTE)
-#define PTE_HWTABLE_OFF		(PTE_HWTABLE_PTRS * sizeof(pte_t))
-#define PTE_HWTABLE_SIZE	(PTRS_PER_PTE * sizeof(u32))
-
+/* Page directory */
+#define PGDIR_SHIFT		20
+#define PGDIR_SIZE		(1UL << PGDIR_SHIFT)
+#define PGDIR_MASK		(~(PGDIR_SIZE-1))
 
 /*
  * MM flags
@@ -77,10 +76,9 @@ typedef unsigned long 		addr;
 
 #ifndef __ASSEMBLY__
 typedef unsigned long pte_t;
-typedef unsigned long pmd_t;
-typedef unsigned long pgd_t[2];
+typedef unsigned long pgd_t;
 
-typedef struct page *pgtable_t;
+//typedef struct page *pgtable_t;
 typedef u32 phys_addr_t;
 #endif
 
@@ -91,24 +89,16 @@ typedef u32 phys_addr_t;
 
 /* to find an entry in a page-table-directory */
 #define pgd_index(addr)		((addr) >> PGDIR_SHIFT)
-#define pgd_offset(mm, addr)	((pgd_t *)((mm)->pgd + pgd_index(addr)))
-#define pmd_alloc(mm, pgd, address)	((pmd_t *)pgd)
+#define pgd_offset(pgd, addr)	((pgd_t *)(((pgd_t *)pgd) + pgd_index(addr)))
 
 #define pte_index(addr)		(((addr) >> PAGE_SHIFT) & (PTRS_PER_PTE - 1))
 
 /*
  * Tools.
  */
-#define KILOBYTE_SIZE		(1 << 10)
-#define MEGABYTE_SIZE		(1 << 20)
-
-#if 0
-/* Power of each 0 in hex long integer. 
- * 
- * 0x 0      0      0      0      0      0      0      0
- *    |      |      |      |      |      |      |      |
- *    4G    256M    16M    1M    64K     4K    256     16
- */
-#endif
+#define KILOBYTES_SIZE		(1UL << 10)
+#define KILOBYTES_MASK		(~(KILOBYTES_SIZE-1))
+#define MEGABYTES_SIZE		(1UL << 20)
+#define MEGABYTES_MASK		(~(MEGABYTES_SIZE-1))
 
 #endif
