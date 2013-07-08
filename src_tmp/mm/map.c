@@ -1,59 +1,45 @@
 #include <type.h>
 #include <memory.h>
 #include <mm.h>
-#include "mem_bank.h"
 #include "mem_map.h"
 #include <list.h>
 #include "bootmem.h"
 #include <printk.h>
 
-/* Section mapping. */
+extern unsigned long mm_pgd;
 
-static void create_section_map_item(addr physical, addr virtual) {
-  unsigned long table_item;
-  addr *table_item_addr;
-
-  /* site proterty */
-  table_item = PMD_TYPE_SECT | PMD_SECT_AP_WRITE | PMD_SECT_AP_READ | PMD_FLAGS;
-
-  /* ensure the physical address is aligned to 1M */
-  physical = physical & 0xfff00000;
-
-  /* construct the table item */
-  table_item = table_item | physical;
-
-  /* calculate the table item address */
-  table_item_addr = (addr *)(PAGE_TABLE_ADDRESS + ((virtual - PAGE_OFFSET) >> MAP_ITEM_SHIFT) * 4);
-
-  printk(PR_SS_MM, PR_LVL_DBG6, "create_section_map_item() : table_item = %x, table_item_addr = %x\n", table_item, table_item_addr);
-
-  /* write mapping table */
-  *table_item_addr = table_item;
-}
-
-
-static void flush_mmu() {
-  addr page_table_addr = PAGE_TABLE_ADDRESS;
-  asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
-	  : : "r" (page_table_addr) : "cc");
-  asm("mcr p15, 0, %0, c7, c10, 4"
-	  : : "r" (0) : "memory");
-}
-
-void map_memory_bank(struct membank *bank)
+static inline void clean_pgd_entry(pgd_t *pgd)
 {
-	int items_count = map_length_to_count(bank->size);
-	int i;
-	addr physical, virtual;
+  asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
+      : : "r" (pgd) : "cc");
 
-	for (i = 0; i < items_count; i++) {
-	  physical = bank->start + map_count_to_length(i);
-	  virtual = __phys_to_virt(bank_phys_start(bank)) + i * MEGABYTES_SIZE;
-	  printk(PR_SS_MM, PR_LVL_DBG6, "map_memory_bank() : physical = %x, virtual = %x\n", physical, virtual);
-	  create_section_map_item(physical, virtual);
+  /* not enabled on s3c6410 by default
+  asm("mcr	p15, 1, %0, c15, c9, 1  @ L2 flush_pmd"
+      : : "r" (pgd) : "cc");
+  */
+}
+
+void pgd_clear(pgd_t *pgdp) {
+  *pgdp = 0;
+  clean_pgd_entry(pgdp);
+}
+
+void prepare_page_table() {
+  unsigned long addr;
+  /* Map the space before kernel: 0 ~ 3G */
+  for (addr = 0; addr < PAGE_OFFSET; addr += PGDIR_SIZE) {
+    pgd_clear(pgd_offset(((pgd_t *)mm_pgd), addr));
+  }
+  /* The 1st megabytes is not cleared. This is the space that kernel binary is running, it has been mapped by assembly code in the beginning. */
+  for (addr = PAGE_OFFSET + 0x100000; addr <= 0xffe00000; addr += PGDIR_SIZE) {
+	/* As temporary solution, so must jump over debug io mapping here. */
+	if (addr == 0xef000000) {
+	  printk(PR_SS_MM, PR_LVL_DBG7, "prepare_page_table(): jump over debug io section: %x\n", addr);
+	  continue;
 	}
+    pgd_clear(pgd_offset(((pgd_t *)mm_pgd), addr));
+  }
 
-	flush_mmu();
 }
 
 

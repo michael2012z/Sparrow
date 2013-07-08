@@ -2,13 +2,11 @@
 #include <memory.h>
 #include <linkage.h>
 #include <interrupt.h>
-#include "mem_bank.h"
 #include "mem_map.h"
 #include "alloc.h"
 #include <mm.h>
 #include <printk.h>
 
-struct membank membank;
 unsigned long mm_pgd;
 
 extern bool boot_alloc_ready;
@@ -34,9 +32,14 @@ static inline void flush_pgd_entry(pgd_t *pgd)
 
 static void create_mapping_section (unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
-  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pgd = %x, *pgd = %x\n", __func__, pgd, (physical | 0x0c02));  
+  unsigned long property = (PMD_TYPE_SECT | PMD_SECT_AP_WRITE | PMD_SECT_AP_READ | PMD_FLAGS);
+
+  //  unsigned long pgd_index = pgd_index(virtual);
+  //  printk(PR_SS_MM, PR_LVL_DBG7, "%s: physical = %x, virtual = %x, pgd_index = %x\n", __func__, physical, virtual, pgd_index);  
+
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pgd = %x, *pgd = %x\n", __func__, pgd, (physical | property));  
   //  *pgd = (pgd_t)(physical | 0x031);
-  *pgd = (pgd_t)(physical | 0x0c02);
+  *pgd = (pgd_t)(physical | property);
   flush_pgd_entry(pgd);
 }
 
@@ -143,7 +146,7 @@ static void map_low_memory() {
   struct map_desc map;
   map.physical = PHYS_OFFSET;
   map.virtual = PAGE_OFFSET;
-  map.length = MEMORY_SIZE;
+  map.length = MEMORY_SIZE - EXCEPTION_SIZE;
   map.type = MAP_DESC_TYPE_SECTION;
   create_mapping(&map);
 }
@@ -216,15 +219,94 @@ static void map_timer_memory() {
 }
 
 
+//////////////////////////////////////////////////////////////
+
+struct membank {
+	addr start;
+	addr size;
+};
+#define bank_pfn_start(bank)	__phys_to_pfn((bank)->start)
+#define bank_pfn_end(bank)	__phys_to_pfn((bank)->start + (bank)->size)
+#define bank_pfn_size(bank)	((bank)->size >> PAGE_SHIFT)
+#define bank_phys_start(bank)	(bank)->start
+#define bank_phys_end(bank)	((bank)->start + (bank)->size)
+#define bank_phys_size(bank)	(bank)->size
+
+
+static void create_section_map_item(addr physical, addr virtual) {
+  unsigned long table_item;
+  addr *table_item_addr;
+
+  /* site proterty */
+  table_item = PMD_TYPE_SECT | PMD_SECT_AP_WRITE | PMD_SECT_AP_READ | PMD_FLAGS;
+
+  /* ensure the physical address is aligned to 1M */
+  physical = physical & 0xfff00000;
+
+  /* construct the table item */
+  table_item = table_item | physical;
+
+  /* calculate the table item address */
+  table_item_addr = (addr *)(PAGE_TABLE_ADDRESS + ((virtual - PAGE_OFFSET) >> MAP_ITEM_SHIFT) * 4);
+
+  printk(PR_SS_MM, PR_LVL_DBG7, "create_mapping_section: pgd = %x, *pgd = %x\n", table_item_addr, table_item);  
+  printk(PR_SS_MM, PR_LVL_DBG6, "create_section_map_item() : table_item = %x, table_item_addr = %x\n", table_item, table_item_addr);
+
+  /* write mapping table */
+  *table_item_addr = table_item;
+}
+
+
+static void flush_mmu() {
+  addr page_table_addr = PAGE_TABLE_ADDRESS;
+  asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
+	  : : "r" (page_table_addr) : "cc");
+  asm("mcr p15, 0, %0, c7, c10, 4"
+	  : : "r" (0) : "memory");
+}
+
+void map_memory_bank(struct membank *bank)
+{
+	int items_count = map_length_to_count(bank->size);
+	int i;
+	addr physical, virtual;
+
+	for (i = 0; i < items_count; i++) {
+	  physical = bank->start + map_count_to_length(i);
+	  virtual = __phys_to_virt(bank_phys_start(bank)) + i * MEGABYTES_SIZE;
+	  printk(PR_SS_MM, PR_LVL_DBG6, "map_memory_bank() : physical = %x, virtual = %x\n", physical, virtual);
+	  create_section_map_item(physical, virtual);
+	}
+
+	flush_mmu();
+}
+
+
+
+
+//////////////////////////////////////////////////////////////
+
+
 void mm_init() {
   boot_alloc_ready = false;
   page_alloc_ready = false;
   slab_alloc_ready = false;
 
   mm_pgd = PAGE_OFFSET + PAGE_TABLE_OFFSET;
-  membank.start = PHYS_OFFSET;
-  membank.size = MEMORY_SIZE - EXCEPTION_SIZE;
-  map_memory_bank(&membank);
+
+  if (0) {
+	struct membank membank;
+	membank.start = PHYS_OFFSET;
+	membank.size = MEMORY_SIZE - EXCEPTION_SIZE;
+	map_memory_bank(&membank);
+  }
+
+  if (1) {
+	struct membank membank;
+	membank.start = PHYS_OFFSET;
+	membank.size = MEGABYTES_SIZE;
+	map_memory_bank(&membank);
+  }
 
   /* clear the page table at first*/
   // prepare_page_table();
@@ -260,7 +342,6 @@ void mm_init() {
   slab_alloc_init();
   slab_alloc_ready = true;
   //  slab_alloc_test();
-
 
 }
 

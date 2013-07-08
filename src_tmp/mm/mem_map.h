@@ -15,8 +15,6 @@ struct map_desc {
 #define map_length_to_count(x)		((x) >> MAP_ITEM_SHIFT)
 #define map_count_to_length(x)		((x) << MAP_ITEM_SHIFT)
 
-void map_memory_bank(struct membank *bank);
-
 void init_pages_map();
 
 #endif

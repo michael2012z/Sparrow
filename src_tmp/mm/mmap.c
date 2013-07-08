@@ -123,4 +123,3 @@ void add_page_anon_vma(struct page *page, struct vm_area_struct *vma, unsigned l
   printk(PR_SS_MM, PR_LVL_DBG6, "	add_page_anon_vma(): fatal error, function not implemented.\n");
   while(1);
 }
-
