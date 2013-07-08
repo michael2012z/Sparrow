@@ -68,7 +68,7 @@ void __init start_kernel(void) {
   init_IRQ();
   init_timer();
 
-  //exception_enable();
+  exception_enable();
 
   printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
 

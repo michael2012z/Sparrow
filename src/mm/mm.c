@@ -213,6 +213,15 @@ static void map_timer_memory() {
   create_mapping(&map);
 }
 
+static void map_page_zero() {
+  struct map_desc map;
+  map.physical = __virt_to_phys((unsigned long)kmalloc(PAGE_SIZE));
+  map.virtual = NULL;
+  map.length = PAGE_SIZE;
+  map.type = MAP_DESC_TYPE_PAGE;
+  create_mapping(&map);
+}
+
 
 void mm_init() {
   boot_alloc_ready = false;
@@ -242,6 +251,8 @@ void mm_init() {
   map_vic_memory();
   /* map timer IRQ page */
   map_timer_memory();
+  /* map zero page */
+  map_page_zero();
 
   //  bootmem_test();
   init_pages_map();

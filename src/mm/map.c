@@ -67,7 +67,7 @@ void init_pages_map() {
   for (i = 0; i < MEMORY_PAGES; i++) {
 	page = &pages_map[i];
 	page->virtual = PAGE_OFFSET + (addr)(i * PAGE_SIZE);
-	page->allocated = map_item[i];
+	page->allocated = (map_item[i]==0)?0:0xff;
 	INIT_LIST_HEAD(&(page->list));
 	list_add_tail(&(page->list), &(pages_map->list));
 	
