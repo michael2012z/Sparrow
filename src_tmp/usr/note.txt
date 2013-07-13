@@ -1,4 +1,0 @@
-
-Skyeye:
-	Store the 2 ELF executable files to fixed location in memory.
-	In kernel, read the binary data from the hard-coded place.
