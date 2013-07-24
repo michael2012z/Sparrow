@@ -18,7 +18,8 @@ void schedule_initialize() {
 }
 
 static void switch_pgd(unsigned long pgd, int pid) {
-  cpu_v6_switch_mm(__virt_to_phys(pgd), pid);
+  /* The second parameter is context id, we don't support it. */
+  cpu_v6_switch_mm(__virt_to_phys(pgd), 0);
 }
 
 static void switch_to(struct task_struct *prev, struct task_struct *next) {
@@ -74,5 +75,5 @@ void schedule() {
 	current_task = next_task;
   }
   
-  context_switch(current_task, next_task);
+  if (0) context_switch(current_task, next_task);
 }

@@ -45,3 +45,4 @@ ENTRY(__switch_to)
 /* put next context to registers */
 	ldmia	r4, {r4 - sl, fp, sp, pc}  	@ Load all regs saved previously
 ENDPROC(__switch_to)
+

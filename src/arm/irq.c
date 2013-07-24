@@ -98,3 +98,13 @@ void __exception test_IRQ_1() {
 void __exception test_IRQ_2() {
   printk(PR_SS_IRQ, PR_LVL_INF, "++++++++++++++++++ %s\n", __func__);
 }
+
+/*
+ * General handling for unsupported exception.
+ */
+void __exception asm_unsupported_exception(unsigned int code)
+{
+	printk(PR_SS_IRQ, PR_LVL_ERR, "An unsupported exception happened, code = %d\n", code);
+	while(1);
+}
+
