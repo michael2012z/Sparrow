@@ -4,17 +4,6 @@
 #include <ptrace.h>
 #include <printk.h>
 
-/*
- * bad_mode handles the impossible case in the vectors.  If you see one of
- * these, then it's extremely serious, and could mean you have buggy hardware.
- * It never returns, and never tries to sync.  We hope that we can at least
- * dump out some state information...
- */
-void bad_mode(struct pt_regs *regs, int reason)
-{
-
-}
-
 
 struct pt_regs *  __irq_regs;
 
@@ -97,14 +86,5 @@ void __exception test_IRQ_1() {
 
 void __exception test_IRQ_2() {
   printk(PR_SS_IRQ, PR_LVL_INF, "++++++++++++++++++ %s\n", __func__);
-}
-
-/*
- * General handling for unsupported exception.
- */
-void __exception asm_unsupported_exception(unsigned int code)
-{
-	printk(PR_SS_IRQ, PR_LVL_ERR, "An unsupported exception happened, code = %d\n", code);
-	while(1);
 }
 

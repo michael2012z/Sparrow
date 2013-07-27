@@ -2,7 +2,7 @@
 #include <interrupt.h>
 #include "vic.h"
 #include "head.h"
-
+#include "abort-macro.S"
 
 /*
  * These are the registers used in the syscall handler, and allow us to
@@ -22,6 +22,14 @@ tsk	.req	r9		@ current thread_info
 
 	.macro	disable_irq_notrace
 	cpsid	i
+	.endm
+
+	.macro	enable_irq_notrace
+	cpsie	i
+	.endm
+
+	.macro enable_irq
+	enable_irq_notrace
 	.endm
 
 	.macro disable_irq
@@ -184,6 +192,62 @@ tsk	.req	r9		@ current thread_info
 
 
 /*
+ * Function: v6_early_abort
+ *
+ * Params  : r2 = address of aborted instruction
+ *         : r3 = saved SPSR
+ *
+ * Returns : r0 = address of abort
+ *	   : r1 = FSR, bit 11 = write
+ *	   : r2-r8 = corrupted
+ *	   : r9 = preserved
+ *	   : sp = pointer to registers
+ *
+ * Purpose : obtain information about current aborted instruction.
+ * Note: we read user space.  This means we might cause a data
+ * abort here if the I-TLB and D-TLB aren't seeing the same
+ * picture.  Unfortunately, this does happen.  We live with it.
+ */
+	.align	5
+ENTRY(v6_early_abort)
+	clrex
+	mrc	p15, 0, r1, c5, c0, 0		@ get FSR
+	mrc	p15, 0, r0, c6, c0, 0		@ get FAR
+/*
+ * Faulty SWP instruction on 1136 doesn't set bit 11 in DFSR (erratum 326103).
+ * The test below covers all the write situations, including Java bytecodes
+ */
+	bic	r1, r1, #1 << 11		@ clear bit 11 of FSR
+	tst	r3, #PSR_J_BIT			@ Java?
+	movne	pc, lr
+	do_thumb_abort
+	ldreq	r3, [r2]			@ read aborted ARM instruction
+	do_ldrd_abort
+	tst	r3, #1 << 20			@ L = 0 -> write
+	orreq	r1, r1, #1 << 11		@ yes.
+	mov	pc, lr
+ENDPROC(v6_early_abort)
+		
+
+/*
+ * Function: v6_pabort
+ *
+ * Params  : r0 = address of aborted instruction
+ *
+ * Returns : r0 = address of abort
+ *	   : r1 = IFSR
+ *
+ * Purpose : obtain information about current prefetch abort.
+ */
+
+	.align	5
+ENTRY(v6_pabort)
+	mrc	p15, 0, r1, c5, c0, 1		@ get IFSR
+	mov	pc, lr
+ENDPROC(v6_pabort)
+
+		
+/*
  * "slow" syscall return path.  "why" tells us if this was a real syscall.
  */
 ENTRY(ret_to_user)
@@ -203,7 +267,6 @@ common_invalid:
 	str	r4, [sp]		@ save preserved r0
 	stmia	r0, {r5 - r7}		@ lr_<exception>,
 					@ cpsr_<exception>, "old_r0"
-
 	mov	r0, sp
 	b	bad_mode
 ENDPROC(common_invalid)
@@ -213,6 +276,16 @@ __irq_invalid:
 	inv_entry BAD_IRQ
 	b	common_invalid
 ENDPROC(__irq_invalid)
+
+__dabt_invalid:
+	inv_entry BAD_DATA
+	b	common_invalid
+ENDPROC(__dabt_invalid)
+
+__pabt_invalid:
+	inv_entry BAD_PREFETCH
+	b	common_invalid
+ENDPROC(__pabt_invalid)
 
 		
 	.align	5
@@ -234,6 +307,131 @@ __irq_usr:
 	b	ret_to_user
 	.fnend
 ENDPROC(__irq_usr)
+
+
+	.align	5
+__dabt_svc:
+	svc_entry
+
+	@
+	@ get ready to re-enable interrupts if appropriate
+	@
+	mrs	r9, cpsr
+	tst	r3, #PSR_I_BIT
+	biceq	r9, r9, #PSR_I_BIT
+
+	@
+	@ Call the processor-specific abort handler:
+	@
+	@  r2 - aborted context pc
+	@  r3 - aborted context cpsr
+	@
+	@ The abort handler must return the aborted address in r0, and
+	@ the fault status register in r1.  r9 must be preserved.
+	@
+	bl	v6_early_abort
+
+	@
+	@ set desired IRQ state, then call main handler
+	@
+	msr	cpsr_c, r9
+	mov	r2, sp
+	bl	do_DataAbort
+
+	@
+	@ IRQs off again before pulling preserved data off the stack
+	@
+	disable_irq_notrace
+
+	@
+	@ restore SPSR and restart the instruction
+	@
+	ldr	r2, [sp, #S_PSR]
+	svc_exit r2				@ return from exception
+	.fnend
+ENDPROC(__dabt_svc)
+
+
+	.align	5
+__pabt_svc:
+	svc_entry
+
+	@
+	@ re-enable interrupts if appropriate
+	@
+	mrs	r9, cpsr
+	tst	r3, #PSR_I_BIT
+	biceq	r9, r9, #PSR_I_BIT
+
+	mov	r0, r2			@ pass address of aborted instruction.
+	bl	v6_pabort
+	msr	cpsr_c, r9			@ Maybe enable interrupts
+	mov	r2, sp				@ regs
+	bl	do_PrefetchAbort		@ call abort handler
+
+	@
+	@ IRQs off again before pulling preserved data off the stack
+	@
+	disable_irq_notrace
+
+	@
+	@ restore SPSR and restart the instruction
+	@
+	ldr	r2, [sp, #S_PSR]
+	svc_exit r2				@ return from exception
+	.fnend
+ENDPROC(__pabt_svc)
+
+
+	.align	5
+__dabt_usr:
+	usr_entry
+
+	@
+	@ Call the processor-specific abort handler:
+	@
+	@  r2 - aborted context pc
+	@  r3 - aborted context cpsr
+	@
+	@ The abort handler must return the aborted address in r0, and
+	@ the fault status register in r1.
+	@
+	bl	v6_early_abort
+
+	@
+	@ IRQs on, then call the main handler
+	@
+	enable_irq
+	mov	r2, sp
+	adr	lr, ret_from_exception
+	b	do_DataAbort
+	.fnend
+ENDPROC(__dabt_usr)
+
+
+
+	.align	5
+__pabt_usr:
+	usr_entry
+	mov	r0, r2			@ pass address of aborted instruction.
+	bl	v6_pabort
+	enable_irq				@ Enable interrupts
+	mov	r2, sp				@ regs
+	bl	do_PrefetchAbort		@ call abort handler
+	.fnend
+	/* fall through */
+/*
+ * This is the return code to user mode for abort handlers
+ */
+ENTRY(ret_from_exception)
+	.fnstart
+	.cantunwind
+	get_thread_info tsk
+	mov	why, #0
+	b	ret_to_user
+	.fnend
+ENDPROC(__pabt_usr)
+ENDPROC(ret_from_exception)
 
 		
 /*
@@ -311,6 +509,53 @@ __stubs_start:
 	.long	__irq_invalid			@  e
 	.long	__irq_invalid			@  f
 
+/*
+ * Data abort dispatcher
+ * Enter in ABT mode, spsr = USR CPSR, lr = USR PC
+ */
+	vector_stub	dabt, ABT_MODE, 8
+
+	.long	__dabt_usr			@  0  (USR_26 / USR_32)
+	.long	__dabt_invalid			@  1  (FIQ_26 / FIQ_32)
+	.long	__dabt_invalid			@  2  (IRQ_26 / IRQ_32)
+	.long	__dabt_svc			@  3  (SVC_26 / SVC_32)
+	.long	__dabt_invalid			@  4
+	.long	__dabt_invalid			@  5
+	.long	__dabt_invalid			@  6
+	.long	__dabt_invalid			@  7
+	.long	__dabt_invalid			@  8
+	.long	__dabt_invalid			@  9
+	.long	__dabt_invalid			@  a
+	.long	__dabt_invalid			@  b
+	.long	__dabt_invalid			@  c
+	.long	__dabt_invalid			@  d
+	.long	__dabt_invalid			@  e
+	.long	__dabt_invalid			@  f
+
+/*
+ * Prefetch abort dispatcher
+ * Enter in ABT mode, spsr = USR CPSR, lr = USR PC
+ */
+	vector_stub	pabt, ABT_MODE, 4
+
+	.long	__pabt_usr			@  0 (USR_26 / USR_32)
+	.long	__pabt_invalid			@  1 (FIQ_26 / FIQ_32)
+	.long	__pabt_invalid			@  2 (IRQ_26 / IRQ_32)
+	.long	__pabt_svc			@  3 (SVC_26 / SVC_32)
+	.long	__pabt_invalid			@  4
+	.long	__pabt_invalid			@  5
+	.long	__pabt_invalid			@  6
+	.long	__pabt_invalid			@  7
+	.long	__pabt_invalid			@  8
+	.long	__pabt_invalid			@  9
+	.long	__pabt_invalid			@  a
+	.long	__pabt_invalid			@  b
+	.long	__pabt_invalid			@  c
+	.long	__pabt_invalid			@  d
+	.long	__pabt_invalid			@  e
+	.long	__pabt_invalid			@  f
+
+
 	.align	5
 
 /* Unsupported exception. */
@@ -327,12 +572,6 @@ vector_fiq:
 	b asm_unsupported_exception
 
 vector_addrexcptn:
-	b asm_unsupported_exception
-
-vector_pabt:
-	b asm_unsupported_exception
-
-vector_dabt:
 	b asm_unsupported_exception
 
 

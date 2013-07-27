@@ -75,5 +75,5 @@ void schedule() {
 	current_task = next_task;
   }
   
-  if (0) context_switch(current_task, next_task);
+  if (1) context_switch(current_task, next_task);
 }
