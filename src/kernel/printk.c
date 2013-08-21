@@ -298,11 +298,10 @@ void printk(int ss, int level, const char *fmt, ...)
 	  return;
 	case PR_LVL_DBG3:
 	  leading_lvl = "[DBG3-";
-	  return;
 	  break;
 	case PR_LVL_DBG7:
 	  leading_lvl = "[DBG7-";
-	  //	  return;
+	  return;
 	  break;
 	default:
 	  return;

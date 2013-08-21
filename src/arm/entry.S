@@ -12,21 +12,20 @@
  *	It is assumed that:
  *	- we are not using split page tables
  */
-/*
- * r0 = pgd_phys
- * r1 = context_id
+/* r0 = pgd_phys, * r1 = context_id
  */
 ENTRY(cpu_v6_switch_mm)
 	mov	r2, #0
 	orr	r0, r0, #TTB_FLAGS_UP
 	mcr	p15, 0, r2, c7, c5, 6		@ flush BTAC/BTB
 	mcr	p15, 0, r2, c7, c10, 4		@ drain write buffer
-	mcr	p15, 0, r0, c2, c0, 0		@ set TTB 0
+	mcr	p15, 0, r0, c2, c0, 0		@ write Translation Table Base Register 0
 	mcr	p15, 0, r1, c13, c0, 1		@ set context ID
 	mov	pc, lr
 ENDPROC(cpu_v6_switch_mm)
 
-		
+/* r0 = previous task_struct, r1 = previous thread_info, r2 = next thread_info
+ */
 ENTRY(__switch_to)
 /* thread_info + TI_CPU_SAVE hold saved cpu context, registers value is stored */
 /* now ip hold the address of the context of previous process */

@@ -25,10 +25,35 @@ void process_test() {
   printk(PR_SS_PROC, PR_LVL_INF, "process %d created\n", pid_2);
 }
 
+struct task_struct *init_kernel_task = NULL;
+
+static struct task_struct *create_init_kernel_task() {
+  int pid;
+  struct task_struct *task = NULL;
+  pid = allocate_pid();
+  if (pid < 0)
+	return NULL;
+  
+  task = (struct task_struct *)kmalloc(sizeof(struct task_struct));
+
+  if (NULL == task)
+	return NULL;
+
+  task->stack = (void *)&init_thread_union;
+
+  task->pid = pid;
+
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s process %d stack = %x\n", __func__, pid, task->stack);
+
+  task->mm.pgd = mm_pgd;
+
+  return task;
+}
 
 void initialize_process() {
   initialize_pid();
   schedule_initialize();
+  init_kernel_task = create_init_kernel_task();
 }
 
 
@@ -44,7 +69,11 @@ int create_kernel_thread(int (*fn)(void *)) {
   if (NULL == task)
 	return -1;
 
+  task->stack = (void *)kmalloc(PAGE_SIZE);
+
   task->pid = pid;
+
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s process %d stack = %x\n", __func__, pid, task->stack);
 
   INIT_LIST_HEAD(&(task->mm.mmap.list));
   task->mm.pgd = (unsigned long)kmalloc(PAGE_SIZE * 4);
@@ -73,7 +102,11 @@ int create_process(struct file *filep) {
   if (NULL == task)
 	return -1;
 
+  task->stack = (void *)kmalloc(PAGE_SIZE);
+
   task->pid = pid;
+
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s process %d stack = %x\n", __func__, pid, task->stack);
 
   INIT_LIST_HEAD(&(task->mm.mmap.list));
   task->mm.pgd = (unsigned long)kmalloc(PAGE_SIZE * 4);

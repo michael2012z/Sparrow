@@ -27,7 +27,7 @@ struct task_struct {
 
   struct pt_regs regs;
 
-  unsigned long pgd;
+  //  unsigned long pgd;
 
   bool kernel_thread;
 
