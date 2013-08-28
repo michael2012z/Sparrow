@@ -37,10 +37,20 @@ static int __init kernel_init(void *unused) {
 	  while(1);
 	}
 	*/
-	return 0;
+  while(1) {
+	int i = 0;
+	for (i = 0; i < 65535 ; i++){}
+	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
+  }
+  return 0;
 }
 
 static int __init kernel_demo(void *unused) {
+  while(1) {
+	int i = 0;
+	for (i = 0; i < 65535 ; i++){}
+	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
+  }
   process_test();
   return 0;
 }
