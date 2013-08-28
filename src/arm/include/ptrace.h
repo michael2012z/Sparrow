@@ -10,6 +10,7 @@ struct pt_regs {
 	unsigned long uregs[18];
 };
 
+#define ARM_ORIG_r0	uregs[17]
 #define ARM_cpsr	uregs[16]
 #define ARM_pc		uregs[15]
 #define ARM_lr		uregs[14]
@@ -27,7 +28,6 @@ struct pt_regs {
 #define ARM_r2		uregs[2]
 #define ARM_r1		uregs[1]
 #define ARM_r0		uregs[0]
-#define ARM_ORIG_r0	uregs[17]
 
 
 /*

@@ -1,5 +1,5 @@
 #include <linkage.h>
-#include "head.h"
+#include <head.h>
 
 
 /*
@@ -27,9 +27,9 @@ ENDPROC(cpu_v6_switch_mm)
 /* r0 = previous task_struct, r1 = previous thread_info, r2 = next thread_info
  */
 ENTRY(__switch_to)
-/* thread_info + TI_CPU_SAVE hold saved cpu context, registers value is stored */
+/* thread_info + TI_CPU_CONTEXT hold saved cpu context, registers value is stored */
 /* now ip hold the address of the context of previous process */
-	add	ip, r1, #TI_CPU_SAVE
+	add	ip, r1, #TI_CPU_CONTEXT
 /* now r3 hold TP value of next process */
 	ldr	r3, [r2, #TI_TP_VALUE]
 /* store current regs to prev thread_info */
@@ -40,8 +40,18 @@ ENTRY(__switch_to)
 	mcr	p15, 0, r3, c13, c0, 3		@ yes, set TLS register
 	mcr	p15, 0, r6, c3, c0, 0		@ Set domain register
 /* now r4 hold the address of the next context */
-	add	r4, r2, #TI_CPU_SAVE
+	add	r4, r2, #TI_CPU_CONTEXT
 /* put next context to registers */
 	ldmia	r4, {r4 - sl, fp, sp, pc}  	@ Load all regs saved previously
 ENDPROC(__switch_to)
 
+
+ENTRY(arm_start_kernel_thread)
+		ldr	r1, [sp, #S_PSR]	@ get calling cpsr
+		ldr	lr, [sp, #S_PC]	@ get pc
+		add	sp, sp, #S_SP
+		msr	spsr_cxsf, r1			@ save in spsr_svc
+		ldmdb	sp, {r0 - r12}			@ get calling r0 - r12
+		add	sp, sp, #S_FRAME_SIZE - S_SP
+		mov	pc, lr				@ return & move spsr_svc into cpsr
+ENDPROC(arm_start_kernel_thread)

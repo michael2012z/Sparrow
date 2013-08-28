@@ -104,10 +104,12 @@
 #define TTB_FLAGS	TTB_RGN_WBWA|TTB_S
 #define TTB_FLAGS_UP	TTB_RGN_WBWA
 
+
 /* offset of thread_info */
+#define TI_TASK 0 /* offsetof(struct thread_info, task) @ */
 #define TI_CPU_DOMAIN 4 /* offsetof(struct thread_info, cpu_domain)	@ */
 #define TI_TP_VALUE 8 /* offsetof(struct thread_info, tp_value)	@ */
-#define TI_CPU_SAVE 12 /* offsetof(struct thread_info, cpu_context)	@ */
+#define TI_CPU_CONTEXT 12 /* offsetof(struct thread_info, cpu_context)	@ */
 
 
 #endif

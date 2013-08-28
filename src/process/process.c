@@ -27,7 +27,7 @@ void process_test() {
 
 struct task_struct *init_kernel_task = NULL;
 
-static struct task_struct *create_init_kernel_task() {
+static struct task_struct *create_launch_kernel_task() {
   int pid;
   struct task_struct *task = NULL;
   pid = allocate_pid();
@@ -53,23 +53,29 @@ static struct task_struct *create_init_kernel_task() {
 void initialize_process() {
   initialize_pid();
   schedule_initialize();
-  init_kernel_task = create_init_kernel_task();
+  init_kernel_task = create_launch_kernel_task();
 }
 
+
+void arm_start_kernel_thread(void) __asm__("arm_start_kernel_thread");
 
 int create_kernel_thread(int (*fn)(void *)) {
   int pid;
   struct task_struct *task = NULL;
+  struct pt_regs *regs = NULL;
+  struct thread_info *thread = NULL;
+
   pid = allocate_pid();
   if (pid < 0)
 	return pid;
   
+  /* make task_struct */
   task = (struct task_struct *)kmalloc(sizeof(struct task_struct));
 
   if (NULL == task)
 	return -1;
 
-  task->stack = (void *)kmalloc(PAGE_SIZE);
+  task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
   task->pid = pid;
 
@@ -81,13 +87,22 @@ int create_kernel_thread(int (*fn)(void *)) {
 
   INIT_LIST_HEAD(&(task->sched_en.queue_entry));
 
-  arm_create_kernel_thread(fn, NULL, &task->regs);
+  /* populate initial content of stack */
+  regs = task_pt_regs(task);
+  arm_create_kernel_thread(fn, NULL, regs);
+  regs->ARM_r0 = 0;
+  regs->ARM_sp = 0; /* this is user-space sp, don't need to set it */
+	
+  thread = task_thread_info(task);
+  thread->task = task;
+  thread->cpu_domain = arm_calc_kernel_domain();
+  thread->tp_value = 0;
+  thread->cpu_context.sp = (unsigned long)regs;
+  thread->cpu_context.pc = (unsigned long)arm_start_kernel_thread;
 
   enqueue_task(task, sched_enqueue_flag_new);
 
   return pid;
-
-
 }
 
 int create_process(struct file *filep) {
@@ -102,7 +117,7 @@ int create_process(struct file *filep) {
   if (NULL == task)
 	return -1;
 
-  task->stack = (void *)kmalloc(PAGE_SIZE);
+  task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
   task->pid = pid;
 

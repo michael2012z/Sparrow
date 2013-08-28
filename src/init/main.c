@@ -7,6 +7,7 @@
 #include <process.h>
 #include <vfs.h>
 #include <irq.h>
+#include <head.h>
 
 #define UFCON0	((volatile unsigned int *)(0x7f005020))
 
@@ -50,6 +51,16 @@ static void __init rest_init(void) {
   cpu_idle();
 }
 
+static void __init health_check(void) {
+  arm_health_check();
+
+  CRASHIF(TI_TASK != offsetof(struct thread_info, task));
+  CRASHIF(TI_CPU_DOMAIN != offsetof(struct thread_info, cpu_domain));
+  CRASHIF(TI_TP_VALUE != offsetof(struct thread_info, tp_value));
+  CRASHIF(TI_CPU_CONTEXT != offsetof(struct thread_info, cpu_context));
+
+}
+
 void __init start_kernel(void) {
 
   printk(PR_SS_INI, PR_LVL_INF, "Enter start_kernel().\n");
@@ -59,6 +70,9 @@ void __init start_kernel(void) {
 
   exception_disable();
   printk(PR_SS_INI, PR_LVL_INF, "Enter irq diabled.\n");
+
+  health_check();
+  printk(PR_SS_INI, PR_LVL_INF, "Passed health check.\n");
 
   mm_init();
 

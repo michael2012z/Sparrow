@@ -2,6 +2,7 @@
 #include <string.h>
 #include "head.h"
 #include <printk.h>
+#include <list.h>
 
 void start_thread(struct pt_regs *regs, unsigned long pc, unsigned long sp) {
 	unsigned long *stack = (unsigned long *)sp;
@@ -61,3 +62,28 @@ ENTRY(cpu_v6_do_idle)
    */
 }
 
+void arm_health_check(void) {
+  CRASHIF(S_R0 != offsetof(struct pt_regs, ARM_r0));
+  CRASHIF(S_R1 != offsetof(struct pt_regs, ARM_r1));
+  CRASHIF(S_R2 != offsetof(struct pt_regs, ARM_r2));
+  CRASHIF(S_R3 != offsetof(struct pt_regs, ARM_r3));
+  CRASHIF(S_R4 != offsetof(struct pt_regs, ARM_r4));
+  CRASHIF(S_R5 != offsetof(struct pt_regs, ARM_r5));
+  CRASHIF(S_R6 != offsetof(struct pt_regs, ARM_r6));
+  CRASHIF(S_R7 != offsetof(struct pt_regs, ARM_r7));
+  CRASHIF(S_R8 != offsetof(struct pt_regs, ARM_r8));
+  CRASHIF(S_R9 != offsetof(struct pt_regs, ARM_r9));
+  CRASHIF(S_R10 != offsetof(struct pt_regs, ARM_r10));
+  CRASHIF(S_FP != offsetof(struct pt_regs, ARM_fp));
+  CRASHIF(S_IP != offsetof(struct pt_regs, ARM_ip));
+  CRASHIF(S_SP != offsetof(struct pt_regs, ARM_sp));
+  CRASHIF(S_LR != offsetof(struct pt_regs, ARM_lr));
+  CRASHIF(S_PC != offsetof(struct pt_regs, ARM_pc));
+  CRASHIF(S_PSR != offsetof(struct pt_regs, ARM_cpsr));
+  CRASHIF(S_OLD_R0 != offsetof(struct pt_regs, ARM_ORIG_r0));
+  CRASHIF(S_FRAME_SIZE != sizeof(struct pt_regs));
+}
+
+unsigned int arm_calc_kernel_domain() {
+  return domain_val(DOMAIN_USER, DOMAIN_MANAGER) | domain_val(DOMAIN_KERNEL, DOMAIN_MANAGER) | domain_val(DOMAIN_TABLE, DOMAIN_MANAGER) | domain_val(DOMAIN_IO, DOMAIN_CLIENT);
+}

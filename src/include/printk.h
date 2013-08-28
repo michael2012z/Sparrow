@@ -48,4 +48,6 @@ void test_printk(void);
 void printk_disable();
 void printk_enable();
 
+#define CRASHIF(condition) {if (condition) { printk(PR_SS_INI, PR_LVL_ERR, "crash at %s : %d\n", __func__, __LINE__); while(1); }}
+
 #endif

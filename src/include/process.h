@@ -88,6 +88,9 @@ struct thread_info {
 
 
 #define task_thread_info(task)	((struct thread_info *)(task)->stack)
+#define task_stack_page(task)	((task)->stack)
+#define task_pt_regs(p) \
+	((struct pt_regs *)(THREAD_START_SP + task_stack_page(p)) - 1)
 
 
 union thread_union {
@@ -110,7 +113,8 @@ void schedule();
 void schedule_initialize();
 
 void cpu_idle();
-
+void arm_health_check(void);
+unsigned int arm_calc_kernel_domain();
 void cpu_v6_switch_mm(unsigned long, int);
 void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs);
 void __switch_to(struct task_struct *prev, struct thread_info *prev_thread, struct thread_info *next_thread);
