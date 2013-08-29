@@ -41,7 +41,7 @@ static int __init kernel_init(void *unused) {
 	int i = 0;
 	for (i = 0; i < 65535 ; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-	//	schedule();
+		schedule();
   }
   return 0;
 }
@@ -51,7 +51,7 @@ static int __init kernel_demo(void *unused) {
 	int i = 0;
 	for (i = 0; i < 65535 ; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-	//	schedule();
+		schedule();
   }
   process_test();
   return 0;
@@ -90,8 +90,6 @@ void __init start_kernel(void) {
   printk(PR_SS_INI, PR_LVL_INF, "MM initialization finish.\n");
 
   exception_init();
-  init_IRQ();
-  init_timer();
 
   exception_disable();
 
@@ -113,7 +111,9 @@ void __init start_kernel(void) {
 
   printk(PR_SS_INI, PR_LVL_INF, "Will enable IRQ.\n");
 
-  //  exception_enable();
+  init_IRQ();
+  init_timer();
+  exception_enable();
 
   printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
 
