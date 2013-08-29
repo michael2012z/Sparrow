@@ -41,6 +41,7 @@ static int __init kernel_init(void *unused) {
 	int i = 0;
 	for (i = 0; i < 65535 ; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
+	//	schedule();
   }
   return 0;
 }
@@ -50,6 +51,7 @@ static int __init kernel_demo(void *unused) {
 	int i = 0;
 	for (i = 0; i < 65535 ; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
+	//	schedule();
   }
   process_test();
   return 0;
@@ -58,7 +60,6 @@ static int __init kernel_demo(void *unused) {
 static void __init rest_init(void) {
   create_kernel_thread(kernel_init);
   create_kernel_thread(kernel_demo);
-  cpu_idle();
 }
 
 static void __init health_check(void) {
@@ -92,9 +93,7 @@ void __init start_kernel(void) {
   init_IRQ();
   init_timer();
 
-  exception_enable();
-
-  printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
+  exception_disable();
 
   register_file_system(&listfs_file_system_type);
 
@@ -110,6 +109,17 @@ void __init start_kernel(void) {
 
   rest_init();
 
+  schedule();
+
+  printk(PR_SS_INI, PR_LVL_INF, "Will enable IRQ.\n");
+
+  //  exception_enable();
+
+  printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
+
   printk(PR_SS_INI, PR_LVL_INF, "Kernel is running ...\n");
+
+  cpu_idle();
+
   while(1);
 }
