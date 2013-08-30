@@ -66,10 +66,11 @@ void schedule() {
   register unsigned long sp asm ("sp");
   printk(PR_SS_PROC, PR_LVL_DBG3, "%s, sp = %x\n", __func__, sp);
 
-  if (current_task)
-	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
-  else
-	prev_task = init_kernel_task;
+  if (NULL == current_task) while(1);
+
+  scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
+
+  scheduler->dump();
 
   next_task = scheduler->pick_next_task();
 
@@ -91,7 +92,8 @@ void schedule() {
 	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task != next_task\n", __func__);
 	current_task = next_task;
   }
-  
+
+  printk(PR_SS_PROC, PR_LVL_INF, "%s, context_switch %d <--> %d start\n", __func__, prev_task->pid, next_task->pid);  
   if (1) context_switch(prev_task, next_task);
   printk(PR_SS_PROC, PR_LVL_INF, "%s, context_switch %d <--> %d finish\n", __func__, prev_task->pid, next_task->pid);
 }

@@ -9,6 +9,8 @@
 #include <irq.h>
 #include <head.h>
 
+extern struct task_struct *current_task;
+
 #define UFCON0	((volatile unsigned int *)(0x7f005020))
 
 void __init helloworld(void){
@@ -41,7 +43,8 @@ static int __init kernel_init(void *unused) {
 	int i = 0;
 	for (i = 0; i < 65535 ; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-		schedule();
+	current_task->sched_en.continuous_ticks++;
+	schedule();
   }
   return 0;
 }
@@ -51,7 +54,8 @@ static int __init kernel_demo(void *unused) {
 	int i = 0;
 	for (i = 0; i < 65535 ; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-		schedule();
+	current_task->sched_en.continuous_ticks++;
+	schedule();
   }
   process_test();
   return 0;
@@ -118,6 +122,13 @@ void __init start_kernel(void) {
   printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
 
   printk(PR_SS_INI, PR_LVL_INF, "Kernel is running ...\n");
+
+  while(1) {
+	//	int i = 0;
+	//	for (i = 0; i < 65535 ; i++){}
+	printk(PR_SS_INI, PR_LVL_INF, "%s : Kernel is running ...\n", __func__);
+	//schedule();
+  }
 
   cpu_idle();
 

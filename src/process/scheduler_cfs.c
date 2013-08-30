@@ -86,6 +86,10 @@ static void task_tick_cfs (struct task_struct *p) {
   printk(PR_SS_PROC, PR_LVL_DBG3, "%s, pid = %d, continuous_ticks = %d\n", __func__, p->pid, task_en->continuous_ticks);
 }
 
+static void dump_cfs () {
+  cfs_queue_dump();
+}
+
 const struct sched_class sched_class_cfs = {
   .init = scheduler_init_cfs,
   .enqueue_task		= enqueue_task_cfs,
@@ -94,4 +98,5 @@ const struct sched_class sched_class_cfs = {
   .check_preempt_curr	= check_preempt_curr_cfs,
   .pick_next_task		= pick_next_task_cfs,
   .task_tick		= task_tick_cfs,
+  .dump = dump_cfs,
 };

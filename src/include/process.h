@@ -62,6 +62,7 @@ struct sched_class {
   void (*check_preempt_curr) (struct task_struct *p);
   struct task_struct * (*pick_next_task) ();
   void (*task_tick) (struct task_struct *p);
+  void (*dump) ();
 };
 
 

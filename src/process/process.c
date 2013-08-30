@@ -8,6 +8,8 @@
 
 extern unsigned long mm_pgd;
 extern struct list_head *task_list;
+extern struct task_struct *current_task;
+extern struct sched_class *scheduler;
 
 void process_test() {
   struct file demo_1, demo_2;
@@ -47,13 +49,17 @@ static struct task_struct *create_launch_kernel_task() {
 
   task->mm.pgd = mm_pgd;
 
+  enqueue_task(task, sched_enqueue_flag_new);
+
   return task;
 }
 
 void initialize_process() {
   initialize_pid();
   schedule_initialize();
-  init_kernel_task = create_launch_kernel_task();
+  create_launch_kernel_task();
+  init_kernel_task = scheduler->pick_next_task();
+  current_task = init_kernel_task;
 }
 
 
