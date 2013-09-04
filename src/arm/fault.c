@@ -41,3 +41,11 @@ void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct 
 	printk(PR_SS_IRQ, PR_LVL_ERR, "A prefetch abort happened, addr = %x\n", addr);
 	while(1);
 }
+
+void __exception irq_usr_debug() {
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s\n", __func__);
+}
+
+void __exception irq_svc_debug() {
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s\n", __func__);
+}

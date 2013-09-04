@@ -41,10 +41,8 @@ static int __init kernel_init(void *unused) {
 	*/
   while(1) {
 	int i = 0;
-	for (i = 0; i < 65535 ; i++){}
+	for (i = 0; i < 256; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-	current_task->sched_en.continuous_ticks++;
-	schedule();
   }
   return 0;
 }
@@ -52,10 +50,8 @@ static int __init kernel_init(void *unused) {
 static int __init kernel_demo(void *unused) {
   while(1) {
 	int i = 0;
-	for (i = 0; i < 65535 ; i++){}
+	for (i = 0; i < 256; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-	current_task->sched_en.continuous_ticks++;
-	schedule();
   }
   process_test();
   return 0;
@@ -111,7 +107,7 @@ void __init start_kernel(void) {
 
   rest_init();
 
-  schedule();
+  //  schedule();
 
   printk(PR_SS_INI, PR_LVL_INF, "Will enable IRQ.\n");
 
@@ -123,14 +119,15 @@ void __init start_kernel(void) {
 
   printk(PR_SS_INI, PR_LVL_INF, "Kernel is running ...\n");
 
+  /*
   while(1) {
 	//	int i = 0;
 	//	for (i = 0; i < 65535 ; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s : Kernel is running ...\n", __func__);
 	//schedule();
   }
+  */
 
   cpu_idle();
 
-  while(1);
 }

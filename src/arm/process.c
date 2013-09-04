@@ -51,7 +51,7 @@ void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs
 
 void cpu_idle() {
   printk(PR_SS_INI, PR_LVL_ERROR, "cpu_idle() \n");
-  while(1) {}
+  while(1) {asm("nop\n");}
   /* Should call cpu founction:
 ENTRY(cpu_v6_do_idle)
 	mov	r1, #0

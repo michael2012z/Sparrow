@@ -7,6 +7,7 @@ struct sched_class *scheduler = NULL;
 
 extern struct task_struct *init_kernel_task;
 extern struct sched_class sched_class_cfs;
+extern bool need_reschedule;
 
 bool is_scheduler_ready() {
   return (scheduler != NULL);
@@ -52,6 +53,11 @@ void update_task_on_tick() {
 	scheduler->task_tick(current_task);
 }
 
+void check_and_schedule() {
+  if (check_should_schedule())
+	schedule();
+}
+
 bool check_should_schedule() {
   if (NULL != current_task)  
 	return scheduler->need_to_reschedule(current_task);
@@ -65,6 +71,8 @@ void schedule() {
 
   register unsigned long sp asm ("sp");
   printk(PR_SS_PROC, PR_LVL_DBG3, "%s, sp = %x\n", __func__, sp);
+
+  need_reschedule = false;
 
   if (NULL == current_task) while(1);
 
