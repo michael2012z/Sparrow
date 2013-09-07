@@ -142,7 +142,20 @@ int create_process(struct file *filep) {
   return pid;
 }
 
+int execute_binary(struct task_struct *task, struct file *filep) {
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: current process: %d\n", __func__, task->pid);
+  load_elf_binary(filep, &task->regs, &task->mm);
+  return 0; // meaningless return value
+}
+
 void destroy_process(struct task_struct *task) {
   free_pid(task->pid);
   kfree(task);
 }
+
+
+void run_kernel_process(char *init_filename)
+{
+	arm_kernel_execve(init_filename, NULL, NULL);
+}
+

@@ -104,7 +104,9 @@ void process_test();
 void initialize_process();
 int create_kernel_thread(int (*fn)(void *));
 int create_process(struct file *filep);
+int execute_binary(struct task_struct *task, struct file *filep);
 void destroy_process(struct task_struct *task);
+void run_kernel_process(char *init_filename);
 
 bool is_scheduler_ready();
 void update_task_on_tick();
@@ -116,6 +118,7 @@ void schedule_initialize();
 void cpu_idle();
 void arm_health_check(void);
 unsigned int arm_calc_kernel_domain();
+int arm_kernel_execve(const char *filename, char *const argv[], char *const envp[]);
 void cpu_v6_switch_mm(unsigned long, int);
 void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs);
 void __switch_to(struct task_struct *prev, struct thread_info *prev_thread, struct thread_info *next_thread);

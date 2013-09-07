@@ -41,19 +41,16 @@ static int __init kernel_init(void *unused) {
 	*/
   while(1) {
 	int i = 0;
-	for (i = 0; i < 256; i++){}
+	for (i = 0; i < 1024; i++){}
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
   }
   return 0;
 }
 
 static int __init kernel_demo(void *unused) {
-  while(1) {
-	int i = 0;
-	for (i = 0; i < 256; i++){}
-	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-  }
-  process_test();
+  printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
+  run_kernel_process("/sbin/init");
+  //  process_test();
   return 0;
 }
 

@@ -268,12 +268,11 @@ void printk(int ss, int level, const char *fmt, ...)
 	  return;
 	case PR_SS_MM:
 	  leading_ss = "MM] ";
+	  return;// ++
 	  break;
-	  return;
 	case PR_SS_PROC:
 	  leading_ss = "PROC] ";
 	  break;
-	  return;
 	case PR_SS_IRQ:
 	  leading_ss = "IRQ] ";
 	  break;
