@@ -27,7 +27,7 @@ static void switch_pgd(unsigned long pgd, int pid) {
 static void switch_to(struct task_struct *prev, struct task_struct *next) {
   struct thread_info *prev_thread = task_thread_info(prev);
   struct thread_info *next_thread = task_thread_info(next);  
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, prev_thread = %x, next_thread = %x\n", __func__, prev_thread, next_thread);  
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, prev_thread = %x, next_thread = %x\n", __func__, prev_thread, next_thread);  
   __switch_to(prev,task_thread_info(prev), task_thread_info(next));
 }
 
@@ -36,10 +36,9 @@ context_switch(struct task_struct *prev,
 	       struct task_struct *next)
 {
   register unsigned long sp asm ("sp");
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, sp = %x\n", __func__, sp);
-
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, prev = %x, next = %x\n", __func__, prev, next);  
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, prev.pgd = %x, next.pgd = %x\n", __func__, prev->mm.pgd, next->mm.pgd);  
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, sp = %x\n", __func__, sp);
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, prev = %x, next = %x\n", __func__, prev, next);  
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, prev.pgd = %x, next.pgd = %x\n", __func__, prev->mm.pgd, next->mm.pgd);  
   switch_pgd(next->mm.pgd, next->pid);
   switch_to(prev, next);
 }
@@ -70,7 +69,7 @@ void schedule() {
   struct task_struct *prev_task = current_task;
 
   register unsigned long sp asm ("sp");
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s, sp = %x\n", __func__, sp);
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, sp = %x\n", __func__, sp);
 
   need_reschedule = false;
 
@@ -83,25 +82,25 @@ void schedule() {
   next_task = scheduler->pick_next_task();
 
   if (current_task)
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task->pid = %d\n", __func__, current_task->pid);
+	printk(PR_SS_PROC, PR_LVL_DBG5, "%s, current_task->pid = %d\n", __func__, current_task->pid);
   if (next_task)
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, next_task->pid = %d\n", __func__, next_task->pid);
+	printk(PR_SS_PROC, PR_LVL_DBG5, "%s, next_task->pid = %d\n", __func__, next_task->pid);
 
   if (current_task == next_task) {
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task == next_task\n", __func__);
+	printk(PR_SS_PROC, PR_LVL_DBG5, "%s, current_task == next_task\n", __func__);
 	return;
   } else if (NULL == next_task) {
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, NULL == next_task\n", __func__);
+	printk(PR_SS_PROC, PR_LVL_DBG5, "%s, NULL == next_task\n", __func__);
 	return;
   } else if (NULL == current_task) {
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, NULL == current_task\n", __func__);
+	printk(PR_SS_PROC, PR_LVL_DBG5, "%s, NULL == current_task\n", __func__);
 	current_task = next_task;
   } else {
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s, current_task != next_task\n", __func__);
+	printk(PR_SS_PROC, PR_LVL_DBG5, "%s, current_task != next_task\n", __func__);
 	current_task = next_task;
   }
 
-  printk(PR_SS_PROC, PR_LVL_INF, "%s, context_switch %d <--> %d start\n", __func__, prev_task->pid, next_task->pid);  
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, context_switch %d <--> %d start\n", __func__, prev_task->pid, next_task->pid);  
   if (1) context_switch(prev_task, next_task);
-  printk(PR_SS_PROC, PR_LVL_INF, "%s, context_switch %d <--> %d finish\n", __func__, prev_task->pid, next_task->pid);
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, context_switch %d <--> %d finish\n", __func__, prev_task->pid, next_task->pid);
 }

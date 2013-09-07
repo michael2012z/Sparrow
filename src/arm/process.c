@@ -52,7 +52,7 @@ void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs
 
 
 void cpu_idle() {
-  printk(PR_SS_INI, PR_LVL_ERROR, "cpu_idle() \n");
+  printk(PR_SS_INI, PR_LVL_INF, "cpu_idle() \n");
   while(1) {asm("nop\n");}
   /* Should call cpu founction:
 ENTRY(cpu_v6_do_idle)
@@ -111,7 +111,8 @@ int arm_kernel_execve(const char *filename, char *const argv[], char *const envp
    * Save argc to the register structure for userspace.
    */
   regs->ARM_r0 = ret;
-  
+
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: going to push process %d into user mode\n", __func__, current_task->pid);  
   /*
    * We were successful.  We won't be returning to our caller, but
    * instead to user space by manipulating the kernel stack.

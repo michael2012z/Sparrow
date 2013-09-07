@@ -9,6 +9,7 @@ void init_timer() {
 
 bool need_reschedule = false;
 
+extern struct task_struct *current_task;
 /* Get called on periodic tick.
  * Update current task ticks. Re-schedule if the min time slices has been used up.
  */
@@ -20,11 +21,11 @@ void on_timer() {
 	 * reschedule if time slices is up.
 	 */
 	if (check_should_schedule()) {
-	  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, current task times up, will reschedule\n", __func__);
+	  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, current task (%d) times up, will reschedule\n", __func__, current_task->pid);
 	  need_reschedule = true;
 	  //	  schedule();
 	} else {
-	  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, current task should continue, not kicked out\n", __func__);
+	  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, current task (%d) should continue, not kicked out\n", __func__, current_task->pid);
 	  need_reschedule = false;
 	}
   }

@@ -16,12 +16,12 @@ void cfs_queue_enqueue (struct sched_entity *en) {
   struct list_head *pos = NULL, *head = queue;
   struct sched_entity *current;
 
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s\n", __func__);
+  printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
   list_for_each(pos, head) {
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s 1\n", __func__);
+	printk(PR_SS_PROC, PR_LVL_DBG6, "%s 1\n", __func__);
 	current = list_entry(pos, struct sched_entity, queue_entry);
 	if (en->vruntime < current->vruntime) {
-	  printk(PR_SS_PROC, PR_LVL_DBG3, "%s 2\n", __func__);
+	  printk(PR_SS_PROC, PR_LVL_DBG6, "%s 2\n", __func__);
 	  list_add_tail(&en->queue_entry, pos);
 	  return;
 	}
@@ -68,12 +68,12 @@ void cfs_queue_dump() {
   struct sched_entity *current;
   struct task_struct* task = NULL;
 
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s\n", __func__);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: queue size: %d\n", __func__, cfs_queue_size());
+  printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
+  printk(PR_SS_PROC, PR_LVL_DBG6, "%s: queue size: %d\n", __func__, cfs_queue_size());
   list_for_each(pos, head) {
 	current = list_entry(pos, struct sched_entity, queue_entry);
 	task = 	container_of(current, struct task_struct, sched_en);
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s: pid: %d, vruntime: %d \n", __func__, task->pid, current->vruntime);
+	printk(PR_SS_PROC, PR_LVL_DBG6, "%s: pid: %d, vruntime: %d \n", __func__, task->pid, current->vruntime);
   }
   return;
 }
