@@ -1,5 +1,9 @@
 #include <vfs.h>
 #include <string.h>
+#ifdef __ARCH_X86__
+#include <stdio.h>
+#include <stdlib.h>
+#endif
 
 /* All registered file systems should be in a list,
  * but as there is only one kind of FS is supported,

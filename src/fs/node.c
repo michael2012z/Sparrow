@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #endif
 
+extern vfs_node *root_vfs_node;
+
 vfs_node *vfs_new_node(vfs_node_type type) {
   if (VFS_NODE_TYPE_DIR == type)
 	return vfs_new_dir();
@@ -84,23 +86,81 @@ int vfs_remove_node_from_dir(vfs_node *parent, vfs_node *node) {
   return 0;
 }
 
+vfs_node* vfs_find_node(char *name) {
+  char current_dir[16] = {(char)0};
+  char *name_tmp=name, *current_tmp;
+  vfs_node* current_node = root_vfs_node;
+
+  printk(PR_SS_FS, PR_LVL_DBG3, "%s: finding node with full name: %s\n", __func__, name);
+
+  if (NULL == name)
+    return NULL;
+
+  do {
+    current_tmp = current_dir;
+    // skip leading "/" or " ":
+    while(('/' == *name_tmp) || (' ' == *name_tmp))
+      name_tmp++;
+    if (0 == *name_tmp) {
+      printk(PR_SS_FS, PR_LVL_DBG3, "%s: end of path name each, return\n", __func__);
+      break;
+    }
+
+    // copy current path name
+    while(('/' != *name_tmp) && (0 != *name_tmp))
+      *(current_tmp++) = *(name_tmp++); 
+    *current_tmp = 0;
+
+    printk(PR_SS_FS, PR_LVL_DBG3, "%s: finding node: %s\n", __func__, current_dir);
+
+    // now current_dir hold current dir name
+    current_node = vfs_find_in_node(current_node, current_dir);
+    if (NULL == current_node)
+      printk(PR_SS_FS, PR_LVL_INF, "%s: node %s was not found\n", __func__, name);
+  } while(current_node);
+  return current_node;
+}
+
+vfs_node* vfs_find_in_node(vfs_node *node, char *name) {
+  printk(PR_SS_FS, PR_LVL_DBG3, "%s: finding %s in current node: %s\n", __func__, name, node->name);
+  if (VFS_NODE_TYPE_FILE == node->type){  
+    printk(PR_SS_FS, PR_LVL_DBG3, "%s: current node is file\n", __func__);
+    if(0 == strcmp(node->name, name))
+      return node;
+    else
+      return NULL;
+  } else if (VFS_NODE_TYPE_DIR == node->type) {
+    struct list_head *current;
+    vfs_node *child;
+    printk(PR_SS_FS, PR_LVL_DBG3, "%s: current node is dir\n", __func__);
+    list_for_each(current, &(node->dir.nodes)) {
+      child = list_entry(current,vfs_node,list);
+      printk(PR_SS_FS, PR_LVL_DBG3, "%s: checking child: %s\n", __func__, child->name);
+      if(0 == strcmp(child->name, name))
+	return child;
+    }
+    return NULL;
+  } else
+    return NULL;
+}
+
 void vfs_print_dir(vfs_node *dir) {
   if (VFS_NODE_TYPE_DIR == dir->type)
-	printk(PR_SS_FS, PR_LVL_INF, "DIR: name = %s\n", dir->name);
+	printk(PR_SS_FS, PR_LVL_DBG0, "DIR: name = %s\n", dir->name);
   else
-	printk(PR_SS_FS, PR_LVL_INF, "Node is not a DIR.\n");
+	printk(PR_SS_FS, PR_LVL_DBG0, "Node is not a DIR.\n");
 }
 
 void vfs_print_file(vfs_node *file) {
   if (VFS_NODE_TYPE_FILE == file->type)
-	printk(PR_SS_FS, PR_LVL_INF, "FILE: name = %s, size = %d, addr = 0x%x\n", file->name, file->file.size, (unsigned int)file->file.addr);
+	printk(PR_SS_FS, PR_LVL_DBG0, "FILE: name = %s, size = %d, addr = 0x%x\n", file->name, file->file.size, (unsigned int)file->file.addr);
   else
-	printk(PR_SS_FS, PR_LVL_INF, "Node is not a FILE.\n");
+	printk(PR_SS_FS, PR_LVL_DBG0, "Node is not a FILE.\n");
 }
 
 static void vfs_print_indent(int indent) {
   while (indent-- > 0)
-    printk(PR_SS_FS, PR_LVL_INF, " ");
+    printk(PR_SS_FS, PR_LVL_DBG0, " ");
 }
 
 static void _vfs_print_node_re(vfs_node *node, int indent) {

@@ -39,6 +39,7 @@
  *   DBG0 -- Mount
  *   DBG1 -- Unmount
  *   DBG2 -- ListFS parsing
+ *   DBG3 -- File reading
  */
 
 void printk(int a, int b, const char *fmt, ...);

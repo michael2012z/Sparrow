@@ -1,7 +1,7 @@
 
 src_dir := ../../fs
 
-objects	:= test.o node.o node-test.o vfs-test.o
+objects	:= test.o node.o node-test.o vfs-test.o mount.o
 
 subdirs := ListFS/
 

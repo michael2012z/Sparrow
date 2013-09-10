@@ -101,6 +101,13 @@ void __init start_kernel(void) {
 
   printk(PR_SS_INI, PR_LVL_INF, "FS initialization finish.\n");
 
+  // tmp test code for FS
+  {
+    vfs_node* file = vfs_find_node("/ListFS/mount.c");
+    printk(PR_SS_INI, PR_LVL_INF, "%s: file location: %x, file size: %d\n", __func__, file->file.addr, file->file.size);
+    while(1);
+  }
+
   initialize_process();
 
   printk(PR_SS_INI, PR_LVL_INF, "Process initialization finish.\n");

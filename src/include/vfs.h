@@ -95,6 +95,8 @@ vfs_node *vfs_new_dir();
 vfs_node *vfs_new_file();
 int vfs_add_node_to_dir(vfs_node *parent, vfs_node *node);
 int vfs_remove_node_from_dir(vfs_node *parent, vfs_node *node);
+vfs_node* vfs_find_node(char *name);
+vfs_node* vfs_find_in_node(vfs_node *node, char *name);
 
 /* Debug */
 void vfs_print_file(vfs_node *file);
