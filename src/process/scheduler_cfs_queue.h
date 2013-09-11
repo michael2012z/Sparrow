@@ -7,5 +7,6 @@ void cfs_queue_dequeue (struct sched_entity* en);
 struct sched_entity* cfs_queue_find_first ();
 struct sched_entity* cfs_queue_dequeue_first ();
 int cfs_queue_size ();
+void cfs_queue_dump ();
 
 #endif /* _SCHEDULER_CFS_QUEUE_H_ */

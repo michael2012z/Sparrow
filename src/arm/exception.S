@@ -291,7 +291,9 @@ ENDPROC(__pabt_invalid)
 	.align	5
 __irq_svc:
 	svc_entry
+	bl irq_svc_debug
 	irq_handler
+	bl check_and_schedule
 	ldr	r4, [sp, #S_PSR]		@ irqs are already disabled
 	svc_exit r4				@ return from exception
 	.fnend
@@ -302,6 +304,7 @@ ENDPROC(__irq_svc)
 __irq_usr:
 	usr_entry
 	get_thread_info tsk
+	bl irq_usr_debug
 	irq_handler
 	mov	why, #0
 	b	ret_to_user

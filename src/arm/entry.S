@@ -51,7 +51,9 @@ ENTRY(arm_start_kernel_thread)
 		ldr	lr, [sp, #S_PC]	@ get pc
 		add	sp, sp, #S_SP
 		msr	spsr_cxsf, r1			@ save in spsr_svc
-		ldmdb	sp, {r0 - r12}			@ get calling r0 - r12
+		strex	r1, r2, [sp]
+		ldmdb	sp, {r0 - r12}^			@ get calling r0 - r12
+		mov r0, r0
 		add	sp, sp, #S_FRAME_SIZE - S_SP
-		mov	pc, lr				@ return & move spsr_svc into cpsr
+		movs	pc, lr				@ return & move spsr_svc into cpsr
 ENDPROC(arm_start_kernel_thread)

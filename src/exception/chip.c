@@ -105,7 +105,7 @@ int set_irq_handler(unsigned int irq, irq_flow_handler_t handle)
 {
 	struct irq_desc *desc = irq_to_desc(irq);
 
-	printk(PR_SS_IRQ, PR_LVL_INF, "%s, irq = %d, desc = %x\n", __func__, irq, desc);
+	printk(PR_SS_IRQ, PR_LVL_DBG0, "%s, irq = %d, desc = %x\n", __func__, irq, desc);
 
 	desc->handle_irq = handle;
 

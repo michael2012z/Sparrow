@@ -40,6 +40,17 @@
  *   DBG1 -- Unmount
  *   DBG2 -- ListFS parsing
  *   DBG3 -- File reading
+ *
+ * Process & Schedule:
+ *   DBG0 -- Process initialization
+ *   DBG1 -- Program load
+ *   DBG5 -- Schedule actions
+ *   DBG6 -- Schedule algorithm
+ *
+ * IRQ:
+ *   DBG0 -- IRQ setup
+ *   DBG1 -- IRQ handling: indication
+ *   DBG2 -- IRQ handling: detail
  */
 
 void printk(int a, int b, const char *fmt, ...);

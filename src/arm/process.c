@@ -3,6 +3,8 @@
 #include "head.h"
 #include <printk.h>
 #include <list.h>
+#include <type.h>
+#include <process.h>
 
 void start_thread(struct pt_regs *regs, unsigned long pc, unsigned long sp) {
 	unsigned long *stack = (unsigned long *)sp;
@@ -50,8 +52,8 @@ void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs
 
 
 void cpu_idle() {
-  printk(PR_SS_INI, PR_LVL_ERROR, "cpu_idle() \n");
-  while(1) {}
+  printk(PR_SS_INI, PR_LVL_INF, "cpu_idle() \n");
+  while(1) {asm("nop\n");}
   /* Should call cpu founction:
 ENTRY(cpu_v6_do_idle)
 	mov	r1, #0
@@ -87,3 +89,50 @@ void arm_health_check(void) {
 unsigned int arm_calc_kernel_domain() {
   return domain_val(DOMAIN_USER, DOMAIN_MANAGER) | domain_val(DOMAIN_KERNEL, DOMAIN_MANAGER) | domain_val(DOMAIN_TABLE, DOMAIN_MANAGER) | domain_val(DOMAIN_IO, DOMAIN_CLIENT);
 }
+
+extern struct task_struct *current_task;
+int arm_kernel_execve(const char *filename, char *const argv[], char *const envp[])
+{
+  struct pt_regs* regs = &current_task->regs;
+  int ret;
+  struct file exe_file;
+  
+  /* need to find the file according to filename, this is demo  */
+  exe_file.buf = (void *)0xc4040000;
+  exe_file.size = 33807;
+  
+
+  memset(regs, 0, sizeof(struct pt_regs));
+  ret = execute_binary(current_task, &exe_file);
+  if (ret < 0)
+	goto out;
+  
+  /*
+   * Save argc to the register structure for userspace.
+   */
+  regs->ARM_r0 = ret;
+
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: going to push process %d into user mode\n", __func__, current_task->pid);  
+  /*
+   * We were successful.  We won't be returning to our caller, but
+   * instead to user space by manipulating the kernel stack.
+   */
+  asm(	"add	r0, %0, %1\n\t"
+		"mov	r1, %2\n\t"
+		"mov	r2, %3\n\t"
+		"bl	memmove\n\t"	/* copy regs to top of stack */
+		"mov	r8, #0\n\t"	/* not a syscall */
+		"mov	r9, %0\n\t"	/* thread structure */
+		"mov	sp, r0\n\t"	/* reposition stack pointer */
+		"b	ret_to_user"
+		:
+		: "r" (task_thread_info(current_task)),
+		  "Ir" (THREAD_START_SP - sizeof(*regs)),
+		  "r" (regs),
+		  "Ir" (sizeof(*regs))
+		: "r0", "r1", "r2", "r3", "ip", "lr", "memory");
+
+ out:
+	return ret;
+}
+

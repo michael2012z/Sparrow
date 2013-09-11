@@ -2,6 +2,7 @@
 #define _STRING_H_
 
 void *memcpy(void *dest, const void *src, unsigned int count);
+void *memmove(void *dest, const void *src, unsigned int count);
 int memcmp(const void *cs, const void *ct, unsigned int count);
 void *memset(void *s, int c, unsigned int count);
 unsigned int strlen(const char *s);

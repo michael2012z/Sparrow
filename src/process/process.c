@@ -8,6 +8,8 @@
 
 extern unsigned long mm_pgd;
 extern struct list_head *task_list;
+extern struct task_struct *current_task;
+extern struct sched_class *scheduler;
 
 void process_test() {
   struct file demo_1, demo_2;
@@ -47,13 +49,17 @@ static struct task_struct *create_launch_kernel_task() {
 
   task->mm.pgd = mm_pgd;
 
+  enqueue_task(task, sched_enqueue_flag_new);
+
   return task;
 }
 
 void initialize_process() {
   initialize_pid();
   schedule_initialize();
-  init_kernel_task = create_launch_kernel_task();
+  create_launch_kernel_task();
+  init_kernel_task = scheduler->pick_next_task();
+  current_task = init_kernel_task;
 }
 
 
@@ -136,7 +142,20 @@ int create_process(struct file *filep) {
   return pid;
 }
 
+int execute_binary(struct task_struct *task, struct file *filep) {
+  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: current process: %d\n", __func__, task->pid);
+  load_elf_binary(filep, &task->regs, &task->mm);
+  return 0; // meaningless return value
+}
+
 void destroy_process(struct task_struct *task) {
   free_pid(task->pid);
   kfree(task);
 }
+
+
+void run_kernel_process(char *init_filename)
+{
+	arm_kernel_execve(init_filename, NULL, NULL);
+}
+
