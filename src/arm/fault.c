@@ -32,14 +32,14 @@ void __exception asm_unsupported_exception(unsigned int code)
  */
 void __exception do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 {
-	printk(PR_SS_IRQ, PR_LVL_ERR, "A data abort happened, addr = %x\n", addr);
-	//while(1);
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A data abort happened, addr = %x\n", __func__, addr);
+  while(1);
 }
 
 void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
 {
-	printk(PR_SS_IRQ, PR_LVL_ERR, "A prefetch abort happened, addr = %x\n", addr);
-	while(1);
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x\n", __func__, addr);
+  while(1);
 }
 
 void __exception irq_usr_debug() {
@@ -49,3 +49,9 @@ void __exception irq_usr_debug() {
 void __exception irq_svc_debug() {
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s\n", __func__);
 }
+
+void asm_dbg_nail() {
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s\n", __func__);
+  while(1);
+}
+

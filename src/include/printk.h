@@ -44,6 +44,7 @@
  * Process & Schedule:
  *   DBG0 -- Process initialization
  *   DBG1 -- Program load
+ *   DBG3 -- Program actions
  *   DBG5 -- Schedule actions
  *   DBG6 -- Schedule algorithm
  *

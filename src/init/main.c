@@ -49,7 +49,7 @@ static int __init kernel_init(void *unused) {
 
 static int __init kernel_demo(void *unused) {
   printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-  run_kernel_process("/sbin/init");
+  run_kernel_process("/demo_1");
   //  process_test();
   return 0;
 }
@@ -97,13 +97,6 @@ void __init start_kernel(void) {
   mount_file_system("ListFS");
 
   printk(PR_SS_INI, PR_LVL_INF, "FS initialization finish.\n");
-
-  // tmp test code for FS
-  {
-    vfs_node* file = vfs_find_node("/ListFS/mount.c");
-    printk(PR_SS_INI, PR_LVL_INF, "%s: file location: %x, file size: %d\n", __func__, file->file.addr, file->file.size);
-    while(1);
-  }
 
   initialize_process();
 

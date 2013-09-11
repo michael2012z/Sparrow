@@ -76,28 +76,10 @@ unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long ad
   struct vm_area_struct *vma;
   int error;
 
-  // test
-  static struct vm_area_struct vma1, vma2, vmab1, vmab2;
-  // test ~
-
-  // test
-  //  vma = (struct vm_area_struct *)kmalloc(sizeof(struct vm_area_struct));
+  vma = (struct vm_area_struct *)kmalloc(sizeof(struct vm_area_struct));
 
   printk(PR_SS_MM, PR_LVL_DBG6, "do_mmap():\n");
   printk(PR_SS_MM, PR_LVL_DBG6, "mm = %x, addr = %x, len = %x, offset = %x, pgoff = %x\n", mm, addr, len, offset, pgoff);
-
-  if(NULL != filep) {
-	if (filep->buf == (void *)0xc4040000) // demo 1
-	  vma = &vma1;
-	if (filep->buf == (void *)0xc4080000) // demo 2
-	  vma = &vma2;
-  } else {
-	if (NULL == vmab1.vm_mm)
-	  vma = &vmab1;
-	else
-	  vma = &vmab2;
-  }
-  // test ~
 
   if (!vma) {
 	error = -ENOMEM;
