@@ -358,7 +358,6 @@ ENDPROC(__dabt_svc)
 	.align	5
 __pabt_svc:
 	svc_entry
-
 	@
 	@ re-enable interrupts if appropriate
 	@
@@ -454,6 +453,9 @@ ENDPROC(ret_from_exception)
 	.align	5
 
 vector_\name:
+@	ldr r0, =0xef005020
+@	mov r1, #0x42
+@	str r1,[r0]
 	.if \correction
 	sub	lr, lr, #\correction
 	.endif

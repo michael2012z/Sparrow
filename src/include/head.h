@@ -30,7 +30,7 @@
 #define PSR_Z_BIT	0x40000000
 #define PSR_N_BIT	0x80000000
 
-
+#define PSR_ENDSTATE	0
 
 /*
  * CR1 bits (CP#15 CR1)

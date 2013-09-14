@@ -33,6 +33,7 @@ struct pt_regs {
 /*
  * PSR bits
  */
+/*
 #define USR26_MODE	0x00000000
 #define FIQ26_MODE	0x00000001
 #define IRQ26_MODE	0x00000002
@@ -59,6 +60,6 @@ struct pt_regs {
 #define PSR_Z_BIT	0x40000000
 #define PSR_N_BIT	0x80000000
 
-#define PSR_ENDSTATE	PSR_E_BIT
-
+#define PSR_ENDSTATE	0
+*/
 #endif

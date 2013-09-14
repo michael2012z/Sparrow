@@ -250,6 +250,7 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
   mm->start_code = start_code;
   mm->start_data = start_data;
   mm->end_data = end_data;
+  mm->start_stack = STACK_TOP;
 
   start_thread(regs, elf_entry, mm->start_stack);
   retval = 0;

@@ -28,6 +28,8 @@
 
 #define TASK_SIZE		(PAGE_OFFSET - 0x01000000)
 
+#define STACK_TOP		TASK_SIZE
+
 /* Exception vectors table */
 #define EXCEPTION_SIZE		0x100000
 #define EXCEPTION_BASE		0xffff0000

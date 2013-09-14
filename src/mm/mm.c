@@ -214,12 +214,22 @@ static void map_timer_memory() {
 }
 
 static void map_page_zero() {
+  if (1) {
   struct map_desc map;
   map.physical = __virt_to_phys((unsigned long)kmalloc(PAGE_SIZE));
   map.virtual = NULL;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
   create_mapping(&map);
+  return;
+  }
+
+  unsigned long virtual = 0;
+  for (virtual = 0; virtual < PAGE_OFFSET; virtual += SECTION_SIZE) {
+	pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
+	*pgd = (unsigned long)pgd;
+	//	printk(PR_SS_MM, PR_LVL_DBG7, "%s: virtual = %x, pgd = %x, *pgd = %x\n", __func__, virtual, pgd, *pgd);
+  }
 }
 
 
@@ -253,6 +263,11 @@ void mm_init() {
   map_timer_memory();
   /* map zero page */
   map_page_zero();
+
+  {
+	pgd_t *pc_pgd = pgd_offset(((pgd_t *)mm_pgd), 0x8000);
+	printk(PR_SS_PROC, PR_LVL_DBG3, "%s: %d: pc pgd:     %x = %x\n", __func__, __LINE__, pc_pgd, *pc_pgd);  
+  }
 
   //  bootmem_test();
   init_pages_map();
