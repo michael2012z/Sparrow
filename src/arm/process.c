@@ -126,7 +126,7 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
 	"mov	r8, #0\n\t"	/* not a syscall */
 	"mov	r9, %0\n\t"	/* thread structure */
 	"mov	sp, r0\n\t"	/* reposition stack pointer */
-	"bl asm_dbg_nail\n\t"
+		//	"bl asm_dbg_nail\n\t"
 	"b	ret_to_user"
 	:
 	: "r" (task_thread_info(current_task)),

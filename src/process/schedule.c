@@ -53,11 +53,13 @@ void update_task_on_tick() {
 }
 
 void check_and_schedule() {
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s\n", __func__);
   if (check_should_schedule())
 	schedule();
 }
 
 bool check_should_schedule() {
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s: current_task = %x\n", __func__, current_task);
   if (NULL != current_task)  
 	return scheduler->need_to_reschedule(current_task);
   else 

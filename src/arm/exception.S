@@ -475,6 +475,7 @@ vector_\name:
 	eor	r0, r0, #(\mode ^ SVC_MODE | PSR_ISETSTATE)
 	msr	spsr_cxsf, r0
 
+
 	@
 	@ the branch table must immediately follow this code
 	@

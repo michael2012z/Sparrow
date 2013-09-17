@@ -8,6 +8,7 @@
 #include <vfs.h>
 #include <irq.h>
 #include <head.h>
+#include <setup.h>
 
 extern struct task_struct *current_task;
 
@@ -29,6 +30,10 @@ void __init store_registers() {
 }
 
 extern struct file_system_type listfs_file_system_type;
+
+static void __init cpu_init() {
+  arm_cpu_init();
+}
 
 static int __init kernel_init(void *unused) {
 	/*
@@ -72,6 +77,9 @@ static void __init health_check(void) {
 void __init start_kernel(void) {
 
   printk(PR_SS_INI, PR_LVL_INF, "Enter start_kernel().\n");
+
+  cpu_init();
+
 
   store_registers();
   printk(PR_SS_INI, PR_LVL_INF, "Enter registers stored.\n");

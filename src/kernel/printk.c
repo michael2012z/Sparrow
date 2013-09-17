@@ -269,6 +269,7 @@ void printk(int ss, int level, const char *fmt, ...)
 	  break;
 	case PR_SS_MM:
 	  leading_ss = "MM] ";
+	  return;
 	  break;
 	case PR_SS_PROC:
 	  leading_ss = "PROC] ";
@@ -300,6 +301,10 @@ void printk(int ss, int level, const char *fmt, ...)
 	  break;
 	case PR_LVL_DBG3:
 	  leading_lvl = "[DBG3-";
+	  break;
+	case PR_LVL_DBG5:
+	  leading_lvl = "[DBG5-";
+	  return;
 	  break;
 	case PR_LVL_DBG7:
 	  leading_lvl = "[DBG7-";
