@@ -183,11 +183,11 @@ tsk	.req	r9		@ current thread_info
 	mov r6, r0
 	ldr	r0, [r0]
 	mov r7, r0
-	b asm_dbg_nail
+	@b asm_dbg_nail
 	@
 	@ Enable the alignment trap while in kernel mode
 	@
-	@alignment_trap r0
+	alignment_trap r0
 
 	.endm
 
