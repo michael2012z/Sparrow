@@ -173,7 +173,6 @@ ENDPROC(__create_page_tables)
 
 
 /* Following code is called after MMU enabled. */
-
 	.align	2
 	.type	__switch_data, %object
 __switch_data:
@@ -182,6 +181,10 @@ __switch_data:
 	.long	_data				@ r5
 	.long	__bss_start			@ r6
 	.long	_end				@ r7
+	.long	0			@ r4
+	.long	0		@ r5
+	.long	0			@ r6
+	.long	cr_alignment			@ r7
 	.long	init_thread_union + THREAD_START_SP @ sp
 
 /*
@@ -196,7 +199,7 @@ __switch_data:
 __mmap_switched:
 	adr	r3, __switch_data + 4
 
-	ldmia	r3, {r4, r5, r6, r7, sp}
+	ldmia	r3!, {r4, r5, r6, r7}
 	cmp	r4, r5				@ Copy data segment if needed
 1:	cmpne	r5, r6
 	ldrne	fp, [r4], #4
@@ -207,6 +210,12 @@ __mmap_switched:
 1:	cmp	r6, r7
 	strcc	fp, [r6],#4
 	bcc	1b
+
+	mov r8, r7
+		
+ 	ldmia	r3, {r4, r5, r6, r7, sp}
+	bic	r4, r0, #CR_A			@ Clear 'A' bit
+	stmia	r7, {r0, r4}			@ Save control register values
 
 	b	start_kernel
 ENDPROC(__mmap_switched)

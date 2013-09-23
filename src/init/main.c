@@ -24,7 +24,7 @@ void __init helloworld(void){
 extern unsigned int _kernel_end;
 void __init store_registers() {
 
-  asm("mov %0, r7\n"
+  asm("mov %0, r8\n"
 	  : "=r"(_kernel_end)
 	  : );
 }
@@ -78,10 +78,10 @@ void __init start_kernel(void) {
 
   printk(PR_SS_INI, PR_LVL_INF, "Enter start_kernel().\n");
 
+  store_registers();
+
   cpu_init();
 
-
-  store_registers();
   printk(PR_SS_INI, PR_LVL_INF, "Enter registers stored.\n");
 
   exception_disable();

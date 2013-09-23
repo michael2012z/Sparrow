@@ -52,5 +52,6 @@ void exception_init() {
 	memcpy((void *)vectors, __vectors_start, __vectors_end - __vectors_start);
 	memcpy((void *)vectors + 0x200, __stubs_start, __stubs_end - __stubs_start);
 
+	printk(PR_SS_IRQ, PR_LVL_INF, "%s: finish\n", __func__);
 }
 

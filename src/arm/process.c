@@ -111,8 +111,19 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
    * Save argc to the register structure for userspace.
    */
   regs->ARM_r0 = ret;
+  {
+	pgd_t *pc_pgd = pgd_offset(((pgd_t *)current_task->mm.pgd), 0x8000);
+	*pc_pgd |= 0x8c00;
+  }
+  
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: going to push process %d into user mode\n", __func__, current_task->pid); 
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: task_thread_info = %x\n", __func__, task_thread_info(current_task));   
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: THREAD_START_SP = %x, sizeof(*regs) = %x\n", __func__, THREAD_START_SP, sizeof(*regs));
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
 
-  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: going to push process %d into user mode\n", __func__, current_task->pid);  
   print_regs(regs);
   //  while(1);
   /*
@@ -126,7 +137,7 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
 	"mov	r8, #0\n\t"	/* not a syscall */
 	"mov	r9, %0\n\t"	/* thread structure */
 	"mov	sp, r0\n\t"	/* reposition stack pointer */
-		//	"bl asm_dbg_nail\n\t"
+	//	"bl asm_dbg_nail\n\t"
 	"b	ret_to_user"
 	:
 	: "r" (task_thread_info(current_task)),

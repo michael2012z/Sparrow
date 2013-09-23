@@ -5,7 +5,9 @@
 #include "head.h"
 #include <printk.h>
 #include <mm.h>
+#include <process.h>
 
+extern struct task_struct *current_task;
 
 /*
  * bad_mode handles the impossible case in the vectors.  If you see one of
@@ -94,7 +96,7 @@ void asm_dbg_nail() {
   //  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_ORIG_r0  = %x\n", __func__, _ARM_ORIG_r0);
 
   // check pmd
-  pgd_t *pc_pgd = pgd_offset(((pgd_t *)mm_pgd), 0x8000);
+  pgd_t *pc_pgd = pgd_offset(((pgd_t *)current_task->mm.pgd), 0x8000);
   printk(PR_SS_PROC, PR_LVL_DBG3, "%s: pc pgd:     %x = %x\n", __func__, pc_pgd, *pc_pgd);  
 
   while(1);

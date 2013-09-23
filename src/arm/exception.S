@@ -44,15 +44,19 @@ tsk	.req	r9		@ current thread_info
 	.macro	restore_user_regs, fast = 0, offset = 0
 	ldr	r1, [sp, #\offset + S_PSR]	@ get calling cpsr
 	ldr	lr, [sp, #\offset + S_PC]!	@ get pc
+
 	msr	spsr_cxsf, r1			@ save in spsr_svc
 	clrex					@ clear the exclusive monitor
+
 	.if	\fast
 	ldmdb	sp, {r1 - lr}^			@ get calling r1 - lr
 	.else
 	ldmdb	sp, {r0 - lr}^			@ get calling r0 - lr
 	.endif
 	mov	r0, r0				@ ARMv5T and earlier require a nop after ldm {}^
+
 	add	sp, sp, #S_FRAME_SIZE - S_PC
+
 	movs	pc, lr				@ return & move spsr_svc into cpsr
 	.endm
 
@@ -151,6 +155,7 @@ tsk	.req	r9		@ current thread_info
 	.macro	usr_entry
 	.fnstart
 	.cantunwind
+
 	sub	sp, sp, #S_FRAME_SIZE
 	stmib	sp, {r1 - r12}
 
@@ -172,11 +177,17 @@ tsk	.req	r9		@ current thread_info
 	@
 	stmia	r0, {r2 - r4}
  	stmdb	r0, {sp, lr}^
-
+	@b b_dbg_nail
+	mov r5, r0
+	ldr	r0, .LCcralign
+	mov r6, r0
+	ldr	r0, [r0]
+	mov r7, r0
+	b asm_dbg_nail
 	@
 	@ Enable the alignment trap while in kernel mode
 	@
-	alignment_trap r0
+	@alignment_trap r0
 
 	.endm
 
@@ -190,6 +201,11 @@ tsk	.req	r9		@ current thread_info
 	mov	r1, #\reason
 	.endm
 
+b_dbg_nail:
+	ldr r0, =0xef005020
+	mov r1, #0x42
+	str r1,[r0]
+	b b_dbg_nail
 
 /*
  * Function: v6_early_abort
