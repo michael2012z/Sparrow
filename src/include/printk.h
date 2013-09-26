@@ -52,6 +52,7 @@
  *   DBG0 -- IRQ setup
  *   DBG1 -- IRQ handling: indication
  *   DBG2 -- IRQ handling: detail
+ *   DBG5 -- Prefetch/Data abort handling
  */
 
 void printk(int a, int b, const char *fmt, ...);

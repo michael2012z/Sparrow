@@ -105,31 +105,6 @@ out:
   return retval;
 }
 
-static unsigned long elf_map(struct mm_struct *mm, struct file *filep, unsigned long addr, struct elf_phdr *eppnt)
-{
-	unsigned long map_addr;
-	unsigned long size = eppnt->p_filesz + ELF_PAGEOFFSET(eppnt->p_vaddr);
-	/* This is to calculate the offset in from the beginning of page, because the content of file will be mapped in page by page. */
-	unsigned long off = eppnt->p_offset - ELF_PAGEOFFSET(eppnt->p_vaddr);
-
-	printk(PR_SS_PROC, PR_LVL_DBG1, "%s: addr = %x, size = %x\n", __func__, addr, size);
-
-	addr = ELF_PAGESTART(addr);
-	size = ELF_PAGEALIGN(size);
-
-	printk(PR_SS_PROC, PR_LVL_DBG1, "%s: addr = %x, size = %x, off = %x\n", __func__, addr, size, off);
-
-	/* mmap() will return -EINVAL if given a zero size, but a
-	 * segment with zero filesize is perfectly valid */
-	if (!size)
-	  return addr;
-
-	map_addr = do_mmap(mm, filep, addr, size, off);
-
-	printk(PR_SS_PROC, PR_LVL_DBG1, "%s: return from do_mmap(): map_addr = %x\n", __func__, map_addr);
-
-	return map_addr;
-}
 
 static int set_brk(struct mm_struct *mm, unsigned long start, unsigned long end)
 {
@@ -204,9 +179,9 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
 
 	vaddr = elf_ppnt->p_vaddr;
 
-	error = elf_map(mm, filep, vaddr, elf_ppnt);
+	error = do_mmap(mm, filep, elf_ppnt->p_vaddr, elf_ppnt->p_filesz, elf_ppnt->p_offset);
 
-	printk(PR_SS_PROC, PR_LVL_DBG1, "%s: elf_map = %x\n", __func__, error);
+	printk(PR_SS_PROC, PR_LVL_DBG1, "%s: do_mmap = %x\n", __func__, error);
 
 	if (BAD_ADDR(error)) {
 	  goto out;

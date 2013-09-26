@@ -6,6 +6,8 @@
 #include "alloc.h"
 #include <mm.h>
 #include <printk.h>
+#include <mmap.h>
+#include <string.h>
 
 unsigned long mm_pgd;
 
@@ -146,17 +148,6 @@ static void map_low_memory() {
   create_mapping(&map);
 }
 
-/*
-static void map_vector_memory() {
-  struct map_desc map;
-  map.physical = PHYS_OFFSET + 63*SECTION_SIZE;
-  map.virtual = EXCEPTION_BASE & SECTION_MASK;
-  map.length = SECTION_SIZE;
-  map.type = MAP_DESC_TYPE_SECTION;
-  create_mapping(&map);
-}
-*/
-
 static void map_vector_memory() {
   struct map_desc map;
   map.physical = __virt_to_phys((unsigned long)kmalloc(PAGE_SIZE));
@@ -217,7 +208,7 @@ static void clean_user_space() {
   unsigned long virtual = 0;
   for (virtual = 0; virtual < PAGE_OFFSET; virtual += SECTION_SIZE) {
 	pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
-	*pgd = (unsigned long)pgd;
+	*pgd = (unsigned long)0;
 	printk(PR_SS_MM, PR_LVL_DBG7, "%s: virtual = %x, pgd = %x, *pgd = %x\n", __func__, virtual, pgd, *pgd);
   }
 }
@@ -288,4 +279,96 @@ void map_fs_to_ram() {
   map.length = SECTION_SIZE*64;
   map.type = MAP_DESC_TYPE_SECTION;
   create_mapping(&map);
+}
+
+
+
+
+
+
+
+
+
+
+/* map the page around addr */
+static int fix_page_fault(unsigned long addr, struct vm_area_struct *vma) {
+  /* establish the mapping, 1 page each time */
+  struct map_desc map;
+  unsigned long aligned_addr = page_start(addr);
+
+  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s:\n", __func__);
+
+  map.physical = __virt_to_phys((unsigned long)kmalloc(PAGE_SIZE));
+  map.virtual = aligned_addr;
+  map.length = PAGE_SIZE;
+  map.type = MAP_DESC_TYPE_PAGE;
+
+  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: map.physical = %x, map.virtual = %x, map.length = %x, map.type = %x\n", __func__, map.physical, map.virtual, map.length, map.type);
+
+  create_mapping(&map);
+
+  /* copy the content if needed */
+  if (vma->vm_file) {
+	unsigned long target_start, source_start, size;
+	unsigned long vm_start = vma->vm_start;
+	unsigned long vm_offset = vma->vm_offset;
+	unsigned long vm_length = vma->vm_length;
+	unsigned long vm_end = vma->vm_end;
+	unsigned long file_buf = (unsigned long)vma->vm_file->buf;
+	unsigned long file_offset = vma->vm_fileoffset;
+
+	printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: vm_start = %x, vm_end = %x, vm_offset = %x, vm_length = %x\n", __func__, vm_start, vm_end, vm_offset, vm_length);
+	printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: file_buf = %x, file_offset = %x\n", __func__, file_buf, file_offset);
+
+	if (aligned_addr == vm_start) {
+	  /* in first page */
+	  target_start = addr;
+	  source_start = file_buf + file_offset;
+	  if (vm_length > (aligned_addr + PAGE_SIZE - addr))
+		size = aligned_addr + PAGE_SIZE - addr;
+	  else
+		size = vm_length;
+	} else {
+	  /* midle or end page */
+	  target_start = aligned_addr;
+	  source_start = aligned_addr - vm_start - vm_offset + file_offset + file_buf;
+	  if (((aligned_addr + PAGE_SIZE) - (vm_start + vm_offset)) < vm_length)
+		size = PAGE_SIZE;
+	  else
+		size = vm_length - (aligned_addr - vm_start - vm_offset);
+	}
+	printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: target_start = %x, source_start = %x, size = %x\n", __func__, target_start, source_start, size);
+	memcpy((void *)target_start, (void *)source_start, size);
+  }
+  
+  return 0;
+}
+
+int do_translation_fault(struct mm_struct *mm, unsigned long addr, unsigned int fsr) {
+  struct vm_area_struct *vma;
+
+  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s:\n", __func__);
+
+  if (addr >= TASK_SIZE)
+	return -1;
+
+  print_all_vma(mm);
+
+  vma = find_vma(mm, addr);
+  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: vma = %x\n", __func__, vma);
+
+  if (!vma)
+	return -2;
+
+  if (vma->vm_start > addr) {
+	/* program is growing stack, vma is the stack, it must be the last vm_area in user space*/
+	printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: target address is not in any vma, maybe stack-expanding.\n", __func__);
+	if (0 > expand_stack(vma, addr)) {
+	  /* stack boundary was exceeded, this is invalid memory access */
+	  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: target address exceeds the stack boundary.\n", __func__);
+	  return -3;
+	}
+  }
+
+  return fix_page_fault(addr, vma);
 }

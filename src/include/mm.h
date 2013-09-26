@@ -21,5 +21,8 @@ void map_fs_to_ram();
 void* kmalloc(int size);
 void kfree(void *p);
 
+struct mm_struct;
+int do_translation_fault(struct mm_struct *mm, unsigned long addr, unsigned int fsr);
+
 
 #endif

@@ -5,6 +5,11 @@
 #define PAGE_SIZE		(1UL<<PAGE_SHIFT)
 #define PAGE_MASK		(~(PAGE_SIZE-1))
 
+#define page_start(_v) ((_v) & PAGE_MASK)
+#define page_offset(_v) ((_v) & (~PAGE_MASK))
+#define page_align(_v) (((_v) + (~PAGE_MASK)) & PAGE_MASK)
+
+
 #define SECTION_SHIFT		20
 #define SECTION_SIZE		(1UL<<SECTION_SHIFT)
 #define SECTION_MASK		(~(SECTION_SIZE-1))
@@ -29,6 +34,9 @@
 #define TASK_SIZE		(PAGE_OFFSET - 0x01000000)
 
 #define STACK_TOP		TASK_SIZE
+
+/* User stack size limit: 64K */
+#define STACK_SIZE_LIMIT (PAGE_SIZE << 4)
 
 /* Exception vectors table */
 #define EXCEPTION_SIZE		0x100000

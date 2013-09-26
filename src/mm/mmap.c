@@ -10,8 +10,7 @@
  */
 
 
-struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
-{
+struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr) {
   struct vm_area_struct *vma = NULL;
   struct list_head *pos = NULL, *head = &mm->mmap.list;
 
@@ -69,17 +68,22 @@ bool remove_vma(struct mm_struct *mm, struct vm_area_struct *vma) {
   }
 }
 
-
+/* Input parameters:
+ *   mm       - mm struct pointer
+ *   filep    - file pointer
+ *   addr     - start address, not aligned
+ *   len      - length of the area, not aligned
+ *   offset   - content offset in file
+ */
 unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long addr, unsigned long len, unsigned long offset)
 {
-  unsigned long pgoff = offset >> PAGE_SHIFT;
   struct vm_area_struct *vma;
   int error;
 
   vma = (struct vm_area_struct *)kmalloc(sizeof(struct vm_area_struct));
 
   printk(PR_SS_MM, PR_LVL_DBG6, "do_mmap():\n");
-  printk(PR_SS_MM, PR_LVL_DBG6, "mm = %x, addr = %x, len = %x, offset = %x, pgoff = %x\n", mm, addr, len, offset, pgoff);
+  printk(PR_SS_MM, PR_LVL_DBG6, "mm = %x, addr = %x, len = %x, offset = %x\n", mm, addr, len, offset);
 
   if (!vma) {
 	error = -ENOMEM;
@@ -87,10 +91,18 @@ unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long ad
   }
 
   vma->vm_mm = mm;
-  vma->vm_start = addr;
-  vma->vm_end = addr + len;
+  /* align addr to get vma start */
+  vma->vm_start = page_start(addr);  
+  /* the offset from the beginning of the vma */
+  vma->vm_offset = page_offset(addr);
+  /* align addr + len to get vma end */
+  vma->vm_end = page_align(addr+len);
+  /* real content length */
+  vma->vm_length = len;
+  /* the offset from the beginning of the file */
+  vma->vm_fileoffset = offset;
+  /* file */
   vma->vm_file = filep;
-  vma->vm_pgoff = pgoff;
 
   add_vma(mm, vma);
 
@@ -106,4 +118,37 @@ unsigned long do_brk(struct mm_struct *mm, unsigned long addr, unsigned long len
 void add_page_anon_vma(struct page *page, struct vm_area_struct *vma, unsigned long address) {
   printk(PR_SS_MM, PR_LVL_DBG6, "	add_page_anon_vma(): fatal error, function not implemented.\n");
   while(1);
+}
+
+
+void print_all_vma(struct mm_struct *mm) {
+  struct vm_area_struct *vma = NULL;
+  struct list_head *pos = NULL, *head = &mm->mmap.list;
+  printk(PR_SS_MM, PR_LVL_DBG6, "%s:\n", __func__);
+
+  list_for_each(pos, head) {
+	vma = list_entry(pos, struct vm_area_struct, list);
+	printk(PR_SS_MM, PR_LVL_DBG6, "%s: start = %x, end = %x, offset = %x, length = %x, file = %x\n", __func__, vma->vm_start, vma->vm_end, vma->vm_offset, vma->vm_length, vma->vm_file);
+  }
+}
+
+int expand_stack(struct vm_area_struct *vma, unsigned long addr) {
+  int ret = 0;
+  if (addr >= vma->vm_end)
+	ret = -1; /* exceed stack up-boundary */
+  else if (addr >= vma->vm_start)
+	ret = 1; /* in stack, not need to expand */
+  else if (addr < vma->vm_end - STACK_SIZE_LIMIT)
+	ret = -3; /* in unknown area, invalid memory access */
+  else {
+	unsigned long new_start = page_start(addr);
+	printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: new_start = %x, vma->vm_start = %x\n", __func__, new_start, vma->vm_start);
+	if (new_start < vma->vm_start) {
+	  vma->vm_start = new_start;
+	  vma->vm_length = vma->vm_end - vma->vm_start;
+	}
+	ret = 0;
+  }
+  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: ret = %x\n", __func__, ret);
+  return ret;
 }

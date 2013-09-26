@@ -9,6 +9,13 @@
 
 extern struct task_struct *current_task;
 
+
+static int do_unknown_fault(unsigned long addr, unsigned int fsr, struct pt_regs *regs) {
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: an unknown fault happened, fsr = %d\n", __func__, fsr);
+  while(1);
+  return 0;
+}
+
 /*
  * bad_mode handles the impossible case in the vectors.  If you see one of
  * these, then it's extremely serious, and could mean you have buggy hardware.
@@ -42,8 +49,15 @@ void __exception do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_re
 
 void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
 {
-  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x\n", __func__, addr);
-  while(1);
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
+  switch(ifsr) {
+  case 5:
+	do_translation_fault(&(current_task->mm), addr, ifsr);
+	break;
+  default:
+	do_unknown_fault(addr, ifsr, regs);
+	break;
+  }
 }
 
 void __exception irq_usr_debug() {

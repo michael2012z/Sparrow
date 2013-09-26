@@ -20,10 +20,11 @@ struct vm_area_struct;
 struct vm_area_struct {
   struct mm_struct * vm_mm;	/* The address space we belong to. */
   unsigned long vm_start;		/* Our start address within vm_mm. */
+  unsigned long vm_offset;
   unsigned long vm_end;		/* The first byte after our end address
 							   within vm_mm. */
-
-  unsigned long vm_pgoff;		/* Offset (within vm_file) in PAGE_SIZE
+  unsigned long vm_length;  /* content length */
+  unsigned long vm_fileoffset;		/* Offset (within vm_file) in PAGE_SIZE
 								   units, *not* PAGE_CACHE_SIZE */
   struct file * vm_file;		/* File we map to (can be NULL). */
 
@@ -55,6 +56,9 @@ bool add_vma(struct mm_struct *mm, struct vm_area_struct *vma);
 
 bool remove_vma(struct mm_struct *mm, struct vm_area_struct *vma);
 
+int expand_stack(struct vm_area_struct *vma, unsigned long addr);
+
+void print_all_vma(struct mm_struct *mm);
 
 unsigned long mmap_region(struct mm_struct *mm, struct file *file, unsigned long addr, unsigned long len, unsigned long pgoff);
 unsigned long do_mmap(struct mm_struct *mm, struct file *file, unsigned long addr, unsigned long len, unsigned long offset);
