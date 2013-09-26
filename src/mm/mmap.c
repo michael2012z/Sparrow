@@ -102,7 +102,9 @@ unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long ad
   /* the offset from the beginning of the file */
   vma->vm_fileoffset = offset;
   /* file */
-  vma->vm_file = filep;
+  vma->vm_file = (struct file *)kmalloc(sizeof(struct file));
+  vma->vm_file->buf = filep->buf;
+  vma->vm_file->size = filep->size;
 
   add_vma(mm, vma);
 

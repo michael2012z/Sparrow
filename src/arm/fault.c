@@ -50,6 +50,8 @@ void __exception do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_re
 void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
 {
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
   switch(ifsr) {
   case 5:
 	do_translation_fault(&(current_task->mm), addr, ifsr);
