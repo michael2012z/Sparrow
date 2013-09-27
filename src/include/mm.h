@@ -23,6 +23,6 @@ void kfree(void *p);
 
 struct mm_struct;
 int do_translation_fault(struct mm_struct *mm, unsigned long addr, unsigned int fsr);
-
+void print_memory_byte (unsigned long start, unsigned long end);
 
 #endif

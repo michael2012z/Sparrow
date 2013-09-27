@@ -23,6 +23,8 @@
 #define PR_LVL_DBG5	0x25
 #define PR_LVL_DBG6	0x26
 #define PR_LVL_DBG7	0x27
+#define PR_LVL_DBG8	0x28
+#define PR_LVL_DBG9	0x29
 
 /* Trace Guide:
  * Memory Management (MM):
@@ -34,6 +36,7 @@
  *   DBG5 -- Slab Allocator de-allocation
  *   DBG6 -- Paging
  *   DBG7 -- Memory Mapping/MMU operation
+ *   DBG9 -- Dump memory content
  *
  * File System (FS):
  *   DBG0 -- Mount

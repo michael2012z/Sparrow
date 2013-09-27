@@ -376,3 +376,63 @@ int do_translation_fault(struct mm_struct *mm, unsigned long addr, unsigned int 
 
   return fix_page_fault(mm->pgd, addr, vma);
 }
+
+
+void print_memory_byte (unsigned long start, unsigned long end) {
+  int row=0, i, j, tmp;
+  int digits;
+  unsigned char c;
+  static unsigned char hex_sym[] = "0123456789abcdef";
+  char lineContent[60] = {0};
+  int lineIndex = 0;
+  int length = 0;
+  start = start & 0xfffffff0;
+  end = (end + 0xf) & 0xfffffff0;
+  length = end - start;
+  
+  printk(PR_SS_MM, PR_LVL_DBG9, "%s(): start = %x, end = %x, length = %x\n", __func__, start, end, length);
+  if (start > end)
+	return;
+  printk(PR_SS_MM, PR_LVL_DBG9, "          00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff \n");
+  for (i=0; i < length; i++) {
+	if (0 == i%16) {
+	  // print line number
+	  if (0 != lineContent[0]) {
+		lineContent[lineIndex++] = '\n';		
+		printk(PR_SS_MM, PR_LVL_DBG9, lineContent);
+	  }
+	  memset(lineContent, 0, 60);
+	  lineIndex = 0;
+	  tmp = row;
+	  digits = 0;
+	  do {
+		tmp = tmp / 16;
+		digits ++;
+	  }	while(0 != tmp);
+	  for (j = 0; j < (7-digits); j++) {
+		lineContent[lineIndex++] = '0';
+	  }
+
+	  for (j = digits; j >0; j--) {
+		tmp = 0x0f << (4 * (j-1));
+		tmp = row & tmp;
+		tmp = tmp >> (4 * (j-1));
+		lineContent[lineIndex++] = hex_sym[tmp];
+	  }
+	  lineContent[lineIndex++] = '0';
+	  lineContent[lineIndex++] = ':';
+	  lineContent[lineIndex++] = ' ';
+	  row++;
+	}
+	c = ((unsigned char *)start)[i];
+	// print first digit
+	lineContent[lineIndex++] = hex_sym[(c&0x0f0) >> 4];
+	lineContent[lineIndex++] = hex_sym[(c&0x0f)];
+	lineContent[lineIndex++] = ' ';
+  }
+  if (0 != lineContent[0]) {
+	lineContent[lineIndex++] = '\n';
+	printk(PR_SS_MM, PR_LVL_DBG9, lineContent);
+  }
+
+}

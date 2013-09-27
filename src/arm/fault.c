@@ -37,7 +37,7 @@ void __exception asm_unsupported_exception(unsigned int code)
 	while(1);
 }
 
-
+int g_debug_flag = 0;
 /*
  * Dispatch a data abort to the relevant handler.
  */
@@ -53,6 +53,7 @@ void __exception do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_re
 	break;
   }
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: return\n", __func__);
+  g_debug_flag = 1;
 }
 
 void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
