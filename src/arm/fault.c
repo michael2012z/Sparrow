@@ -52,6 +52,7 @@ void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct 
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
+
   switch(ifsr) {
   case 5:
 	do_translation_fault(&(current_task->mm), addr, ifsr);
@@ -60,6 +61,7 @@ void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct 
 	do_unknown_fault(addr, ifsr, regs);
 	break;
   }
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: return\n", __func__);
 }
 
 void __exception irq_usr_debug() {
@@ -69,8 +71,6 @@ void __exception irq_usr_debug() {
 void __exception irq_svc_debug() {
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s\n", __func__);
 }
-
-extern unsigned long mm_pgd;
 
 void asm_dbg_nail() {
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s\n", __func__);

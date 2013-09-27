@@ -4,7 +4,8 @@
 #define __HEAD		.section	".head.text","ax"
 
 #ifndef __ALIGN
-#define __ALIGN		.align 4,0x90
+/*#define __ALIGN		.align 4,0x90 */
+#define __ALIGN		.align 0
 #endif
 
 #define ALIGN __ALIGN

@@ -3,7 +3,6 @@
 #include <ptrace.h>
 #include <mmap.h>
 #include <mm.h>
-#include "pgtable.h"
 
 static void do_memory_access_fault() {
   return;

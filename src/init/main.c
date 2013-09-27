@@ -111,7 +111,6 @@ void __init start_kernel(void) {
   printk(PR_SS_INI, PR_LVL_INF, "Process initialization finish.\n");
 
   rest_init();
-
   //  schedule();
 
   printk(PR_SS_INI, PR_LVL_INF, "Will enable IRQ.\n");
@@ -119,7 +118,6 @@ void __init start_kernel(void) {
   init_IRQ();
   init_timer();
   exception_enable();
-
   printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
 
   printk(PR_SS_INI, PR_LVL_INF, "Kernel is running ...\n");
@@ -134,5 +132,4 @@ void __init start_kernel(void) {
   */
 
   cpu_idle();
-
 }

@@ -111,10 +111,6 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
    * Save argc to the register structure for userspace.
    */
   regs->ARM_r0 = ret;
-  {
-	pgd_t *pc_pgd = pgd_offset(((pgd_t *)current_task->mm.pgd), 0x8000);
-	*pc_pgd |= 0x8c00;
-  }
   
   printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
   printk(PR_SS_PROC, PR_LVL_DBG1, "%s: going to push process %d into user mode\n", __func__, current_task->pid); 
@@ -125,6 +121,7 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
   printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
 
   print_regs(regs);
+
   //  while(1);
   /*
    * We were successful.  We won't be returning to our caller, but

@@ -9,7 +9,7 @@
 #include <mmap.h>
 #include <string.h>
 
-unsigned long mm_pgd;
+unsigned long kernel_pgd;
 
 extern bool boot_alloc_ready;
 extern bool page_alloc_ready;
@@ -32,7 +32,7 @@ static inline void flush_pgd_entry(pgd_t *pgd)
   dsb();
 }
 
-static void create_mapping_section (unsigned long physical, unsigned long virtual) {
+static void create_mapping_section (unsigned long mm_pgd, unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: pgd = %x, *pgd = %x\n", __func__, pgd, (physical | 0x0c02));  
   //  *pgd = (pgd_t)(physical | 0x031);
@@ -49,13 +49,13 @@ static pte_t *pte_offset(pte_t *pt, unsigned long virtual) {
 /* Each PT contains 256 items, and take 1K memory. But the size of each page is 4K, so each page hold 4 page table.
  * Here we're different from Linux, in which a page contains 2 linux tables and 2 hardware tables. As we don't support page swap in/out, so we don't need any extra information besides the hardware pagetable.
  */
-static void create_mapping_page (unsigned long physical, unsigned long virtual) {
+static void create_mapping_page (unsigned long mm_pgd, unsigned long physical, unsigned long virtual) {
   pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
   pte_t *pte, pte_value, *pt = NULL;
   /* 4 continuous page table fall in the same page. */
   pgd_t *aligned_pgd = (pgd_t *)((unsigned long)pgd & 0xfffffff0);
 
-  printk(PR_SS_MM, PR_LVL_DBG7, "%s: pgd = %x, virtual = %x\n", __func__, pgd, virtual);  
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: mm_pgd = %x, pgd = %x, virtual = %x\n", __func__, mm_pgd, pgd, virtual);  
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: aligned_pgd = %x\n", __func__, aligned_pgd);  
 
   if (NULL == *pgd) {
@@ -72,6 +72,7 @@ static void create_mapping_page (unsigned long physical, unsigned long virtual) 
 	}
   } 
 
+  printk(PR_SS_MM, PR_LVL_DBG7, "%s: *pgd = %x\n", __func__, *pgd);
   pt = (pte_t *)(__phys_to_virt((unsigned long)*pgd) & KILOBYTES_MASK);
   /* populate pte */
   if (NULL == pt) {
@@ -91,7 +92,7 @@ static void print_map_desc(struct map_desc *map) {
   printk(PR_SS_MM, PR_LVL_DBG7, "physical = %x, virtual = %x, length = %x, type = %x\n", map->physical, map->virtual, map->length, map->type);  
 }
 
-static void create_mapping(struct map_desc *md) {
+static void create_mapping(unsigned long mm_pgd, struct map_desc *md) {
   printk(PR_SS_MM, PR_LVL_DBG7, "create_mapping():\n");
   print_map_desc(md);
   switch(md->type) {
@@ -111,7 +112,7 @@ static void create_mapping(struct map_desc *md) {
 	  }
 	  */
       while (virtual < (md->virtual + md->length)) {
-		create_mapping_section(physical, virtual);
+		create_mapping_section(mm_pgd, physical, virtual);
 		physical += SECTION_SIZE;
 		virtual += SECTION_SIZE;
       }
@@ -127,7 +128,7 @@ static void create_mapping(struct map_desc *md) {
       unsigned long physical = md->physical; 
       unsigned long virtual = md->virtual;
       while (virtual < (md->virtual + md->length)) {
-		create_mapping_page(physical, virtual);
+		create_mapping_page(mm_pgd, physical, virtual);
 		physical += PAGE_SIZE;
 		virtual += PAGE_SIZE;
       }
@@ -145,7 +146,7 @@ static void map_low_memory() {
   map.virtual = PAGE_OFFSET;
   map.length = MEMORY_SIZE;
   map.type = MAP_DESC_TYPE_SECTION;
-  create_mapping(&map);
+  create_mapping(kernel_pgd, &map);
 }
 
 static void map_vector_memory() {
@@ -154,7 +155,7 @@ static void map_vector_memory() {
   map.virtual = EXCEPTION_BASE;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
-  create_mapping(&map);
+  create_mapping(kernel_pgd, &map);
 }
 
 extern void * _debug_output_io;
@@ -169,10 +170,10 @@ static void map_debug_memory() {
   /* Have to disable printk, otherwise any printing before mapping finish will lead to mapping fault. */
   printk_disable();
   /* Remove existing section mapping: */
-  pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), map.virtual);
+  pgd_t *pgd = pgd_offset(((pgd_t *)kernel_pgd), map.virtual);
   *pgd = 0;
   /* Create new mapping. */
-  create_mapping(&map);
+  create_mapping(kernel_pgd, &map);
   _debug_output_io = (void *)((map.virtual & PAGE_MASK) | (0x7f005020 & ~PAGE_MASK));
   printk_enable();
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: debug io is mapped to %x\n", __func__, _debug_output_io);
@@ -185,13 +186,13 @@ static void map_vic_memory() {
   map.virtual = 0xe1200000;
   map.length = SECTION_SIZE;
   map.type = MAP_DESC_TYPE_SECTION;
-  create_mapping(&map);
+  create_mapping(kernel_pgd, &map);
   /* VIC1 */
   map.physical = 0x71300000;
   map.virtual = 0xe1300000;
   map.length = SECTION_SIZE;
   map.type = MAP_DESC_TYPE_SECTION;
-  create_mapping(&map);
+  create_mapping(kernel_pgd, &map);
 
 }
 
@@ -201,15 +202,15 @@ static void map_timer_memory() {
   map.virtual = S3C6410_TIMER_BASE;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
-  create_mapping(&map);
+  create_mapping(kernel_pgd, &map);
 }
 
 static void clean_user_space() {
   unsigned long virtual = 0;
   for (virtual = 0; virtual < PAGE_OFFSET; virtual += SECTION_SIZE) {
-	pgd_t *pgd = pgd_offset(((pgd_t *)mm_pgd), virtual);
+	pgd_t *pgd = pgd_offset(((pgd_t *)kernel_pgd), virtual);
 	*pgd = (unsigned long)0;
-	printk(PR_SS_MM, PR_LVL_DBG7, "%s: virtual = %x, pgd = %x, *pgd = %x\n", __func__, virtual, pgd, *pgd);
+	//	printk(PR_SS_MM, PR_LVL_DBG7, "%s: virtual = %x, pgd = %x, *pgd = %x\n", __func__, virtual, pgd, *pgd);
   }
 }
 
@@ -219,8 +220,8 @@ void mm_init() {
   page_alloc_ready = false;
   slab_alloc_ready = false;
 
-  mm_pgd = PAGE_OFFSET + PAGE_TABLE_OFFSET;
-  printk(PR_SS_MM, PR_LVL_DBG7, "mm_init(): mm_pgd = %x\n", mm_pgd);
+  kernel_pgd = PAGE_OFFSET + PAGE_TABLE_OFFSET;
+  printk(PR_SS_MM, PR_LVL_DBG7, "mm_init(): kernel_pgd = %x\n", kernel_pgd);
   /* clear the page table at first*/
   prepare_page_table();
   printk(PR_SS_MM, PR_LVL_DBG7, "mm_init(): page table prepared\n");
@@ -246,7 +247,7 @@ void mm_init() {
   clean_user_space();
 
   {
-	pgd_t *pc_pgd = pgd_offset(((pgd_t *)mm_pgd), 0x8000);
+	pgd_t *pc_pgd = pgd_offset(((pgd_t *)kernel_pgd), 0x8000);
 	printk(PR_SS_PROC, PR_LVL_DBG3, "%s: %d: pc pgd:     %x = %x\n", __func__, __LINE__, pc_pgd, *pc_pgd);  
   }
 
@@ -278,7 +279,7 @@ void map_fs_to_ram() {
   map.virtual = 0xC8000000;
   map.length = SECTION_SIZE*64;
   map.type = MAP_DESC_TYPE_SECTION;
-  create_mapping(&map);
+  create_mapping(kernel_pgd, &map);
 }
 
 
@@ -291,7 +292,7 @@ void map_fs_to_ram() {
 
 
 /* map the page around addr */
-static int fix_page_fault(unsigned long addr, struct vm_area_struct *vma) {
+static int fix_page_fault(unsigned long mm_pgd, unsigned long addr, struct vm_area_struct *vma) {
   /* establish the mapping, 1 page each time */
   struct map_desc map;
   unsigned long aligned_addr = page_start(addr);
@@ -304,8 +305,9 @@ static int fix_page_fault(unsigned long addr, struct vm_area_struct *vma) {
   map.type = MAP_DESC_TYPE_PAGE;
 
   printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: map.physical = %x, map.virtual = %x, map.length = %x, map.type = %x\n", __func__, map.physical, map.virtual, map.length, map.type);
+  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: map.physical = %x, map.virtual = %x, map.length = %x, map.type = %x\n", __func__, map.physical, map.virtual, map.length, map.type);
 
-  create_mapping(&map);
+  create_mapping(mm_pgd, &map);
 
   /* copy the content if needed */
   if (vma->vm_file) {
@@ -340,6 +342,8 @@ static int fix_page_fault(unsigned long addr, struct vm_area_struct *vma) {
 	printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: target_start = %x, source_start = %x, size = %x\n", __func__, target_start, source_start, size);
 	memcpy((void *)target_start, (void *)source_start, size);
   }
+
+  printk(PR_SS_IRQ, PR_LVL_DBG5, "%s: finished\n", __func__);
   
   return 0;
 }
@@ -370,5 +374,5 @@ int do_translation_fault(struct mm_struct *mm, unsigned long addr, unsigned int 
 	}
   }
 
-  return fix_page_fault(addr, vma);
+  return fix_page_fault(mm->pgd, addr, vma);
 }

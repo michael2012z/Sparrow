@@ -437,10 +437,13 @@ __pabt_usr:
 	mov	r2, sp				@ regs
 	bl	do_PrefetchAbort		@ call abort handler
 	.fnend
+
 	/* fall through */
 /*
  * This is the return code to user mode for abort handlers
  */
+@b asm_dbg_nail
+
 ENTRY(ret_from_exception)
 	.fnstart
 	.cantunwind
