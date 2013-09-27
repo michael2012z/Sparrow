@@ -322,6 +322,7 @@ __irq_usr:
 	get_thread_info tsk
 	bl irq_usr_debug
 	irq_handler
+	bl check_and_schedule	
 	mov	why, #0
 	b	ret_to_user
 	.fnend

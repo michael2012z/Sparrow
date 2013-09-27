@@ -43,17 +43,23 @@ void __exception asm_unsupported_exception(unsigned int code)
  */
 void __exception do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 {
-  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A data abort happened, addr = %x\n", __func__, addr);
-  while(1);
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A data abort happened, addr = %x, fsr = %x\n", __func__, addr, fsr);
+  switch(fsr & 0x0f) {
+  case 5:
+	do_translation_fault(&(current_task->mm), addr, fsr);
+	break;
+  default:
+	do_unknown_fault(addr, fsr, regs);
+	break;
+  }
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: return\n", __func__);
 }
 
 void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
 {
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
-  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
-  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: A prefetch abort happened, addr = %x, ifsr = %x\n", __func__, addr, ifsr);
 
-  switch(ifsr) {
+  switch(ifsr & 0x0f) {
   case 5:
 	do_translation_fault(&(current_task->mm), addr, ifsr);
 	break;

@@ -5,8 +5,8 @@
 #include <mm.h>
 #include "mmap.h"
 
-/*
- * mm_struct hold a list of vm_area_struct as vma_list
+/* Find a proper vma from all vma list.
+ * If none vma contains the address, return the last vma, that is user-stack.
  */
 
 
@@ -18,8 +18,6 @@ struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr) {
 	vma = list_entry(pos, struct vm_area_struct, list);
 	if ((addr >= vma->vm_start) && (addr < vma->vm_end))
 	  break;
-	else
-	  vma = NULL;
   }
 
   return vma;
@@ -102,9 +100,12 @@ unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long ad
   /* the offset from the beginning of the file */
   vma->vm_fileoffset = offset;
   /* file */
-  vma->vm_file = (struct file *)kmalloc(sizeof(struct file));
-  vma->vm_file->buf = filep->buf;
-  vma->vm_file->size = filep->size;
+  if (filep) {
+	vma->vm_file = (struct file *)kmalloc(sizeof(struct file));
+	vma->vm_file->buf = filep->buf;
+	vma->vm_file->size = filep->size;
+  } else
+	vma->vm_file = NULL;
 
   add_vma(mm, vma);
 

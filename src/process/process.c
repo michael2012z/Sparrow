@@ -65,11 +65,6 @@ void initialize_process() {
 
 void arm_start_kernel_thread(void) __asm__("arm_start_kernel_thread");
 
-unsigned long *p2_pgd = NULL;
-void g_dbg_nail(int f) {
-  printk(PR_SS_INI, PR_LVL_ERR, "%s(%d): p2_pgd = %x, *p2_pgd = %x ###############################################\n", __func__, f, p2_pgd, (p2_pgd)?(*p2_pgd):0xffffffff);
-}
-
 int create_kernel_thread(int (*fn)(void *)) {
   int pid;
   struct task_struct *task = NULL;
@@ -97,9 +92,6 @@ int create_kernel_thread(int (*fn)(void *)) {
   memcpy((void *)task->mm.pgd, (void *)kernel_pgd, PAGE_SIZE * 4);
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: pid = %x, mm.pgd = %x\n", __func__, pid, task->mm.pgd);
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: *mm.pgd = %x\n", __func__, *((unsigned long *)task->mm.pgd));
-  if (pid == 2)
-	p2_pgd = (unsigned long *)task->mm.pgd;
-
 
   INIT_LIST_HEAD(&(task->sched_en.queue_entry));
 

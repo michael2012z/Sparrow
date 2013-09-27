@@ -208,6 +208,10 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
 
   printk(PR_SS_PROC, PR_LVL_DBG1, " elf_bss = %x, elf_brk = %x, start_code = %x, end_code = %x, start_data = %x, end_data = %x\n",elf_bss, elf_brk, start_code, end_code, start_data, end_data);
 
+  /* After mapping all loadable segment, map an empty vma for stack */
+  error = do_mmap(mm, 0, STACK_TOP, 0, 0);
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: do_mmap = %x\n", __func__, error);
+
   /* Allocate space for BSS segment, and map it. */
   retval = set_brk(mm, elf_bss, elf_brk);
   printk(PR_SS_PROC, PR_LVL_DBG1, " set_brk = %x\n", retval);
