@@ -1,12 +1,14 @@
 
 void main() {
-  char *str = "Hello, I'm demo 2.\n";
-  int i = 0;
-  char uart;
-  char *uart_p = &uart;
-
-  for (i = 0; i < 19; i++)
-	*uart_p = str[i];
-
-  while(1);
+  char buf[16];
+  int i, j, count;
+  count = 0;
+  while(1) {
+	for (i = 0; i < 16; i++) {
+	  for (j = 0; j < 16; j++)
+		buf[j] = i;
+	  for (j = 0; j < 1024; j++);
+	  count ++;
+	}
+  }
 }

@@ -54,7 +54,7 @@ static int __init kernel_init(void *unused) {
 
 static int __init kernel_demo(void *unused) {
   printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
-  run_kernel_process("/demo_1");
+  run_kernel_process("/demo_2");
   //  process_test();
   return 0;
 }
