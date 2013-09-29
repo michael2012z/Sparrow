@@ -380,7 +380,6 @@ int do_translation_fault(struct mm_struct *mm, unsigned long addr, unsigned int 
 
 void print_memory_byte (unsigned long start, unsigned long end) {
   int row=0, i, j, tmp;
-  int digits;
   unsigned char c;
   static unsigned char hex_sym[] = "0123456789abcdef";
   char lineContent[60] = {0};
@@ -403,23 +402,11 @@ void print_memory_byte (unsigned long start, unsigned long end) {
 	  }
 	  memset(lineContent, 0, 60);
 	  lineIndex = 0;
-	  tmp = row;
-	  digits = 0;
-	  do {
-		tmp = tmp / 16;
-		digits ++;
-	  }	while(0 != tmp);
-	  for (j = 0; j < (7-digits); j++) {
-		lineContent[lineIndex++] = '0';
+	  tmp = start + (row << 4);
+	  for (j = 0; j < 8; j++) {
+		lineContent[lineIndex++] = hex_sym[((tmp & 0xf0000000) >> 28)];
+		tmp = tmp << 4;
 	  }
-
-	  for (j = digits; j >0; j--) {
-		tmp = 0x0f << (4 * (j-1));
-		tmp = row & tmp;
-		tmp = tmp >> (4 * (j-1));
-		lineContent[lineIndex++] = hex_sym[tmp];
-	  }
-	  lineContent[lineIndex++] = '0';
 	  lineContent[lineIndex++] = ':';
 	  lineContent[lineIndex++] = ' ';
 	  row++;
