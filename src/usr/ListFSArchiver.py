@@ -115,7 +115,7 @@ contentBuffer = ""
 contentBufferLen = 0
 listStr = ""
 
-archiveDir("./test", 0)
+archiveDir("./fs_root", 0)
 
 alignedListStrLen = alignedSizeOfBuffer(listStr+"<!--XXXXXXXX-->\n")
 listStr = "<!--" + str(alignedListStrLen) + "-->\n" + listStr
