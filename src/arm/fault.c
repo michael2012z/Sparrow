@@ -31,11 +31,21 @@ void bad_mode(struct pt_regs *regs, int reason)
 /*
  * General handling for unsupported exception.
  */
-void __exception asm_unsupported_exception(unsigned int code)
+void __exception do_unsupported_exception(unsigned int code)
 {
 	printk(PR_SS_IRQ, PR_LVL_ERR, "An unsupported exception happened, code = %d\n", code);
 	while(1);
 }
+
+/*
+ * Handler of invalid system call.
+ */
+void __exception do_invalid_swi(unsigned int code)
+{
+	printk(PR_SS_IRQ, PR_LVL_ERR, "%s: invalid system call: %d\n", code);
+	while(1);
+}
+
 
 int g_debug_flag = 0;
 /*

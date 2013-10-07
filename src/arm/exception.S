@@ -273,6 +273,21 @@ ret_slow_syscall:
 ENDPROC(ret_to_user)
 
 
+	.align	5
+/*
+ * This is the fast syscall return path.  We do as little as
+ * possible here, and this includes saving r0 back into the SVC
+ * stack.
+ */
+ret_fast_syscall:
+	.fnstart
+	.cantunwind
+	disable_irq				@ disable interrupts
+
+	restore_user_regs fast = 1, offset = S_OFF
+	.fnend
+
+
 @
 @ common_invalid - generic code for failed exception (re-entrant version of handlers)
 @
@@ -586,19 +601,55 @@ __stubs_start:
 
 /* Unsupported exception. */
 vector_rst:
-	b asm_unsupported_exception
+	b do_unsupported_exception
 
 vector_und:
-	b asm_unsupported_exception
+	b do_unsupported_exception
 
-vector_swi:
-	b asm_unsupported_exception
 
+	.align	5
+ENTRY(vector_swi)
+	sub	sp, sp, #S_FRAME_SIZE
+	stmia	sp, {r0 - r12}			@ Calling r0 - r12
+	add	r8, sp, #S_PC
+	stmdb	r8, {sp, lr}^
+	mrs	r8, spsr			@ called from non-FIQ mode, so ok.
+	str	lr, [sp, #S_PC]			@ Save calling PC
+	str	r8, [sp, #S_PSR]		@ Save CPSR
+	str	r0, [sp, #S_OLD_R0]		@ Save OLD_R0
+
+	enable_irq
+
+	get_thread_info tsk
+	adr	tbl, sys_call_table		@ load syscall table pointer
+
+	stmdb	sp!, {r4, r5}			@ push fifth and sixth args
+
+	cmp	scno, #NR_syscalls		@ check upper syscall limit
+	adr	lr, ret_fast_syscall	@ return address
+	ldrcc	pc, [tbl, scno, lsl #2]		@ call sys_* routine
+
+	mov r0,scno		@ error handler
+	b do_invalid_swi
+ENDPROC(vector_swi)
+
+		
+	.equ NR_syscalls,4
+		
+	.type	sys_call_table, #object
+ENTRY(sys_call_table)
+	.long sys_reset
+	.long sys_print
+	.long sys_brk
+	.long sys_sleep
+		
+
+		
 vector_fiq:
-	b asm_unsupported_exception
+	b do_unsupported_exception
 
 vector_addrexcptn:
-	b asm_unsupported_exception
+	b do_unsupported_exception
 
 
 /*
