@@ -19,7 +19,8 @@ tbl	.req	r8		@ syscall table pointer
 why	.req	r8		@ Linux syscall (!= 0)
 tsk	.req	r9		@ current thread_info
 
-
+		
+		
 	.macro	disable_irq_notrace
 	cpsid	i
 	.endm
@@ -263,30 +264,6 @@ ENTRY(v6_pabort)
 ENDPROC(v6_pabort)
 
 		
-/*
- * "slow" syscall return path.  "why" tells us if this was a real syscall.
- */
-ENTRY(ret_to_user)
-ret_slow_syscall:
-	disable_irq				@ disable interrupts
-	restore_user_regs fast = 0, offset = 0
-ENDPROC(ret_to_user)
-
-
-	.align	5
-/*
- * This is the fast syscall return path.  We do as little as
- * possible here, and this includes saving r0 back into the SVC
- * stack.
- */
-ret_fast_syscall:
-	.fnstart
-	.cantunwind
-	disable_irq				@ disable interrupts
-
-	restore_user_regs fast = 1, offset = S_OFF
-	.fnend
-
 
 @
 @ common_invalid - generic code for failed exception (re-entrant version of handlers)
@@ -470,6 +447,17 @@ ENTRY(ret_from_exception)
 ENDPROC(__pabt_usr)
 ENDPROC(ret_from_exception)
 
+
+/*
+ * "slow" syscall return path.  "why" tells us if this was a real syscall.
+ */
+	.align	5
+ENTRY(ret_to_user)
+	disable_irq				@ disable interrupts
+	restore_user_regs fast = 0, offset = 0
+ENDPROC(ret_to_user)
+
+
 		
 /*
  * Vector stubs.
@@ -623,17 +611,14 @@ ENTRY(vector_swi)
 	get_thread_info tsk
 	adr	tbl, sys_call_table		@ load syscall table pointer
 
-	stmdb	sp!, {r4, r5}			@ push fifth and sixth args
-
 	cmp	scno, #NR_syscalls		@ check upper syscall limit
-	adr	lr, ret_fast_syscall	@ return address
+	adr	lr, ret_to_user			@ return address
 	ldrcc	pc, [tbl, scno, lsl #2]		@ call sys_* routine
 
 	mov r0,scno		@ error handler
 	b do_invalid_swi
 ENDPROC(vector_swi)
 
-		
 	.equ NR_syscalls,4
 		
 	.type	sys_call_table, #object
@@ -643,6 +628,7 @@ ENTRY(sys_call_table)
 	.long sys_brk
 	.long sys_sleep
 		
+
 
 		
 vector_fiq:

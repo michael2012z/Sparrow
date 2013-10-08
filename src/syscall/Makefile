@@ -1,15 +1,12 @@
 
-src_dir := ../../util
+CFLAGS	+=  $(IFLAGS)
 
-objects	:= stringx.o date.o printk.o
+objects	:= syscall_memory.o  syscall_process.o  syscall_utility.o
 
 all: $(BUILTIN)
 
 $(BUILTIN): $(objects)
 	$(LD) $(LFLAGS) -o $@ $^
-
-%.o: $(src_dir)/%.c
-	$(CC) $(CFLAGS) $<
 
 %.o: %.c
 	$(CC) $(CFLAGS) $<

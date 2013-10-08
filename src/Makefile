@@ -21,9 +21,9 @@ BUILTIN	:= built-in.o
 
 export CC LD AR CFLAGS IFLAGS AFLAGS LFLAGS BUILTIN
 
-subdirs := arm/ init/ kernel/ mm/ exception/ process/ fs/ usr/ test/
+subdirs := arm/ init/ util/ mm/ exception/ process/ fs/ syscall/ usr/ test/
 
-lklist	:= arm/head.o arm/init_task.o arm/built-in.o init/built-in.o kernel/built-in.o mm/built-in.o exception/built-in.o process/built-in.o fs/$(BUILTIN)
+lklist	:= arm/head.o arm/init_task.o arm/built-in.o init/built-in.o util/built-in.o mm/built-in.o exception/built-in.o process/built-in.o fs/$(BUILTIN) syscall/$(BUILTIN)
 
 .PHONY: $(subdirs)
 
