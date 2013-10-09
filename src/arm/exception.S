@@ -644,6 +644,9 @@ vector_addrexcptn:
  */
 	.align	5
 
+.LCvswi:
+	.word	vector_swi
+
 	.globl	__stubs_end
 __stubs_end:
 
@@ -655,7 +658,7 @@ __stubs_end:
 __vectors_start:
 	b	vector_rst + stubs_offset
 	b	vector_und + stubs_offset
-	b	vector_swi + stubs_offset
+	ldr	pc, .LCvswi + stubs_offset
 	b	vector_pabt + stubs_offset
 	b	vector_dabt + stubs_offset
 	b	vector_addrexcptn + stubs_offset

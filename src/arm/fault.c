@@ -108,29 +108,31 @@ void asm_dbg_nail() {
   register unsigned long _ARM_lr asm ("lr");
   register unsigned long _ARM_pc asm ("pc");
   //  register unsigned long cpsr asm ("cpsr");
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r0       = %x\n", __func__, _ARM_r0);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r1       = %x\n", __func__, _ARM_r1);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r2       = %x\n", __func__, _ARM_r2);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r3       = %x\n", __func__, _ARM_r3);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r4       = %x\n", __func__, _ARM_r4);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r5       = %x\n", __func__, _ARM_r5);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r6       = %x\n", __func__, _ARM_r6);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r7       = %x\n", __func__, _ARM_r7);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r8       = %x\n", __func__, _ARM_r8);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r9       = %x\n", __func__, _ARM_r9);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_r10      = %x\n", __func__, _ARM_r10);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_fp       = %x\n", __func__, _ARM_fp);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_ip       = %x\n", __func__, _ARM_ip);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_sp       = %x\n", __func__, _ARM_sp);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_lr       = %x\n", __func__, _ARM_lr);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_pc       = %x\n", __func__, _ARM_pc);
-  //  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_cpsr     = %x\n", __func__, cpsr);
-  //  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_cpsr     = %x\n", __func__, cpsr);
-  //  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: _ARM_ORIG_r0  = %x\n", __func__, _ARM_ORIG_r0);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r0       = %x\n", __func__, _ARM_r0);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r1       = %x\n", __func__, _ARM_r1);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r2       = %x\n", __func__, _ARM_r2);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r3       = %x\n", __func__, _ARM_r3);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r4       = %x\n", __func__, _ARM_r4);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r5       = %x\n", __func__, _ARM_r5);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r6       = %x\n", __func__, _ARM_r6);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r7       = %x\n", __func__, _ARM_r7);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r8       = %x\n", __func__, _ARM_r8);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r9       = %x\n", __func__, _ARM_r9);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r10      = %x\n", __func__, _ARM_r10);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_fp       = %x\n", __func__, _ARM_fp);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_ip       = %x\n", __func__, _ARM_ip);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_sp       = %x\n", __func__, _ARM_sp);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_lr       = %x\n", __func__, _ARM_lr);
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_pc       = %x\n", __func__, _ARM_pc);
+  //  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_cpsr     = %x\n", __func__, cpsr);
+  //  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_cpsr     = %x\n", __func__, cpsr);
+  //  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_ORIG_r0  = %x\n", __func__, _ARM_ORIG_r0);
 
   // check pmd
-  pgd_t *pc_pgd = pgd_offset(((pgd_t *)current_task->mm.pgd), 0x8000);
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s: pc pgd:     %x = %x\n", __func__, pc_pgd, *pc_pgd);  
+  //  pgd_t *pc_pgd = pgd_offset(((pgd_t *)current_task->mm.pgd), 0x8000);
+  //printk(PR_SS_INI, PR_LVL_ERR, "%s: pc pgd:     %x = %x\n", __func__, pc_pgd, *pc_pgd);  
+
+  //  print_regs(&current_task->regs);
 
   while(1);
 }
