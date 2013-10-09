@@ -61,6 +61,7 @@
 
 void printk(int a, int b, const char *fmt, ...);
 void __printk(const char *fmt, ...);
+void printu(char *string, int length);
 void test_printk(void);
 
 void printk_disable();

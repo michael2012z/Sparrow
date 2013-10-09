@@ -356,6 +356,10 @@ void __printk(const char *fmt, ...)
 	__put_char (print_buf,i);
 }
 
+void printu(char *string, int length) {
+  __put_char (string, length);
+}
+
 /*
 void debug(const char *fmt, ...)
 {
