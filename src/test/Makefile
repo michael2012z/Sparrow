@@ -8,7 +8,7 @@ NM	:= $(CROSS_COMPILE)nm
 CFLAGS	:= -c -Werror -g -I$(CURDIR)/../include -I$(CURDIR)/.. -I/usr/local/include -D__KERNEL__ -D__ARCH_X86__ 
 #-DSLAB_OPTIMIZE
 
-subdirs := fs/ mm/ util/
+subdirs := fs/ mm/ util/ glibc/
 
 test := test
 
@@ -22,7 +22,7 @@ $(subdirs):
 	$(MAKE) --directory=$@
 
 $(test): ${subdirs} $(objects)
-	$(CC) fs/built-in.o mm/built-in.o util/built-in.o $(objects) -o $@ -L/usr/local/lib -lcunit
+	$(CC) fs/built-in.o mm/built-in.o util/built-in.o glibc/built-in.o $(objects) -o $@ -L/usr/local/lib -lcunit
 
 %.o: %.c
 	$(CC) $(CFLAGS) $<

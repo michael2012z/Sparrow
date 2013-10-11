@@ -1,4 +1,8 @@
+#ifndef __ARCH_X86__
 #include "../inc/stdio.h"
+#else
+#include <stdio.h>
+#endif
 
 #define BUFFER_LEADING_BYTES 8
 #define MIN_ALLOCATION_SIZE 4
@@ -48,11 +52,11 @@ void *malloc(int size)
   struct memory_control_block* mcb;
 
   /* align the size to 4 */
-  size = (size + 3) & 4;
+  size = (size + 3) & 0xfffffffc;
 
   /* allocator not initiated, query heap start address by brk(0) */
   if(0 == heap_start) {
-	heap_start = _brk(0);
+    heap_start = _brk(0);
 	if (0 == heap_start) {
 	  printf("%s: heap can't be initiated.\n", __func__);
 	  return 0;
