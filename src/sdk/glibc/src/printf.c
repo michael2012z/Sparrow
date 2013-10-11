@@ -1,9 +1,4 @@
-#include <string.h>
-#include <printk.h>
-
-#ifdef __ARCH_X86__
-#include <stdio.h>
-#endif
+#include "../inc/string.h"
 
 typedef char * va_list;
 #define _INTSIZEOF(n)   ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) )
@@ -61,22 +56,6 @@ static char print_buf[1024];
 	n = ((unsigned int) n) / (unsigned int) base; \
 	__res; })
 
-
-void * _debug_output_io = (void *)0xef005020; /* This initial value is the physical address, meaningless. */
- 
-#ifdef __ARCH_X86__
-static void __put_char(char *p,int num){
-  while(*p&&num--)
-    printf("%c", *p++);
-}
-#else
-static void __put_char(char *p,int num){
-	while(*p&&num--){
-	  *(volatile unsigned int *)_debug_output_io=*p++;
-	  /*	  *(volatile unsigned int *)0xef005020=*p++; */
-	};
-}
-#endif
 
 char *number(char *str, int num,int base,unsigned int flags){
 	int i=0;
@@ -170,8 +149,7 @@ int format_decode(const char *fmt,unsigned int *flags){
 	return ++fmt-start;
 }
 
-#ifndef __ARCH_X86__
-int vsnprintf(char *buf, int size, const char *fmt, va_list args){
+static int vsnprintf(char *buf, int size, const char *fmt, va_list args){
 	int num;
 	char *str, *end, c,*s;
 	int read;
@@ -239,112 +217,22 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list args){
 	}
 	return str-buf;
 }
-#endif
 
-static int printk_disabled_flag = 0;
-void printk_disable() {
-  printk_disabled_flag = 1;
-}
-
-void printk_enable() {
-  printk_disabled_flag = 0;
-}
-
-void printk(int ss, int level, const char *fmt, ...)
-{
-	va_list args;
-	unsigned int i;
-	char *leading_ss, *leading_lvl;
-
-	if (printk_disabled_flag)
-	  return;
-
-	switch (ss) {
-	case PR_SS_INI:
-	  leading_ss = "INI] ";
-	  break;
-	case PR_SS_FS:
-	  leading_ss = "FS] ";
-	  return;
-	  break;
-	case PR_SS_MM:
-	  leading_ss = "MM] ";
-	  break;
-	case PR_SS_PROC:
-	  leading_ss = "PROC] ";
-	  return;
-	  break;
-	case PR_SS_IRQ:
-	  leading_ss = "IRQ] ";
-	  break;
-	default:
-	  return;
-	}
-
-	switch (level) {
-	case PR_LVL_INF:
-	  leading_lvl = "[INFO-";
-	  break;
-	case PR_LVL_ERR:
-	  leading_lvl = "[ERR-";
-	  break;
-	case PR_LVL_WRN:
-	  leading_lvl = "[WRN-";
-	  break;
-	case PR_LVL_DBG0:
-	  leading_lvl = "[DBG0-";
-	  return;
-	  break;
-	case PR_LVL_DBG1:
-	  leading_lvl = "[DBG1-";
-	  return;
-	  break;
-	case PR_LVL_DBG2:
-	  leading_lvl = "[DBG2-";
-	  return;
-	  break;
-	case PR_LVL_DBG3:
-	  leading_lvl = "[DBG3-";
-	  return;
-	  break;
-	case PR_LVL_DBG4:
-	  leading_lvl = "[DBG4-";
-	  return;
-	  break;
-	case PR_LVL_DBG5:
-	  leading_lvl = "[DBG5-";
-	  return;
-	  break;
-	case PR_LVL_DBG6:
-	  leading_lvl = "[DBG6-";
-	  break;
-	case PR_LVL_DBG7:
-	  leading_lvl = "[DBG7-";
-	  return;
-	  break;
-	case PR_LVL_DBG8:
-	  leading_lvl = "[DBG8-";
-	  return;
-	  break;
-	case PR_LVL_DBG9:
-	  leading_lvl = "[DBG9-";
-	  break;
-	default:
-	  return;
-	}
-
-
-	va_start (args, fmt);
-	i = vsnprintf (print_buf, sizeof(print_buf),fmt, args);
-	va_end (args);
-
-	__put_char (leading_lvl, 8);
-	__put_char (leading_ss, 8);
-	__put_char (print_buf,i);
+static void __put_char(char *p, int num) {
+  /* system call */
+  asm("mov r0, %0  @ parameter 1\n"
+	  "mov r1, %1  @ parameter 2\n"
+	  "mov r2, #0  @ parameter 3\n"
+	  "mov r3, #0  @ parameter 4\n"
+	  "mov r7, #1  @ scno\n"
+	  "swi #0 \n"
+	  :
+	  : "r"(p), "r"(num)
+	  : "r0", "r1");
 
 }
 
-void __printk(const char *fmt, ...)
+void printf(const char *fmt, ...)
 {
 	va_list args;
 	unsigned int i;
@@ -354,32 +242,5 @@ void __printk(const char *fmt, ...)
 	va_end (args);
 
 	__put_char (print_buf,i);
-}
-
-void printu(char *string, int length) {
-  __put_char (string, length);
-}
-
-/*
-void debug(const char *fmt, ...)
-{
-	va_list args;
-	unsigned int i;
-
-	va_start (args, fmt);
-	i = vsnprintf (print_buf, sizeof(print_buf),fmt, args);
-	va_end (args);
-
-	__put_char (print_buf,i);
-}
-*/
-
-void test_printk(void){
-	char *p="this is %s test";
-	char c='H';
-	int d=-256;
-	int k=0;
-
-	printk(0, 0, "test string :::	%s\ntest char ::: %c\ntest digit ::: %d\ntest X ::: %x\ntest unsigned ::: %u\ntest zero ::: %d\n",p,c,d,d,d,k);
 }
 
