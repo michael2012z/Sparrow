@@ -1,7 +1,7 @@
 
 src_dir := ../../sdk/glibc/src
 
-objects	:= malloc.o malloc-test.o
+objects	:= malloc.o malloc-test.o test.o
 
 all: $(BUILTIN)
 
