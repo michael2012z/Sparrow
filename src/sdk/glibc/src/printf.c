@@ -228,7 +228,7 @@ static void __put_char(char *p, int num) {
 	  "swi #0 \n"
 	  :
 	  : "r"(p), "r"(num)
-	  : "r0", "r1");
+	  : "r0", "r1", "r7");
 
 }
 

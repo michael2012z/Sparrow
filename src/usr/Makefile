@@ -1,7 +1,7 @@
 
-CFLAGS	+=  $(IFLAGS)
+CFLAGS:= -I../sdk/glibc/inc
 
-DEMOS := demo_1 demo_2 demo_3 demo_4 demo_5
+DEMOS := demo_1 demo_2 demo_3 demo_4 demo_5 demo_6
 LISTFS:= ListFS.fs
 
 all: $(LISTFS)
@@ -24,9 +24,14 @@ demo_4: demo_4.c
 	cp -f demo_4 ./fs_root/fs/
 
 demo_5: demo_5.c
-	$(CC) -nostdlib -c demo_5.c -o demo_5.o
+	$(CC) $(CFLAGS) -nostdlib -c demo_5.c -o demo_5.o
 	$(CC) -nostdlib demo_5.o ../sdk/glibc/lib/glibc.so -o demo_5 -lgcc
 	cp -f demo_5 ./fs_root/fs/
+
+demo_6: demo_6.c
+	$(CC) $(CFLAGS) -nostdlib -c demo_6.c -o demo_6.o
+	$(CC) -nostdlib demo_6.o ../sdk/glibc/lib/glibc.so -o demo_6 -lgcc
+	cp -f demo_6 ./fs_root/fs/
 
 ListFS.fs:
 	python ListFSArchiver.py

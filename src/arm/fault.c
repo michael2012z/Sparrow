@@ -77,6 +77,9 @@ void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct 
   case 5:
 	do_translation_fault(&(current_task->mm), addr, ifsr);
 	break;
+  case 7:
+	do_translation_fault(&(current_task->mm), addr, ifsr);
+	break;
   default:
 	do_unknown_fault(addr, ifsr, regs);
 	break;

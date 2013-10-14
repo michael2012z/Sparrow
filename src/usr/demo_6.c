@@ -1,11 +1,12 @@
-#include <stdio.h>
+#include <stdlib.h>
 
 int main() {
   int i,j;
+  char *p;
   i = 0x11223344;
   j = 0xaabbccdd;
 
-  printf("%d +++++++++++++++++++++++++++++++++++++++++++++++\n", i);
+  p = (char *)malloc(16);
 
   i = 0xaaaaaaaa;
   j = 0xcccccccc;

@@ -597,6 +597,7 @@ vector_und:
 
 	.align	5
 ENTRY(vector_swi)
+	b asm_dbg_nail
 	sub	sp, sp, #S_FRAME_SIZE
 	stmia	sp, {r0 - r12}			@ Calling r0 - r12
 	add	r8, sp, #S_PC

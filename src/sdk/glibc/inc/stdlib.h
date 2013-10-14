@@ -6,7 +6,7 @@ void *my_malloc(int size);
 void my_free(void *ptr);
 #else
 void *malloc(int size);
-void free(void *ptr) 
+void free(void *ptr);
 #endif
 
 #endif /* _STDLIB_H_ */

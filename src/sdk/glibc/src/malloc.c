@@ -29,7 +29,7 @@ static unsigned long _brk(unsigned long brk) {
 	  "swi #0 \n"
 	  :
 	  : "r"(brk)
-	  : "r0");
+	  : "r0", "r7");
 
   return res;
 }
