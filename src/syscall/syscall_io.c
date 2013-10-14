@@ -11,3 +11,7 @@ long sys_print(char *string, int length) {
 
   return 0;
 }
+
+long sys_inputc() {
+  return 0 ;
+}

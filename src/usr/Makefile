@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-DEMOS := demo_1 demo_2 demo_3
+DEMOS := demo_1 demo_2 demo_3 demo_4
 LISTFS:= ListFS.fs
 
 all: $(LISTFS)
@@ -18,6 +18,10 @@ demo_2: demo_2.c
 demo_3: demo_3.c
 	$(CC) -nostdlib demo_3.c -o demo_3
 	cp -f demo_3 ./fs_root/fs/
+
+demo_4: demo_4.c
+	$(CC) -nostdlib demo_4.c -o demo_4
+	cp -f demo_4 ./fs_root/fs/
 
 ListFS.fs:
 	python ListFSArchiver.py

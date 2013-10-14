@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= string.o printf.o malloc.o
+objects	:= string.o printf.o malloc.o inputc.o
 
 all: $(GLIBCSO)
 

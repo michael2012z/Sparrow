@@ -109,12 +109,12 @@ out:
 static int set_brk(struct mm_struct *mm, unsigned long start, unsigned long end)
 {
   printk(PR_SS_PROC, PR_LVL_DBG1, "\nset_brk():\n");
-  printk(PR_SS_PROC, PR_LVL_DBG1, " start = %x, end = %x\n", start, end);
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: original: start = %x, end = %x\n", __func__, start, end);
 
   start = ELF_PAGEALIGN(start);
   end = ELF_PAGEALIGN(end);
 
-  printk(PR_SS_PROC, PR_LVL_DBG1, " start = %x, end = %x\n", start, end);
+  printk(PR_SS_PROC, PR_LVL_DBG1, "%s: aligned: start = %x, end = %x\n", __func__, start, end);
 
   if (end > start) {
 	unsigned long addr;
@@ -122,6 +122,10 @@ static int set_brk(struct mm_struct *mm, unsigned long start, unsigned long end)
 	if (BAD_ADDR(addr))
 	  return addr;
   }
+
+  mm->start_heap = start;
+  mm->end_heap = end;
+
   return 0;
 }
 
@@ -206,6 +210,7 @@ int load_elf_binary(struct file *filep, struct pt_regs *regs, struct mm_struct *
 
   }
 
+  printk(PR_SS_PROC, PR_LVL_DBG1, " elf_bss = %x, elf_brk = %x, start_code = %x, end_code = %x, start_data = %x, end_data = %x\n",elf_bss, elf_brk, start_code, end_code, start_data, end_data);
   printk(PR_SS_PROC, PR_LVL_DBG1, " elf_bss = %x, elf_brk = %x, start_code = %x, end_code = %x, start_data = %x, end_data = %x\n",elf_bss, elf_brk, start_code, end_code, start_data, end_data);
 
   /* After mapping all loadable segment, map an empty vma for stack */

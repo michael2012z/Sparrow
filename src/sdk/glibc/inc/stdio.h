@@ -7,4 +7,6 @@ void my_printf(const char *fmt, ...);
 void printf(const char *fmt, ...);
 #endif
 
+char inputc();
+
 #endif /* _STDIO_H_ */

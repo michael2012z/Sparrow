@@ -109,7 +109,7 @@ unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long ad
 
   add_vma(mm, vma);
 
-  return addr;
+  return vma->vm_start;
 }
 
 

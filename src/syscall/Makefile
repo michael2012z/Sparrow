@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= syscall_memory.o  syscall_process.o  syscall_utility.o
+objects	:= syscall_memory.o  syscall_process.o  syscall_io.o
 
 all: $(BUILTIN)
 

@@ -41,7 +41,7 @@ struct mm_struct {
   int map_count;				/* number of VMAs */
 
   unsigned long start_code, end_code, start_data, end_data;
-  unsigned long start_brk, brk, start_stack;
+  unsigned long start_heap, end_heap, start_stack, end_stack;
   unsigned long arg_start, arg_end, env_start, env_end;
 
 };
