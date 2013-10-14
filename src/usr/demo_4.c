@@ -6,6 +6,8 @@ int main() {
   i = 0x11223344;
   j = 0xaabbccdd;
 
+  i = i % j; 
+
   func1();
 
   while(1);

@@ -58,6 +58,9 @@ void __exception do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_re
   case 5:
 	do_translation_fault(&(current_task->mm), addr, fsr);
 	break;
+  case 7:
+	do_translation_fault(&(current_task->mm), addr, fsr);
+	break;
   default:
 	do_unknown_fault(addr, fsr, regs);
 	break;
