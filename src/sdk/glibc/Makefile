@@ -3,7 +3,7 @@ GLIBCSO	:= glibc.so
 export GLIBCSO
 
 IFLAGS	:=
-CFLAGS	:= -c -Wall -g -nostdinc -mlittle-endian
+CFLAGS	:= -c -Wall -nostdinc -mlittle-endian
 
 subdirs := src/
 

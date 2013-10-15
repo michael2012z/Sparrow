@@ -4,6 +4,8 @@
 #include <stdio.h>
 #endif
 
+#define printf
+
 #define BUFFER_LEADING_BYTES 8
 #define MIN_ALLOCATION_SIZE 4
 #define BUFFER_TRAILING_BYTES 4
@@ -29,7 +31,7 @@ static unsigned long _brk(unsigned long brk) {
 	  "swi #0 \n"
 	  :
 	  : "r"(brk)
-	  : "r0", "r7");
+	  : "r1", "r2", "r3", "r7");
 
   return res;
 }
@@ -51,12 +53,14 @@ void *malloc(int size)
 {
   struct memory_control_block* mcb;
 
+  printf("%s: size = %x, heap_start = %x, heap_end = %x\n", __func__, size, (unsigned int)heap_start, (unsigned int)heap_end);
   /* align the size to 4 */
   size = (size + 3) & 0xfffffffc;
 
   /* allocator not initiated, query heap start address by brk(0) */
   if(0 == heap_start) {
     heap_start = _brk(0);
+	printf("%s: size = %x, heap_start = %x\n", __func__, size, (unsigned int)heap_start);
 	if (0 == heap_start) {
 	  printf("%s: heap can't be initiated.\n", __func__);
 	  return 0;
@@ -87,7 +91,7 @@ void *malloc(int size)
   }
 
  retry:
-  while (((unsigned long)mcb < (heap_end - MIN_BUFFER_SIZE)) &&((mcb->allocated) || (mcb->size < size)))
+  while (((unsigned long)mcb < (heap_end - MIN_BUFFER_SIZE)) && ((mcb->allocated) || (mcb->size < size)))
 	mcb = get_next_mcb(mcb);
 
   /* now found a proper buffer, or arrived heap_end */
@@ -113,14 +117,15 @@ void *malloc(int size)
 	if (mcb->size >= (size + BUFFER_LEADING_BYTES + MIN_ALLOCATION_SIZE + BUFFER_TRAILING_BYTES)) {
 	  /* need to split */
 	  int remaining_size = mcb->size - size - BUFFER_LEADING_BYTES - BUFFER_TRAILING_BYTES;
+	  struct memory_control_block* next_mcb;
 	  mcb->size = size;
-	  mcb = get_next_mcb(mcb);
-	  mcb->allocated = 0;
-	  mcb->size = remaining_size;
+	  next_mcb = get_next_mcb(mcb);
+	  next_mcb->allocated = 0;
+	  next_mcb->size = remaining_size;
 	}
 	mcb->allocated = 1;
   }
-
+  printf("%s: succeed: mcb = %x, ret = %x\n", __func__, (unsigned int)mcb, (unsigned int)((unsigned long)mcb + BUFFER_LEADING_BYTES));
   return (void *)((unsigned long)mcb + BUFFER_LEADING_BYTES);
 }
 
@@ -132,6 +137,9 @@ void free(void *ptr)
 {
   struct memory_control_block *current_mcb, *next_mcb;
   current_mcb = (struct memory_control_block *)((unsigned long)ptr - BUFFER_LEADING_BYTES);
+
+  printf("%s: ptr = %x, mcb = %x, allocated = %x, size = %x\n", __func__, (unsigned int)ptr, (unsigned int)current_mcb, current_mcb->allocated, current_mcb->size);
+  printf("%s: heap_start = %x, heap_end = %x\n", __func__, (unsigned int)heap_start, (unsigned int)heap_end);
 
   if (((unsigned long)current_mcb < heap_start) || ((unsigned long)current_mcb >= heap_end)) {
 	printf("%s: invalid address\n", __func__);
@@ -152,6 +160,7 @@ void free(void *ptr)
   if ((unsigned long)next_mcb >= heap_end) {
 	/* current_cmb is the last buffer, try to release it to kernel */
 	heap_end = _brk((unsigned long)current_mcb);
+	printf("%s: after brk: heap_start = %x, heap_end = %x\n", __func__, (unsigned int)heap_start, (unsigned int)heap_end);
 	if (heap_end >= ((unsigned long)current_mcb + MIN_BUFFER_SIZE))
 	  current_mcb->size = heap_end - (unsigned long)current_mcb - BUFFER_LEADING_BYTES - BUFFER_TRAILING_BYTES;
 	else if (heap_end < (unsigned long)current_mcb) {
@@ -159,4 +168,5 @@ void free(void *ptr)
 	  return;
 	}
   }
+  return;
 }

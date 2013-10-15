@@ -13,5 +13,6 @@ long sys_print(char *string, int length) {
 }
 
 long sys_inputc() {
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: not implemented\n", __func__);
   return 0 ;
 }

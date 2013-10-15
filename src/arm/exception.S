@@ -299,7 +299,6 @@ ENDPROC(__pabt_invalid)
 	.align	5
 __irq_svc:
 	svc_entry
-	bl irq_svc_debug
 	irq_handler
 	bl check_and_schedule
 	ldr	r4, [sp, #S_PSR]		@ irqs are already disabled
@@ -312,7 +311,6 @@ ENDPROC(__irq_svc)
 __irq_usr:
 	usr_entry
 	get_thread_info tsk
-	bl irq_usr_debug
 	irq_handler
 	bl check_and_schedule	
 	mov	why, #0
@@ -457,6 +455,13 @@ ENTRY(ret_to_user)
 	restore_user_regs fast = 0, offset = 0
 ENDPROC(ret_to_user)
 
+	.align	5
+ENTRY(ret_from_syscall)
+	disable_irq				@ disable interrupts
+	str	r0, [sp, #S_R0]		@ returned r0
+	b ret_to_user
+ENDPROC(ret_from_syscall)
+
 
 		
 /*
@@ -597,7 +602,8 @@ vector_und:
 
 	.align	5
 ENTRY(vector_swi)
-	b asm_dbg_nail
+@	mov r8, r0
+@	b asm_dbg_nail
 	sub	sp, sp, #S_FRAME_SIZE
 	stmia	sp, {r0 - r12}			@ Calling r0 - r12
 	add	r8, sp, #S_PC
@@ -613,7 +619,7 @@ ENTRY(vector_swi)
 	adr	tbl, sys_call_table		@ load syscall table pointer
 
 	cmp	scno, #NR_syscalls		@ check upper syscall limit
-	adr	lr, ret_to_user			@ return address
+	adr	lr, ret_from_syscall			@ return address
 	ldrcc	pc, [tbl, scno, lsl #2]		@ call sys_* routine
 
 	mov r0,scno		@ error handler

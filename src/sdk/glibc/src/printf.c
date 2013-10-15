@@ -1,12 +1,26 @@
 #include "../inc/string.h"
 
+/*
+static void dbg(char *p, int num) {
+  asm("mov r0, %0  @ parameter 1\n"
+	  "mov r1, %1  @ parameter 2\n"
+	  "mov r2, #0  @ parameter 3\n"
+	  "mov r3, #0  @ parameter 4\n"
+	  "mov r7, #1  @ scno\n"
+	  "swi #0 \n"
+	  :
+	  : "r"(p), "r"(num)
+	  : "r0", "r1", "r2", "r3", "r7");
+}
+*/
+
 typedef char * va_list;
 #define _INTSIZEOF(n)   ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) )
 #define va_start(ap,v) ( ap = (va_list)&v + _INTSIZEOF(v) )
 #define va_arg(ap,t) ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) )
 #define va_end(ap)    ( ap = (va_list)0 )
 
-const char *digits="0123456789abcdef";
+const char digits[16]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 char numbers[68];
 
 static char print_buf[1024];
@@ -60,16 +74,16 @@ static char print_buf[1024];
 char *number(char *str, int num,int base,unsigned int flags){
 	int i=0;
 	int sign=0;
-	
+
 	if(FORMAT_SIGNED(flags)&&(signed int)num<0){
 		sign=1;
 		num=~num+1;
 	}
-	
+
 	do{
 		numbers[i++]=digits[do_div(num,base)];
 	}while(num!=0);
-	
+
 	if(FORMAT_BASE(flags)==FORMAT_BASE_O){
 		numbers[i++]='0';
 	}else if(FORMAT_BASE(flags)==FORMAT_BASE_X){
@@ -165,7 +179,6 @@ static int vsnprintf(char *buf, int size, const char *fmt, va_list args){
 
 	while (*fmt) {
 		const char *old_fmt = fmt;
-
 		read = format_decode(fmt, &spec);
 		fmt += read;
 
@@ -206,9 +219,12 @@ static int vsnprintf(char *buf, int size, const char *fmt, va_list args){
 			}else{
 				num = va_arg(args, unsigned int);
 			}
-				str=number(str,num,spec&FORMAT_BASE_MASK,spec);
+
+			str=number(str,num,spec&FORMAT_BASE_MASK,spec);
+
 		}
 	}
+
 	if (size > 0) {
 		if (str < end)
 			*str = '\0';
@@ -228,7 +244,7 @@ static void __put_char(char *p, int num) {
 	  "swi #0 \n"
 	  :
 	  : "r"(p), "r"(num)
-	  : "r0", "r1", "r7");
+	  : "r0", "r1", "r2", "r3", "r7");
 
 }
 

@@ -7,7 +7,7 @@ LISTFS:= ListFS.fs
 all: $(LISTFS)
 $(LISTFS): $(DEMOS)
 
-demo_1: demo_1.c
+demo_1: demo_1.c 
 	$(CC) -nostdlib demo_1.c -o demo_1 
 	cp -f demo_1 ./fs_root/fs/
 
@@ -23,12 +23,12 @@ demo_4: demo_4.c
 	$(CC) -nostdlib demo_4.c -o demo_4 -lgcc
 	cp -f demo_4 ./fs_root/fs/
 
-demo_5: demo_5.c
+demo_5: demo_5.c ../sdk/glibc/lib/glibc.so
 	$(CC) $(CFLAGS) -nostdlib -c demo_5.c -o demo_5.o
 	$(CC) -nostdlib demo_5.o ../sdk/glibc/lib/glibc.so -o demo_5 -lgcc
 	cp -f demo_5 ./fs_root/fs/
 
-demo_6: demo_6.c
+demo_6: demo_6.c ../sdk/glibc/lib/glibc.so
 	$(CC) $(CFLAGS) -nostdlib -c demo_6.c -o demo_6.o
 	$(CC) -nostdlib demo_6.o ../sdk/glibc/lib/glibc.so -o demo_6 -lgcc
 	cp -f demo_6 ./fs_root/fs/

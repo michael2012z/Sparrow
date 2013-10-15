@@ -20,11 +20,12 @@ long sys_brk(unsigned long brk) {
 	printk(PR_SS_IRQ, PR_LVL_ERR, "%s: invalid brk request\n", __func__);
 	return -1;
   } else if ((brk >= start_heap) && (brk <= end_heap)) {
-	printk(PR_SS_IRQ, PR_LVL_ERR, "%s: heap has already covered brk\n", __func__);
+	printk(PR_SS_IRQ, PR_LVL_DBG6, "%s: heap has already covered brk\n", __func__);
 	return brk;
   } else { /* brk > end_heap, need to map new memory */ 
 	unsigned long addr;
 	addr = do_brk(&(current_task->mm), end_heap, (brk-end_heap));
+	printk(PR_SS_IRQ, PR_LVL_DBG6, "%s: extablished new vma for brk request, addr = %x\n", __func__, addr);
 	if (BAD_ADDR(addr)) /* fail, return current heap end */
 	  return end_heap;
 	else {/* succeed, update heap end */
