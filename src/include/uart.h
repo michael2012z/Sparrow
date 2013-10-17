@@ -56,4 +56,7 @@ struct s3c_uart_irq {
 
 void __init s3c_init_uart_irqs();
 
+void arm_init_uart();
+void init_uart();
+
 #endif /* _UART_H_ */

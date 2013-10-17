@@ -4,6 +4,7 @@
 #include <mm.h>
 #include <exception.h>
 #include <timer.h>
+#include <uart.h>
 #include <process.h>
 #include <vfs.h>
 #include <irq.h>
@@ -117,6 +118,7 @@ void __init start_kernel(void) {
 
   init_IRQ();
   init_timer();
+  init_uart();
   exception_enable();
   printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
 

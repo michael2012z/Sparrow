@@ -2,7 +2,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= exception.o irq.o chip.o timer.o
+objects	:= exception.o irq.o chip.o timer.o uart.o
 
 all: $(BUILTIN)
 
