@@ -41,7 +41,6 @@ void handle_bad_irq(unsigned int irq, struct irq_desc *desc)
 
 struct irq_desc all_irq_desc[NR_IRQS] = {
 	[0 ... NR_IRQS-1] = {
-		.status = IRQ_DISABLED,
 		.chip = &no_irq_chip,
 		.handle_irq = handle_bad_irq,
 		.depth = 1,
@@ -59,7 +58,6 @@ void __init init_IRQ(void) {
 
   for (irq = 0; irq < NR_IRQS; irq++) {
 	desc = &all_irq_desc[irq];
-	desc->status |= IRQ_NOREQUEST | IRQ_NOPROBE;
   }
 
   arm_init_irq();

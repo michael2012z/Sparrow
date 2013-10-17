@@ -110,7 +110,6 @@ void __init s3c_init_timer_irq(unsigned int parent_irq, unsigned int timer_irq)
 
   set_irq_chip(timer_irq, &s3c_irq_timer);
   set_irq_handler(timer_irq, handle_level_irq);
-  set_irq_flags(timer_irq, IRQF_VALID);
   setup_irq(timer_irq, &s3c6410_timer_irq);
 }
 

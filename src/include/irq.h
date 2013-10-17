@@ -182,7 +182,6 @@ int set_irq_data(unsigned int irq, void *data);
 int set_irq_chip_data(unsigned int irq, void *data);
 int set_irq_type(unsigned int irq, unsigned int type);
 int set_irq_handler(unsigned int irq, irq_flow_handler_t handle);
-int set_irq_flags(unsigned int irq, unsigned int iflags);
 
 #define get_irq_chip(irq)	(irq_to_desc(irq)->chip)
 #define get_irq_chip_data(irq)	(irq_to_desc(irq)->chip_data)
