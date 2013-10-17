@@ -56,20 +56,15 @@ static void __init s3c6410_init_irq(void)
 
   printk(PR_SS_IRQ, PR_LVL_INF, "%s: initialising interrupts\n", __func__);
 
-  /* initialise the pair of VICs */
+  /* initialize the pair of VICs */
   vic_init((void *)VA_VIC0, IRQ_VIC0_BASE, vic0_valid);
   vic_init((void *)VA_VIC1, IRQ_VIC1_BASE, vic1_valid);
 
-  /* add the timer sub-irqs */
-  /* comment out timer 0 ~ 3 */
-  /*
-  s3c_init_timer_irq(IRQ_TIMER0);
-  s3c_init_timer_irq(IRQ_TIMER1);
-  s3c_init_timer_irq(IRQ_TIMER2);
-  s3c_init_timer_irq(IRQ_TIMER3);
-  */
-  printk(PR_SS_IRQ, PR_LVL_INF, "%s: initialising interrupts\n", __func__);
+  /* initialize timer irq */
   s3c_init_timer_irq(IRQ_TIMER4_VIC, IRQ_TIMER4);
+
+  /* initialize uart irq */
+  s3c_init_uart_irqs();
 
 }
 
