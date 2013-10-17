@@ -28,4 +28,6 @@ typedef unsigned int __u32;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+
 #endif

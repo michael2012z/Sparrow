@@ -3,7 +3,7 @@
 #include <irq.h>
 #include <ptrace.h>
 #include <printk.h>
-
+#include <uart.h>
 
 struct pt_regs *  __irq_regs;
 

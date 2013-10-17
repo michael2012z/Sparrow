@@ -1,3 +1,4 @@
+#include <type.h>
 #include <linkage.h>
 #include <interrupt.h>
 #include <irq.h>
@@ -42,7 +43,7 @@ static struct irqaction s3c6410_uart_irq = {
 	.handler	= s3c6410_uart_interrupt,
 };
 
-static inline void __iomem *s3c_irq_uart_base(unsigned int irq)
+static inline unsigned int s3c_irq_uart_base(unsigned int irq)
 {
 	struct s3c_uart_irq *uirq = get_irq_chip_data(irq);
 	return uirq->regs;
@@ -55,7 +56,7 @@ static inline unsigned int s3c_irq_uart_bit(unsigned int irq)
 
 static void s3c_irq_uart_mask(unsigned int irq)
 {
-	void __iomem *regs = s3c_irq_uart_base(irq);
+	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
 
@@ -66,7 +67,7 @@ static void s3c_irq_uart_mask(unsigned int irq)
 
 static void s3c_irq_uart_maskack(unsigned int irq)
 {
-	void __iomem *regs = s3c_irq_uart_base(irq);
+	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
 
@@ -78,7 +79,7 @@ static void s3c_irq_uart_maskack(unsigned int irq)
 
 static void s3c_irq_uart_unmask(unsigned int irq)
 {
-	void __iomem *regs = s3c_irq_uart_base(irq);
+	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
 
@@ -89,7 +90,7 @@ static void s3c_irq_uart_unmask(unsigned int irq)
 
 static void s3c_irq_uart_ack(unsigned int irq)
 {
-	void __iomem *regs = s3c_irq_uart_base(irq);
+	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 
 	__raw_writel(1 << bit, regs + S3C64XX_UINTP);
@@ -122,7 +123,7 @@ static struct irq_chip s3c_irq_uart = {
 static void __init s3c_init_uart_irq(struct s3c_uart_irq *uirq)
 {
 	struct irq_desc *desc = irq_to_desc(uirq->parent_irq);
-	void __iomem *reg_base = uirq->regs;
+	unsigned int reg_base = uirq->regs;
 	unsigned int irq;
 	int offs;
 
