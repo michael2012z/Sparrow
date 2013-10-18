@@ -16,12 +16,12 @@ objects := test.o
 
 .PHONY: $(subdirs)
 
-all: $(test)
+all: $(subdirs) $(test)
 
 $(subdirs):
 	$(MAKE) --directory=$@
 
-$(test): ${subdirs} $(objects)
+$(test): $(objects)
 	$(CC) fs/built-in.o mm/built-in.o util/built-in.o glibc/built-in.o $(objects) -o $@ -L/usr/local/lib -lcunit
 
 %.o: %.c

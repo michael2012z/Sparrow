@@ -87,6 +87,10 @@ int setup_irq(unsigned int irq, struct irqaction *act)
 void generic_handle_irq(unsigned int irq)
 {
   struct irq_desc *desc = irq_to_desc(irq);
+  
+  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: desc->handler_data = %x\n", __func__, desc->handler_data);
+  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: desc->handle_irq = %x\n", __func__, desc->handle_irq);
+  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: desc->chip = %x\n", __func__, desc->chip);
 
   if (0 != (unsigned int)desc->handler_data) {
 	desc->chip->mask(irq);

@@ -7,7 +7,9 @@ objects	:= vfs.o node.o mount.o
 
 all: $(BUILTIN)
 
-$(BUILTIN): $(objects) ${subdirs}
+ListFS/$(BUILTIN):  ${subdirs}
+
+$(BUILTIN): $(objects) ListFS/$(BUILTIN)
 	$(LD) $(LFLAGS) -o $@ $(objects) ListFS/$(BUILTIN)
 
 .PHONY: $(subdirs)

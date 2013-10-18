@@ -37,11 +37,10 @@ static inline struct pt_regs *set_irq_regs(struct pt_regs *new_regs)
 void __exception asm_do_IRQ(unsigned int irq, struct pt_regs *regs)
 {
   struct pt_regs *old_regs = set_irq_regs(regs);
-  printk(PR_SS_IRQ, PR_LVL_INF, "%s: %d\n", __func__, irq);
-  if (0x45 == irq)
-	return;
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: %d\n", __func__, irq);
+
   if (irq >= NR_IRQS) {
-	printk(PR_SS_IRQ, PR_LVL_INF, "Bad IRQ %d\n", irq);
+	printk(PR_SS_IRQ, PR_LVL_DBG1, "Bad IRQ %d\n", irq);
   } else {
 	generic_handle_irq(irq);
   }

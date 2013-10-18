@@ -12,7 +12,9 @@ all: $(BUILTIN)
 $(subdirs):
 	$(MAKE) --directory=$@
 
-$(BUILTIN): $(objects) ${subdirs}
+ListFS/$(BUILTIN): ${subdirs}
+
+$(BUILTIN): $(objects) ListFS/$(BUILTIN)
 	$(LD) $(LFLAGS) -o $@ $(objects) ListFS/$(BUILTIN)
 
 %.o: $(src_dir)/%.c

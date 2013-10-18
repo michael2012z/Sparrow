@@ -11,7 +11,9 @@ subdirs := src/
 
 all: lib/$(GLIBCSO)
 
-lib/$(GLIBCSO): ${subdirs}
+src/$(GLIBCSO): ${subdirs}
+
+lib/$(GLIBCSO): src/$(GLIBCSO)
 	cp -f src/$(GLIBCSO) lib/$(GLIBCSO)
 
 $(subdirs):

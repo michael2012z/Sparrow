@@ -99,8 +99,15 @@ static void s3c_irq_uart_ack(unsigned int irq)
 static void s3c_irq_demux_uart(unsigned int irq, struct irq_desc *desc)
 {
 	struct s3c_uart_irq *uirq = desc->handler_data;
-	u32 pend = __raw_readl(uirq->regs + S3C64XX_UINTP);
-	int base = uirq->base_irq;
+	u32 pend;
+	int base;
+
+	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: irq = %x\n", __func__, irq);
+
+	pend = __raw_readl(uirq->regs + S3C64XX_UINTP);
+	base = uirq->base_irq;
+
+	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: pend = %x, base = %x\n", __func__, pend, base);
 
 	if (pend & (1 << 0))
 		generic_handle_irq(base);
