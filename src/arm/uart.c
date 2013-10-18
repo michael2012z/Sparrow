@@ -34,7 +34,8 @@ static struct s3c_uart_irq uart_irqs[] = {
 static irqreturn_t
 s3c6410_uart_interrupt(int irq, void *dev_id)
 {
-  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, irq = %d\n", __func__, irq);
+  if (0x10 != irq)
+	printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, irq = %x\n", __func__, irq);
   return IRQ_HANDLED;
 }
 
@@ -56,6 +57,7 @@ static inline unsigned int s3c_irq_uart_bit(unsigned int irq)
 
 static void s3c_irq_uart_mask(unsigned int irq)
 {
+	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
@@ -67,6 +69,7 @@ static void s3c_irq_uart_mask(unsigned int irq)
 
 static void s3c_irq_uart_maskack(unsigned int irq)
 {
+	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
@@ -79,6 +82,7 @@ static void s3c_irq_uart_maskack(unsigned int irq)
 
 static void s3c_irq_uart_unmask(unsigned int irq)
 {
+	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
@@ -90,6 +94,7 @@ static void s3c_irq_uart_unmask(unsigned int irq)
 
 static void s3c_irq_uart_ack(unsigned int irq)
 {
+	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 
@@ -147,7 +152,7 @@ static void __init s3c_init_uart_irq(struct s3c_uart_irq *uirq)
 		setup_irq(irq, &s3c6410_uart_irq);
 	}
 
-	desc->handler_data = uirq;
+	desc->handler_data = (void *)uirq->base_irq;
 	desc->handle_irq = s3c_irq_demux_uart;
 }
 
@@ -203,7 +208,7 @@ GPACON &= ~0xff;
 }
 
 void __init arm_init_uart() {
-  s3c6410_uart_setup();
+  if (0)  s3c6410_uart_setup();
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE0);
   /* unmask all interrupts at the start. */
   __raw_writel(S3C_VA_UART0 + S3C64XX_UINTM, 0x0);

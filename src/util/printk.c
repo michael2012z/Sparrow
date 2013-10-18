@@ -300,6 +300,7 @@ void printk(int ss, int level, const char *fmt, ...)
 	  break;
 	case PR_LVL_DBG2:
 	  leading_lvl = "[DBG2-";
+	  //	  return;
 	  break;
 	case PR_LVL_DBG3:
 	  leading_lvl = "[DBG3-";
