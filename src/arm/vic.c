@@ -67,6 +67,8 @@ static void __init vic_enable(void *base)
 {
   if ((unsigned long)base == VA_VIC0)
 	vic_unmask_irq(IRQ_TIMER4_VIC);
+  else if ((unsigned long)base == VA_VIC1)
+	vic_unmask_irq(IRQ_UART0);
 }
 
 static void __init vic_set_irq_sources(void *base,

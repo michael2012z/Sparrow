@@ -33,7 +33,7 @@
 
 
 #define S3C_PA_UART		(0x7F005000)
-#define S3C_PA_UART0		(S3C_PA_UART + 0x00)
+#define S3C_PA_UART0		(S3C_PA_UART + 0x000)
 #define S3C_PA_UART1		(S3C_PA_UART + 0x400)
 #define S3C_PA_UART2		(S3C_PA_UART + 0x800)
 #define S3C_PA_UART3		(S3C_PA_UART + 0xC00)
