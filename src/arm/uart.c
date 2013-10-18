@@ -34,8 +34,8 @@ static struct s3c_uart_irq uart_irqs[] = {
 static irqreturn_t
 s3c6410_uart_interrupt(int irq, void *dev_id)
 {
-  if (0x10 != irq)
-	printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, irq = %x\n", __func__, irq);
+  if (irq != 0x10)
+    printk(PR_SS_IRQ, PR_LVL_ERR, "%s, irq = %x\n", __func__, irq);
   return IRQ_HANDLED;
 }
 
@@ -57,7 +57,6 @@ static inline unsigned int s3c_irq_uart_bit(unsigned int irq)
 
 static void s3c_irq_uart_mask(unsigned int irq)
 {
-	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
@@ -69,7 +68,6 @@ static void s3c_irq_uart_mask(unsigned int irq)
 
 static void s3c_irq_uart_maskack(unsigned int irq)
 {
-	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
@@ -82,7 +80,6 @@ static void s3c_irq_uart_maskack(unsigned int irq)
 
 static void s3c_irq_uart_unmask(unsigned int irq)
 {
-	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
@@ -94,7 +91,6 @@ static void s3c_irq_uart_unmask(unsigned int irq)
 
 static void s3c_irq_uart_ack(unsigned int irq)
 {
-	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s:%d irq = %x\n", __func__, __LINE__, irq);
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 
@@ -107,12 +103,12 @@ static void s3c_irq_demux_uart(unsigned int irq, struct irq_desc *desc)
 	u32 pend;
 	int base;
 
-	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: irq = %x\n", __func__, irq);
+	//	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: irq = %x\n", __func__, irq);
 
 	pend = __raw_readl(uirq->regs + S3C64XX_UINTP);
 	base = uirq->base_irq;
 
-	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: pend = %x, base = %x\n", __func__, pend, base);
+	//	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: pend = %x, base = %x\n", __func__, pend, base);
 
 	if (pend & (1 << 0))
 		generic_handle_irq(base);
@@ -210,7 +206,12 @@ GPACON &= ~0xff;
 void __init arm_init_uart() {
   if (0)  s3c6410_uart_setup();
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE0);
+  s3c_irq_uart_unmask(IRQ_S3CUART_BASE1);
+  s3c_irq_uart_unmask(IRQ_S3CUART_BASE2);
+  s3c_irq_uart_unmask(IRQ_S3CUART_BASE3);
   /* unmask all interrupts at the start. */
   __raw_writel(S3C_VA_UART0 + S3C64XX_UINTM, 0x0);
-
+  __raw_writel(S3C_VA_UART1 + S3C64XX_UINTM, 0x0);
+  __raw_writel(S3C_VA_UART2 + S3C64XX_UINTM, 0x0);
+  __raw_writel(S3C_VA_UART3 + S3C64XX_UINTM, 0x0);
 }

@@ -56,6 +56,7 @@ void check_and_schedule() {
   printk(PR_SS_PROC, PR_LVL_DBG5, "%s\n", __func__);
   if (check_should_schedule())
 	schedule();
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s: return\n", __func__);
 }
 
 bool check_should_schedule() {
