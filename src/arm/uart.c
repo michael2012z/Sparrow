@@ -34,8 +34,8 @@ static struct s3c_uart_irq uart_irqs[] = {
 static irqreturn_t
 s3c6410_uart_interrupt(int irq, void *dev_id)
 {
-  if (irq != 0x10)
-    printk(PR_SS_IRQ, PR_LVL_ERR, "%s, irq = %x\n", __func__, irq);
+  if (irq != 0x12)
+    printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, irq = %x\n", __func__, irq);
   return IRQ_HANDLED;
 }
 
@@ -99,25 +99,25 @@ static void s3c_irq_uart_ack(unsigned int irq)
 
 static void s3c_irq_demux_uart(unsigned int irq, struct irq_desc *desc)
 {
-	struct s3c_uart_irq *uirq = desc->handler_data;
-	u32 pend;
-	int base;
-
-	//	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: irq = %x\n", __func__, irq);
-
-	pend = __raw_readl(uirq->regs + S3C64XX_UINTP);
-	base = uirq->base_irq;
-
-	//	printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: pend = %x, base = %x\n", __func__, pend, base);
-
-	if (pend & (1 << 0))
-		generic_handle_irq(base);
-	if (pend & (1 << 1))
-		generic_handle_irq(base + 1);
-	if (pend & (1 << 2))
-		generic_handle_irq(base + 2);
-	if (pend & (1 << 3))
-		generic_handle_irq(base + 3);
+  struct s3c_uart_irq *uirq = &uart_irqs[irq - IRQ_UART0];
+  u32 pend;
+  int base;
+  
+  //  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: irq = %x\n", __func__, irq);
+  
+  pend = __raw_readl(uirq->regs + S3C64XX_UINTP);
+  base = uirq->base_irq;
+  
+  //  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: pend = %x, base = %x\n", __func__, pend, base);
+  
+  if (pend & (1 << 0))
+	generic_handle_irq(base);
+  if (pend & (1 << 1))
+	generic_handle_irq(base + 1);
+  if (pend & (1 << 2))
+	generic_handle_irq(base + 2);
+  if (pend & (1 << 3))
+	generic_handle_irq(base + 3);
 }
 
 static struct irq_chip s3c_irq_uart = {
@@ -148,7 +148,7 @@ static void __init s3c_init_uart_irq(struct s3c_uart_irq *uirq)
 		setup_irq(irq, &s3c6410_uart_irq);
 	}
 
-	desc->handler_data = (void *)uirq->base_irq;
+	desc->handler_data = 0;//(void *)uirq->base_irq;
 	desc->handle_irq = s3c_irq_demux_uart;
 }
 
@@ -165,46 +165,22 @@ void __init s3c_init_uart_irqs() {
 }
 
 static void __init s3c6410_uart_setup() {
-#define ULCON0     (*((volatile unsigned long *)0xE2205000))
-#define UCON0      (*((volatile unsigned long *)0xE2205004))
-#define UFCON0     (*((volatile unsigned long *)0xE2205008))
-#define UMCON0     (*((volatile unsigned long *)0xE220500C))
-#define UTRSTAT0   (*((volatile unsigned long *)0xE2205010))
-#define UFSTAT0    (*((volatile unsigned long *)0xE2205018))
-#define UTXH0      (*((volatile unsigned char *)0xE2205020))
-#define URXH0      (*((volatile unsigned char *)0xE2205024))
-#define UBRDIV0    (*((volatile unsigned short *)0xE2205028))
-#define UDIVSLOT0  (*((volatile unsigned short *)0xE220502C))
-#define GPACON     (*((volatile unsigned long *)0xE2208000))
+  //  __raw_writel(0xe2205004, 0x785);
+  __raw_writel(0xe2205004, 0x781);
+  __raw_writel(0xe2205000, 0x7);
+  __raw_writel(0xe2205008, 0x17);
+  __raw_writel(0xe2205008, 0x11);
+  __raw_writel(0xe2205004, 0x385);
+  __raw_writel(0xe2205000, 0x3);
+  __raw_writel(0xe2205028, 0x23);
+  __raw_writel(0xe220500c, 0x0);
+  __raw_writel(0xe220502c, 0x80);
 
-GPACON &= ~0xff;
- GPACON |= 0x22;
- 
- /* ULCON0 */
- ULCON0 = 0x3;  /* 数据位:8, 无较验, 停止位: 1, 8n1 */
- UCON0  = 0x5;  /* 使能UART发送、接收 */
- UFCON0 = 0x01; /* FIFO ENABLE */
-
- UMCON0 = 0;
- 
- /* 波特率 */
- /* DIV_VAL = (PCLK / (bps x 16 ) ) - 1 
-  *PCLK = 66.5MHz
-  * bps = 115200
-  * DIV_VAL = (66500000 / (115200 x 16 ) ) - 1 
-  *         = 35.08
-  */
- UBRDIV0   = 35;
-
- /* x/16 = 0.08
-  * x = 1
-  */
- UDIVSLOT0 = 0x1;
   return;
 }
 
 void __init arm_init_uart() {
-  if (0)  s3c6410_uart_setup();
+  if (1)  s3c6410_uart_setup();
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE0);
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE1);
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE2);
