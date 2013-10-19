@@ -41,6 +41,7 @@ static struct task_struct *create_launch_kernel_task() {
   if (NULL == task)
 	return NULL;
 
+  task->sched_en.state = PROCESS_STATE_RUNNING;
   task->stack = (void *)&init_thread_union;
 
   task->pid = pid;
@@ -80,6 +81,8 @@ int create_kernel_thread(int (*fn)(void *)) {
 
   if (NULL == task)
 	return -1;
+
+  task->sched_en.state = PROCESS_STATE_READY;
 
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
@@ -125,6 +128,7 @@ int create_process(struct file *filep) {
   if (NULL == task)
 	return -1;
 
+  task->sched_en.state = PROCESS_STATE_READY;
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
   task->pid = pid;

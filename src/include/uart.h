@@ -58,5 +58,7 @@ void __init s3c_init_uart_irqs();
 
 void arm_init_uart();
 void init_uart();
+int register_uart_input_c (int pid, char *ch_p);
+void uart_input_char(char ch);
 
 #endif /* _UART_H_ */

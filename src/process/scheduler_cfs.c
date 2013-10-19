@@ -71,11 +71,12 @@ static void check_preempt_curr_cfs (struct task_struct *p) {
 
 static struct task_struct * pick_next_task_cfs () {
   struct sched_entity* task_en = cfs_queue_dequeue_first();
-
   if (NULL==task_en)
 	return NULL;
   else {
 	task_en->continuous_ticks = 0;
+	if (PROCESS_STATE_READY == task_en->state)
+	  task_en->state = PROCESS_STATE_RUNNING;
 	return container_of(task_en, struct task_struct, sched_en);
   }
 }

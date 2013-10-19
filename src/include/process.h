@@ -10,7 +10,15 @@
 
 extern union thread_union init_thread_union;
 
+/* process state */
+#define PROCESS_STATE_INVALID		0
+#define PROCESS_STATE_READY			1
+#define PROCESS_STATE_RUNNING		2
+#define PROCESS_STATE_WAITING		3
+#define PROCESS_STATE_SLEEPING		4
+
 struct sched_entity {
+  int state;
   u64 exec_start;
   u64 sum_exec_runtime;
   u64 vruntime;
@@ -19,25 +27,15 @@ struct sched_entity {
   struct list_head queue_entry;
 };
 
-
 struct task_struct {
-  volatile long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
   void *stack;
-  unsigned int flags;	/* per process flags, defined below */
-
+  unsigned int flags;
   struct pt_regs regs;
-
-  //  unsigned long pgd;
-
   bool kernel_thread;
-
   int priority;
-
   struct mm_struct mm;
-
   int pid;
-
-  struct timespec start_time; 		/* monotonic time */
+  struct timespec start_time;
   struct sched_entity sched_en;
 };
 

@@ -16,16 +16,26 @@ void cfs_queue_enqueue (struct sched_entity *en) {
   struct list_head *pos = NULL, *head = queue;
   struct sched_entity *current;
 
-  printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
-  list_for_each(pos, head) {
-	printk(PR_SS_PROC, PR_LVL_DBG6, "%s 1\n", __func__);
-	current = list_entry(pos, struct sched_entity, queue_entry);
-	if (en->vruntime < current->vruntime) {
-	  printk(PR_SS_PROC, PR_LVL_DBG6, "%s 2\n", __func__);
-	  list_add_tail(&en->queue_entry, pos);
-	  return;
+  /* check task state:
+   * if task is ready: add to first;
+   * if task is waiting/sleeping: add to tail;
+   * else: insert by vruntime.
+   **/
+  if (PROCESS_STATE_READY == en->state) {
+	list_add_tail(&en->queue_entry, head->next);
+  } else if (PROCESS_STATE_RUNNING == en->state) {
+	printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
+	list_for_each(pos, head) {
+	  printk(PR_SS_PROC, PR_LVL_DBG6, "%s 1\n", __func__);
+	  current = list_entry(pos, struct sched_entity, queue_entry);
+	  if (en->vruntime < current->vruntime) {
+		printk(PR_SS_PROC, PR_LVL_DBG6, "%s 2\n", __func__);
+		list_add_tail(&en->queue_entry, pos);
+		return;
+	  }
 	}
   }
+  
   list_add_tail(&en->queue_entry, queue);
   return;
 }

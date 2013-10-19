@@ -54,6 +54,8 @@ s3c6410_uart_interrupt(int irq, void *dev_id)
 	  
 	  ch = __raw_readl(regs + S3C64XX_URXH);
 	  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, '%c' read from FIFO\n", __func__, ch);
+
+	  uart_input_char(ch);
 	  
 	}
   } else if (0x10 == irq) { /* data received */
@@ -206,7 +208,7 @@ static void __init s3c6410_uart_setup() {
 }
 
 void __init arm_init_uart() {
-  if (1)  s3c6410_uart_setup();
+  s3c6410_uart_setup();
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE0);
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE1);
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE2);
