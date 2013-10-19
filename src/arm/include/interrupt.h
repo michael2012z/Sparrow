@@ -17,9 +17,21 @@
 
 
 /* S3C64XX interrupt registers. */
-#define S3C64XX_UINTP		0x30
-#define S3C64XX_UINTSP		0x34
-#define S3C64XX_UINTM		0x38
+#define S3C64XX_ULCON	  	(0x00)
+#define S3C64XX_UCON	  	(0x04)
+#define S3C64XX_UFCON	  	(0x08)
+#define S3C64XX_UMCON	  	(0x0C)
+#define S3C64XX_UTRSTAT	  	(0x10)
+#define S3C64XX_UERSTAT	  	(0x14)
+#define S3C64XX_UFSTAT	  	(0x18)
+#define S3C64XX_UMSTAT	  	(0x1C)
+#define S3C64XX_UTXH	  	(0x20)
+#define S3C64XX_URXH	  	(0x24)
+#define S3C64XX_UBRDIV	  	(0x28)
+#define S3C64XX_DIVSLOT		(0x2C)
+#define S3C64XX_UINTP		(0x30)
+#define S3C64XX_UINTSP		(0x34)
+#define S3C64XX_UINTM		(0x38)
 
 
 #define S3C_ADDR_BASE	(0xe1200000)

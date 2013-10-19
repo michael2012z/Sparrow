@@ -36,6 +36,26 @@ s3c6410_uart_interrupt(int irq, void *dev_id)
 {
   if (irq != 0x12)
     printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, irq = %x\n", __func__, irq);
+
+  if (0x10 == irq) { /* data received */
+	int n, error;
+	char ch;
+
+	while(1) {
+	  n = __raw_readl(0xe2205018);
+	  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, %x char(s) in FIFO\n", __func__, n);
+	  if (0 == n)
+		break;
+	  
+	  error = __raw_readl(0xe2205014);
+	  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, there %s error in FIFO\n", __func__, error?"is":"isn't");
+	  
+	  ch = __raw_readl(0xe2205024);
+	  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, '%c' read from FIFO\n", __func__, ch);
+	  
+	}
+  }
+
   return IRQ_HANDLED;
 }
 
@@ -170,7 +190,8 @@ static void __init s3c6410_uart_setup() {
   __raw_writel(0xe2205000, 0x7);
   __raw_writel(0xe2205008, 0x17);
   __raw_writel(0xe2205008, 0x11);
-  __raw_writel(0xe2205004, 0x385);
+  //  __raw_writel(0xe2205004, 0x385);
+  __raw_writel(0xe2205004, 0x381);
   __raw_writel(0xe2205000, 0x3);
   __raw_writel(0xe2205028, 0x23);
   __raw_writel(0xe220500c, 0x0);
