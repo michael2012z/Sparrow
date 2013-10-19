@@ -34,26 +34,30 @@ static struct s3c_uart_irq uart_irqs[] = {
 static irqreturn_t
 s3c6410_uart_interrupt(int irq, void *dev_id)
 {
-  if (irq != 0x12)
-    printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, irq = %x\n", __func__, irq);
-
+  unsigned int uart_index = (irq - IRQ_S3CUART_BASE0)/4;
+  if (uart_index > 3)
+    printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, invalid uart irq: irq = %x, uart_index = %x\n", __func__, irq, uart_index);	
+  
   if (0x10 == irq) { /* data received */
 	int n, error;
 	char ch;
+	unsigned int regs = uart_irqs[uart_index].regs;
 
 	while(1) {
-	  n = __raw_readl(0xe2205018);
+	  n = __raw_readl(regs + S3C64XX_UFSTAT);
 	  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, %x char(s) in FIFO\n", __func__, n);
 	  if (0 == n)
 		break;
 	  
-	  error = __raw_readl(0xe2205014);
+	  error = __raw_readl(regs + S3C64XX_UERSTAT);
 	  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, there %s error in FIFO\n", __func__, error?"is":"isn't");
 	  
-	  ch = __raw_readl(0xe2205024);
+	  ch = __raw_readl(regs + S3C64XX_URXH);
 	  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, '%c' read from FIFO\n", __func__, ch);
 	  
 	}
+  } else if (0x10 == irq) { /* data received */
+	/* not handled */
   }
 
   return IRQ_HANDLED;
@@ -185,17 +189,18 @@ void __init s3c_init_uart_irqs() {
 }
 
 static void __init s3c6410_uart_setup() {
-  //  __raw_writel(0xe2205004, 0x785);
-  __raw_writel(0xe2205004, 0x781);
-  __raw_writel(0xe2205000, 0x7);
-  __raw_writel(0xe2205008, 0x17);
-  __raw_writel(0xe2205008, 0x11);
-  //  __raw_writel(0xe2205004, 0x385);
-  __raw_writel(0xe2205004, 0x381);
-  __raw_writel(0xe2205000, 0x3);
-  __raw_writel(0xe2205028, 0x23);
-  __raw_writel(0xe220500c, 0x0);
-  __raw_writel(0xe220502c, 0x80);
+  /* setup UART0 only*/
+  unsigned int regs = uart_irqs[0].regs;
+
+  __raw_writel(regs + S3C64XX_UCON, 0x781);
+  __raw_writel(regs + S3C64XX_ULCON, 0x7);
+  __raw_writel(regs + S3C64XX_UFCON, 0x17);
+  __raw_writel(regs + S3C64XX_UFCON, 0x11);
+  __raw_writel(regs + S3C64XX_UCON, 0x381);
+  __raw_writel(regs + S3C64XX_ULCON, 0x3);
+  __raw_writel(regs + S3C64XX_UBRDIV, 0x23);
+  __raw_writel(regs + S3C64XX_UMCON, 0x0);
+  __raw_writel(regs + S3C64XX_DIVSLOT, 0x80);
 
   return;
 }
