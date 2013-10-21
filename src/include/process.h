@@ -60,6 +60,7 @@ struct sched_class {
   void (*check_preempt_curr) (struct task_struct *p);
   struct task_struct * (*pick_next_task) ();
   void (*task_tick) (struct task_struct *p);
+  struct task_struct * (*find_task_by_pid) (int pid);
   void (*dump) ();
 };
 
@@ -110,8 +111,10 @@ bool is_scheduler_ready();
 void update_task_on_tick();
 bool check_should_schedule();
 void enqueue_task(struct task_struct *task, enum sched_enqueue_flag flag);
+void dequeue_task(struct task_struct *task);
 void schedule();
 void schedule_initialize();
+struct task_struct * find_task_by_pid(int pid);
 
 void cpu_idle();
 void arm_health_check(void);

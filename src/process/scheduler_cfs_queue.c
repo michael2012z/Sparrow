@@ -28,7 +28,9 @@ void cfs_queue_enqueue (struct sched_entity *en) {
 	list_for_each(pos, head) {
 	  printk(PR_SS_PROC, PR_LVL_DBG6, "%s 1\n", __func__);
 	  current = list_entry(pos, struct sched_entity, queue_entry);
-	  if (en->vruntime < current->vruntime) {
+	  if (PROCESS_STATE_READY == current->state)
+		continue;
+	  else if (en->vruntime < current->vruntime) {
 		printk(PR_SS_PROC, PR_LVL_DBG6, "%s 2\n", __func__);
 		list_add_tail(&en->queue_entry, pos);
 		return;
@@ -71,6 +73,20 @@ int cfs_queue_size () {
 	  count++;
   }
   return count;
+}
+
+struct sched_entity* cfs_queue_get_nth_entity(int index) {
+  struct list_head *pos = NULL, *head = queue;
+  struct sched_entity *current;
+
+  list_for_each(pos, head) {
+	current = list_entry(pos, struct sched_entity, queue_entry);
+	if (index == 0)
+	  return current;
+	else 
+	  index--;
+  }
+  return NULL;
 }
 
 void cfs_queue_dump() {

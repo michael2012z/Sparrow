@@ -91,6 +91,27 @@ static void dump_cfs () {
   cfs_queue_dump();
 }
 
+static struct task_struct * find_task_by_pid_cfs(int pid) {
+  int index = 0, size;
+  struct sched_entity* task_en = NULL;
+  struct task_struct * task = NULL;
+
+  size = cfs_queue_size();
+  for (index = 0; index < size; index++) {
+	task_en = cfs_queue_get_nth_entity(index);
+	if (NULL == task_en) {
+	  printk(PR_SS_PROC, PR_LVL_ERR, "%s, error, this should not happen\n", __func__);
+	  return NULL;
+	} else {
+	  task = container_of(task_en, struct task_struct, sched_en);
+	  if (pid == task->pid)
+		return task;
+	}
+  }
+  printk(PR_SS_PROC, PR_LVL_DBG6, "%s, the process with pid = %d was not found\n", __func__, task->pid);
+  return NULL;
+}
+
 const struct sched_class sched_class_cfs = {
   .init = scheduler_init_cfs,
   .enqueue_task		= enqueue_task_cfs,
@@ -99,5 +120,6 @@ const struct sched_class sched_class_cfs = {
   .check_preempt_curr	= check_preempt_curr_cfs,
   .pick_next_task		= pick_next_task_cfs,
   .task_tick		= task_tick_cfs,
+  .find_task_by_pid	= find_task_by_pid_cfs,
   .dump = dump_cfs,
 };

@@ -47,6 +47,10 @@ void enqueue_task(struct task_struct *task, enum sched_enqueue_flag flag) {
   scheduler->enqueue_task(task, flag);
 }
 
+void dequeue_task(struct task_struct *task) {
+  scheduler->dequeue_task(task);
+}
+
 void update_task_on_tick() {
   if (NULL != current_task)
 	scheduler->task_tick(current_task);
@@ -66,6 +70,11 @@ bool check_should_schedule() {
   else 
 	return true;
 }
+
+struct task_struct * find_task_by_pid(int pid) {
+  return scheduler->find_task_by_pid(pid);
+}
+
 
 void schedule() {
   struct task_struct *next_task = NULL;
