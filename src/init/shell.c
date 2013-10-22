@@ -3,7 +3,11 @@
 #include <printk.h>
 #include <string.h>
 #include "shell.h"
+#ifndef __ARCH_X86__
 #include <uart.h>
+#else
+#include <stdio.h>
+#endif
 
 static char *cmd_line_stripe(char *cmd_line, int cmd_line_len) {
   int i = 0;
@@ -65,6 +69,8 @@ static int find_command_id(char *cmd) {
 	  ret = SHELL_COMMAND_ID_ELFS;
 	else if (0 == strcmp(cmd, "elfa"))
 	  ret = SHELL_COMMAND_ID_ELFA;
+	else if (0 == strcmp(cmd, "ls"))
+	  ret = SHELL_COMMAND_ID_LS;
 	else if (0 == strcmp(cmd, "jiffies"))
 	  ret = SHELL_COMMAND_ID_JIFFIES;
 	else if (0 == strcmp(cmd, "vruntime"))
@@ -122,28 +128,35 @@ int __init kernel_shell(void *unused) {
 	case SHELL_COMMAND_ID_NONE:
 	  break;
 	case SHELL_COMMAND_ID_ELF:
-	  handle_cmd_elf(secondary_parameters);
+	  handle_cmd_elf(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_ELFS:
-	  handle_cmd_elfs(secondary_parameters);
+	  handle_cmd_elfs(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_ELFA:
-	  handle_cmd_elfa(secondary_parameters);
+	  handle_cmd_elfa(primary_parameter, secondary_parameters);
+	  break;
+	case SHELL_COMMAND_ID_LS:
+	  handle_cmd_ls(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_JIFFIES:
-	  handle_cmd_jiffies(secondary_parameters);
+	  handle_cmd_jiffies(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_VRUNTIME:
-	  handle_cmd_vruntime(secondary_parameters);
+	  handle_cmd_vruntime(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_HELP:
-	  handle_cmd_help(secondary_parameters);
+	  handle_cmd_help(primary_parameter, secondary_parameters);
 	  break;
 	default:
 	  printu("command '%s' is not known\n", cmd_p);
 	  continue;
 	}
+#ifdef __ARCH_X86__
+  } while(0);
+#else
   } while(1);
+#endif
   
   return 0;
 }
