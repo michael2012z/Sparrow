@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= main.o shell.o
+objects	:= main.o shell.o shell_handler.o
 
 all: $(BUILTIN)
 

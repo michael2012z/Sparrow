@@ -60,5 +60,6 @@ void arm_init_uart();
 void init_uart();
 int register_uart_input_c (int pid, char *ch_p);
 void uart_input_char(char ch);
+char inputc();
 
 #endif /* _UART_H_ */

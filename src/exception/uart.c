@@ -44,3 +44,7 @@ void uart_input_char(char ch) {
 	uart_registerd_ch = NULL;
   }
 }
+
+char inputc() {
+  return 0;
+}

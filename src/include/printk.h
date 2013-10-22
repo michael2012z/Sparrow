@@ -27,6 +27,9 @@
 #define PR_LVL_DBG9	0x29
 
 /* Trace Guide:
+ * Initialization (INI):
+ *   DBG0 -- General
+ *   DBG5 -- Shell
  * Memory Management (MM):
  *   DBG0 -- Boot Memory Allocator initialization and allocation
  *   DBG1 -- Boot Memory Allocator de-allocation
@@ -60,8 +63,8 @@
  */
 
 void printk(int a, int b, const char *fmt, ...);
-void __printk(const char *fmt, ...);
-void printu(char *string, int length);
+void printu(const char *fmt, ...);
+void prints(char *string, int length);
 void test_printk(void);
 
 void printk_disable();

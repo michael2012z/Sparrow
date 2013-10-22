@@ -345,7 +345,8 @@ void printk(int ss, int level, const char *fmt, ...)
 
 }
 
-void __printk(const char *fmt, ...)
+/* output to user screen directly*/
+void printu(const char *fmt, ...)
 {
 	va_list args;
 	unsigned int i;
@@ -357,7 +358,8 @@ void __printk(const char *fmt, ...)
 	__put_char (print_buf,i);
 }
 
-void printu(char *string, int length) {
+/* print raw string to screen directly */
+void prints(char *string, int length) {
   __put_char (string, length);
 }
 
