@@ -30,9 +30,12 @@ void uart_input_char(char ch) {
 	struct task_struct *listener = find_task_by_pid(uart_registered_pid);
 	*uart_registerd_ch = ch;
 	uart_registered_pid = -1;
-	if (NULL == listener)
+	if (NULL == listener) {
+	  printk(PR_SS_IRQ, PR_LVL_DBG6, "%s: no uart0 listener found\n", __func__);
 	  return;
+	}
 	else {
+	  printk(PR_SS_IRQ, PR_LVL_DBG6, "%s: pid = %d is listening uart0\n", __func__, listener->pid);
 	  dequeue_task(listener);
 	  listener->sched_en.state = PROCESS_STATE_READY;
 	  enqueue_task(listener, sched_enqueue_flag_new);
