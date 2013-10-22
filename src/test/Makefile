@@ -21,7 +21,7 @@ all: $(subdirs) $(test)
 $(subdirs):
 	$(MAKE) --directory=$@
 
-$(test): $(objects)
+$(test): $(objects) fs/built-in.o mm/built-in.o util/built-in.o glibc/built-in.o shell/built-in.o
 	$(CC) fs/built-in.o mm/built-in.o util/built-in.o glibc/built-in.o shell/built-in.o $(objects) -o $@ -L/usr/local/lib -lcunit
 
 %.o: %.c

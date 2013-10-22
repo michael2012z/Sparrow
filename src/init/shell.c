@@ -7,6 +7,7 @@
 #include <uart.h>
 #else
 #include <stdio.h>
+#define printu //
 #endif
 
 static char *cmd_line_stripe(char *cmd_line, int cmd_line_len) {
@@ -23,6 +24,8 @@ static char *cmd_line_stripe(char *cmd_line, int cmd_line_len) {
   for (i = (cmd_line_len - 1); i >= 0; i--)
 	if ((' ' == cmd_line[i]) || ('\n' == cmd_line[i]))
 	  cmd_line[i] = 0;
+	else if (0 == cmd_line[i])
+	  continue;
 	else
 	  break;
 
@@ -32,12 +35,13 @@ static char *cmd_line_stripe(char *cmd_line, int cmd_line_len) {
 static int cmd_line_parse(char **cmd_p, char **command, char **primary_parameter, char **secondary_parameters) {
   char *p = *cmd_p;
   int i;
-  char *accept_array[6] = {*command, 
-						   *primary_parameter,
-						   secondary_parameters[0],
-						   secondary_parameters[1],
-						   secondary_parameters[2],
-						   secondary_parameters[3]};
+  char **accept_array[6] = {command, 
+						   primary_parameter,
+						   &secondary_parameters[0],
+						   &secondary_parameters[1],
+						   &secondary_parameters[2],
+						   &secondary_parameters[3]};
+
   *command = NULL;
   *primary_parameter = NULL;
   for (i = 0; i < 4; i++)
@@ -45,10 +49,10 @@ static int cmd_line_parse(char **cmd_p, char **command, char **primary_parameter
 
   for (i = 0; i < 6; i++) {
 	if (0 == *p)
-	  return 0;
+	  break;
 	if (0 != *p)
-	  accept_array[i] = p;
-	while(' ' != *p)
+	  *accept_array[i] = p;
+	while ((' ' != *p) && (0 != *p))
 	  p++;
 	while(' ' == *p)
 	  *(p++) = 0;
@@ -102,10 +106,12 @@ int __init kernel_shell(void *unused) {
 	do { /* ENTER indicates the end of a command line */
 	  ch = inputc();
 	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: char %c was received\n", __func__, ch);
+	  cmd_line[i] = ch;
 	  i++;
 	  if (i >= 256)
 		break;
 	} while('\n' != ch);
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: received command line: %s\n", __func__, cmd_line);
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: received command line length: %d\n", __func__, i);
 	if (i >= 256)
 	  continue;
@@ -115,6 +121,16 @@ int __init kernel_shell(void *unused) {
 
 	error = cmd_line_parse(&cmd_p, &command, &primary_parameter, secondary_parameters);
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: cmd_line_parse = %d\n", __func__, error);
+
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: separated command line:\n", __func__);
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: command = %s\n", __func__, command);
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %s\n", __func__, primary_parameter);
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[0] = %s\n", __func__, secondary_parameters[0]);
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[1] = %s\n", __func__, secondary_parameters[1]);
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[2] = %s\n", __func__, secondary_parameters[2]);
+	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[3] = %s\n", __func__, secondary_parameters[3]);
+	
+
 
 	if (-1 == error) {
 	  printu("invalid command\n");

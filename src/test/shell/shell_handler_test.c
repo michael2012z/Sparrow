@@ -30,6 +30,12 @@ static void cmd_parameters_check(char *primary_parameter, char **secondary_param
 	CU_ASSERT(0 == strcmp(secondary_parameters[3], "&&"));
 	break;
   case 7:
+	CU_ASSERT(0 == strcmp(primary_parameter, "/bin"));
+	CU_ASSERT(NULL == secondary_parameters[0]);
+	CU_ASSERT(NULL == secondary_parameters[1]);
+	CU_ASSERT(NULL == secondary_parameters[2]);
+	CU_ASSERT(NULL == secondary_parameters[3]);
+	break;
   case 8:
   case 9:
   case 10:
