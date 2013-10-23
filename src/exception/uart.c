@@ -7,6 +7,7 @@
 int uart_registered_pid = -1;
 char *uart_registerd_ch = NULL;
 extern bool need_reschedule;
+extern struct task_struct *current_task;
 
 void init_uart() {
   arm_init_uart();
@@ -46,5 +47,14 @@ void uart_input_char(char ch) {
 }
 
 char inputc() {
-  return 0;
+  char ch;
+  if (register_uart_input_c(current_task->pid, &ch) < 0)
+	return 0;
+  else {
+	/* change state as waiting */
+	/* schedule */
+	current_task->sched_en.state = PROCESS_STATE_WAITING;
+	schedule();
+  }
+  return ch;
 }

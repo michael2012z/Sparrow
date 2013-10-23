@@ -10,6 +10,7 @@
 #include <irq.h>
 #include <head.h>
 #include <setup.h>
+#include "shell.h"
 
 extern struct task_struct *current_task;
 
@@ -64,6 +65,7 @@ static int __init kernel_demo(void *unused) {
 static void __init rest_init(void) {
   create_kernel_thread(kernel_init);
   create_kernel_thread(kernel_demo);
+  create_kernel_thread(kernel_shell);
 }
 
 static void __init health_check(void) {

@@ -13,6 +13,8 @@
 #define SHELL_COMMAND_ID_VRUNTIME	6
 #define SHELL_COMMAND_ID_HELP		7
 
+int __init kernel_shell(void *unused);
+
 void handle_cmd_elfs(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_elf(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_elfa(char *primary_parameter, char **secondary_parameters);

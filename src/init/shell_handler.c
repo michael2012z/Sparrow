@@ -1,3 +1,4 @@
+#include <linkage.h>
 #include "shell.h"
 
 void handle_cmd_elfs(char *primary_parameter, char **secondary_parameters) {

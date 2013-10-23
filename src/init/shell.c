@@ -97,17 +97,27 @@ int __init kernel_shell(void *unused) {
   int i = 0, cmd_id, error;
   char *cmd_p;
   char *command, *primary_parameter, *secondary_parameters[4];
-  
+
+  printk(PR_SS_INI, PR_LVL_DBG5, "%s: kernel shell started\n", __func__);
+  printu("\n");
+  printu("****************************************\n");
+  printu("      Sparrow OS default shell\n");
+  printu("****************************************\n");
+  printu("\n");
+
   do {
 	for (i = 0; i < 256; i++)
 	  cmd_line[i] = 0;
 	i = 0;
+
+	printu("$: _");
 	/* fetch user input, char by char */
 	do { /* ENTER indicates the end of a command line */
 	  ch = inputc();
 	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: char %c was received\n", __func__, ch);
 	  cmd_line[i] = ch;
 	  i++;
+	  printu("\b%c_", ch);
 	  if (i >= 256)
 		break;
 	} while('\n' != ch);
@@ -130,8 +140,6 @@ int __init kernel_shell(void *unused) {
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[2] = %s\n", __func__, secondary_parameters[2]);
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[3] = %s\n", __func__, secondary_parameters[3]);
 	
-
-
 	if (-1 == error) {
 	  printu("invalid command\n");
 	  continue;
