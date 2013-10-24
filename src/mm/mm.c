@@ -258,11 +258,6 @@ void mm_init() {
   /* clean 0~3G space */
   clean_user_space();
 
-  {
-	pgd_t *pc_pgd = pgd_offset(((pgd_t *)kernel_pgd), 0x8000);
-	printk(PR_SS_PROC, PR_LVL_DBG3, "%s: %d: pc pgd:     %x = %x\n", __func__, __LINE__, pc_pgd, *pc_pgd);  
-  }
-
   //  bootmem_test();
   init_pages_map();
 

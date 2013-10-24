@@ -12,18 +12,29 @@ extern union thread_union init_thread_union;
 
 /* process state */
 #define PROCESS_STATE_INVALID		0
-#define PROCESS_STATE_READY			1
+#define PROCESS_STATE_READY		1
 #define PROCESS_STATE_RUNNING		2
 #define PROCESS_STATE_WAITING		3
-#define PROCESS_STATE_SLEEPING		4
+#define PROCESS_STATE_DEAD		4
+
+#define PROCESS_WAITING_TYPE_INVALID		0
+#define PROCESS_WAITING_TYPE_INPUT		1
+#define PROCESS_WAITING_TYPE_TIME		2
+#define PROCESS_WAITING_TYPE_THREAD		3
 
 struct sched_entity {
+  /* state date */
   int state;
+  int waiting_type;
+  int blocking_pid; /* the process I'm waiting for */
+  int blocked_pid;  /* the process waiting for me */
+  /* timeing data */
   u64 exec_start;
   u64 sum_exec_runtime;
   u64 vruntime;
   u64 continuous_ticks;
   u64 accumulated_ticks;
+  /* list chain */
   struct list_head queue_entry;
 };
 

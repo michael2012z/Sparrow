@@ -182,6 +182,8 @@ void __init s3c_init_uart_irqs() {
   struct s3c_uart_irq *irq = uart_irqs;
   unsigned int nr_irqs = ARRAY_SIZE(uart_irqs);
 
+  if (1) return;
+
   printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: irq = %x, nr_irqs = %x\n", __func__, irq, nr_irqs);
 
   for (; nr_irqs > 0; nr_irqs--, irq++)
@@ -208,6 +210,7 @@ static void __init s3c6410_uart_setup() {
 }
 
 void __init arm_init_uart() {
+  if (1) return;
   s3c6410_uart_setup();
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE0);
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE1);

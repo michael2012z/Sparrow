@@ -40,6 +40,7 @@ context_switch(struct task_struct *prev,
   printk(PR_SS_PROC, PR_LVL_DBG5, "%s, prev = %x, next = %x\n", __func__, prev, next);  
   printk(PR_SS_PROC, PR_LVL_DBG5, "%s, prev.pgd = %x, next.pgd = %x\n", __func__, prev->mm.pgd, next->mm.pgd);  
   switch_pgd(next->mm.pgd, next->pid);
+  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, sp = %x\n", __func__, sp);
   switch_to(prev, next);
 }
 
