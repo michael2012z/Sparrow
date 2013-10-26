@@ -22,7 +22,7 @@ void cfs_queue_enqueue (struct sched_entity *en) {
    * else: insert by vruntime.
    **/
   if (PROCESS_STATE_READY == en->state) {
-	list_add_tail(&en->queue_entry, head->next);
+	list_add(&en->queue_entry, head->next);
   } else if (PROCESS_STATE_RUNNING == en->state) {
 	printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
 	list_for_each(pos, head) {
@@ -32,13 +32,16 @@ void cfs_queue_enqueue (struct sched_entity *en) {
 		continue;
 	  else if (en->vruntime < current->vruntime) {
 		printk(PR_SS_PROC, PR_LVL_DBG6, "%s 2\n", __func__);
-		list_add_tail(&en->queue_entry, pos);
-		return;
+		break;
 	  }
 	}
-  }
+	list_add_tail(&en->queue_entry, pos);
+  } else if (PROCESS_STATE_WAITING == en->state)
+    list_add_tail(&en->queue_entry, queue);
+  else
+	while(1)
+	  printk(PR_SS_PROC, PR_LVL_ERROR, "%s: invalid process state: %d, kernel panic\n", __func__, en->state);	
   
-  list_add_tail(&en->queue_entry, queue);
   return;
 }
 

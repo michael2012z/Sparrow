@@ -63,7 +63,13 @@ static bool need_to_reschedule_cfs (struct task_struct *p) {
 	return true;
 
   printk(PR_SS_PROC, PR_LVL_DBG6, "%s, first: pid = %d, vruntime = %d\n", __func__, container_of(first_en, struct task_struct, sched_en)->pid, first_en->vruntime);
-  return first_en->vruntime < calculate_vruntime(task_en);
+  
+  if (PROCESS_STATE_READY == first_en->state)
+	return true;
+  else if (first_en->vruntime < calculate_vruntime(task_en))
+	return true;
+  else 
+	return false;
 }
 
 static void check_preempt_curr_cfs (struct task_struct *p) {
