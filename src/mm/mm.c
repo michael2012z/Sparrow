@@ -163,8 +163,8 @@ extern void * _debug_output_io;
 
 static void map_debug_memory() {
   struct map_desc map;
-  map.physical = 0x7f005020 & PAGE_MASK;
-  map.virtual = 0xef005020 & PAGE_MASK;//(unsigned long)kmalloc(PAGE_SIZE);
+  map.physical = 0x7f005000 & PAGE_MASK;
+  map.virtual = 0xef005000 & PAGE_MASK;//(unsigned long)kmalloc(PAGE_SIZE);
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
 
@@ -206,15 +206,6 @@ static void map_timer_memory() {
   create_mapping(kernel_pgd, &map);
 }
 
-static void map_uart_memory() {
-  struct map_desc map;
-  map.physical = S3C_PA_UART & SECTION_MASK;
-  map.virtual = S3C_VA_UART & SECTION_MASK;
-  map.length = SECTION_SIZE;
-  map.type = MAP_DESC_TYPE_SECTION;
-  create_mapping(kernel_pgd, &map);
-}
-
 static void clean_user_space() {
   unsigned long virtual = 0;
   for (virtual = 0; virtual < PAGE_OFFSET; virtual += SECTION_SIZE) {
@@ -253,8 +244,6 @@ void mm_init() {
   map_vic_memory();
   /* map timer IRQ page */
   map_timer_memory();
-  /* map uart IRQ page */
-  map_uart_memory();
   /* clean 0~3G space */
   clean_user_space();
 
