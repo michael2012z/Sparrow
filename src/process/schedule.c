@@ -21,6 +21,9 @@ void schedule_initialize() {
 
 static void switch_pgd(unsigned long pgd, int pid) {
   /* The second parameter is context id, we don't support it. */
+  //  printk(PR_SS_MM, PR_LVL_DBG9, "%s: pid = %d: dump page table level 1:\n", __func__, pid);  
+  //print_memory_byte(pgd, pgd + 4*PAGE_SIZE);
+  //while(1);
   cpu_v6_switch_mm(__virt_to_phys(pgd), 0);
 }
 

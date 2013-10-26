@@ -29,6 +29,7 @@ void __init store_registers() {
   asm("mov %0, r8\n"
 	  : "=r"(_kernel_end)
 	  : );
+  printk(PR_SS_INI, PR_LVL_INF, "kernel_end = %x\n", _kernel_end);
 }
 
 extern struct file_system_type listfs_file_system_type;

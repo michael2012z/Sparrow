@@ -300,7 +300,7 @@ void printk(int ss, int level, const char *fmt, ...)
 	  break;
 	case PR_LVL_DBG2:
 	  leading_lvl = "[DBG2-";
-	  //	  return;
+	  return;
 	  break;
 	case PR_LVL_DBG3:
 	  leading_lvl = "[DBG3-";
@@ -311,15 +311,15 @@ void printk(int ss, int level, const char *fmt, ...)
 	  break;
 	case PR_LVL_DBG5:
 	  leading_lvl = "[DBG5-";
-	  //	  return;
+	  //return;
 	  break;
 	case PR_LVL_DBG6:
 	  leading_lvl = "[DBG6-";
-	  //	  return;
+	  //return;
 	  break;
 	case PR_LVL_DBG7:
 	  leading_lvl = "[DBG7-";
-	  //	  return;
+	  return;
 	  break;
 	case PR_LVL_DBG8:
 	  leading_lvl = "[DBG8-";
@@ -327,6 +327,7 @@ void printk(int ss, int level, const char *fmt, ...)
 	  break;
 	case PR_LVL_DBG9:
 	  leading_lvl = "[DBG9-";
+	  return;
 	  break;
 	default:
 	  return;
@@ -359,6 +360,53 @@ void printu(const char *fmt, ...)
 /* print raw string to screen directly */
 void prints(char *string, int length) {
   __put_char (string, length);
+}
+
+
+void print_memory_byte (unsigned long start, unsigned long end) {
+  int row=0, i, j, tmp;
+  unsigned char c;
+  static unsigned char hex_sym[] = "0123456789abcdef";
+  char lineContent[60] = {0};
+  int lineIndex = 0;
+  int length = 0;
+  start = start & 0xfffffff0;
+  end = (end + 0xf) & 0xfffffff0;
+  length = end - start;
+  
+  printk(PR_SS_MM, PR_LVL_DBG9, "%s(): start = %x, end = %x, length = %x\n", __func__, start, end, length);
+  if (start > end)
+	return;
+  printk(PR_SS_MM, PR_LVL_DBG9, "          00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff \n");
+  for (i=0; i < length; i++) {
+	if (0 == i%16) {
+	  // print line number
+	  if (0 != lineContent[0]) {
+		lineContent[lineIndex++] = '\n';		
+		printk(PR_SS_MM, PR_LVL_DBG9, lineContent);
+	  }
+	  memset(lineContent, 0, 60);
+	  lineIndex = 0;
+	  tmp = start + (row << 4);
+	  for (j = 0; j < 8; j++) {
+		lineContent[lineIndex++] = hex_sym[((tmp & 0xf0000000) >> 28)];
+		tmp = tmp << 4;
+	  }
+	  lineContent[lineIndex++] = ':';
+	  lineContent[lineIndex++] = ' ';
+	  row++;
+	}
+	c = ((unsigned char *)start)[i];
+	// print first digit
+	lineContent[lineIndex++] = hex_sym[(c&0x0f0) >> 4];
+	lineContent[lineIndex++] = hex_sym[(c&0x0f)];
+	lineContent[lineIndex++] = ' ';
+  }
+  if (0 != lineContent[0]) {
+	lineContent[lineIndex++] = '\n';
+	printk(PR_SS_MM, PR_LVL_DBG9, lineContent);
+  }
+
 }
 
 /*

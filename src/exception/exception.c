@@ -7,31 +7,10 @@
 
 void exception_disable(void) {
   asm("cpsid i	@ __cli" : : : "memory", "cc");
-  /*
-	asm volatile (
-		"mrs r4,cpsr\n\t"
-		"orr r4,r4,#0x80\n\t"
-		"msr cpsr,r4\n\t"
-		:::"r4"
-	);
-  */
 }
 
 void exception_enable(void) {
-  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, flag 1\n", __func__);
-
   asm("cpsie i	@ __sti" : : : "memory", "cc");
-
-  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, flag 2\n", __func__);
-
-  /*
-	asm volatile (
-		"mrs r4,cpsr\n\t"
-		"bic r4,r4,#0x80\n\t"
-		"msr cpsr,r4\n\t"
-		:::"r4"
-	);
-  */
 }
 
 void exception_init() {
