@@ -32,7 +32,7 @@
 #define IRQ_S3CUART_ERR3	(IRQ_S3CUART_BASE3 + UART_IRQ_ERR)
 
 
-#define S3C_PA_UART		(0x7F005000)
+#define S3C_PA_UART			(0x7F005000)
 #define S3C_PA_UART0		(S3C_PA_UART + 0x000)
 #define S3C_PA_UART1		(S3C_PA_UART + 0x400)
 #define S3C_PA_UART2		(S3C_PA_UART + 0x800)
@@ -40,7 +40,7 @@
 #define S3C_UART_OFFSET		(0x400)
 
 /* See notes on UART VA mapping in debug-macro.S */
-#define S3C_VA_UARTx(x)	(S3C_VA_UART + (S3C_PA_UART & 0xfffff) + ((x) * S3C_UART_OFFSET))
+#define S3C_VA_UARTx(x)	(S3C_VA_UART + ((x) * S3C_UART_OFFSET))
 
 #define S3C_VA_UART0		S3C_VA_UARTx(0)
 #define S3C_VA_UART1		S3C_VA_UARTx(1)
