@@ -92,12 +92,12 @@ tsk	.req	r9		@ current thread_info
 	.macro	irq_handler
 	get_irqnr_preamble r5, lr
 1:	get_irqnr_and_base r0, r6, r5, lr
-	movne	r1, sp
+	mov	r1, sp
 	@
 	@ routine called with r0 = irq number, r1 = struct pt_regs *
 	@
-	adrne   lr, 1b
-	bne     asm_do_IRQ
+	adr   lr, 1b
+	b     asm_do_IRQ
 	.endm
 
 
