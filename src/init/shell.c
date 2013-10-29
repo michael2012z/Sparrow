@@ -134,12 +134,16 @@ int __init kernel_shell(void *unused) {
 
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: separated command line:\n", __func__);
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: command = %s\n", __func__, command);
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %x\n", __func__, primary_parameter);
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[0] = %x\n", __func__, secondary_parameters[0]);
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[0] = %s\n", __func__, secondary_parameters[0]);
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[1] = %s\n", __func__, secondary_parameters[1]);
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[2] = %s\n", __func__, secondary_parameters[2]);
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[3] = %s\n", __func__, secondary_parameters[3]);
+	if (primary_parameter)
+	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %s\n", __func__, primary_parameter);
+	if (secondary_parameters[0])
+	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[0] = %s\n", __func__, secondary_parameters[0]);
+	if (secondary_parameters[1])
+	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[1] = %s\n", __func__, secondary_parameters[1]);
+	if (secondary_parameters[2])
+	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[2] = %s\n", __func__, secondary_parameters[2]);
+	if (secondary_parameters[3])
+	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: secondary_parameters[3] = %s\n", __func__, secondary_parameters[3]);
 	
 	if (-1 == error) {
 	  printu("invalid command\n");
