@@ -8,6 +8,7 @@ void init_timer() {
 }
 
 bool need_reschedule = false;
+unsigned long jiffies = 0;
 
 extern struct task_struct *current_task;
 
@@ -16,6 +17,9 @@ extern int g_debug_flag;
  * Update current task ticks. Re-schedule if the min time slices has been used up.
  */
 void on_timer() {
+
+  jiffies++;
+
   if ((1 == g_debug_flag) && (2 == current_task->pid)) {
 	print_memory_byte(STACK_TOP-64, STACK_TOP);
   }

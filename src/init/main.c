@@ -65,8 +65,8 @@ static int __init kernel_demo(void *unused) {
 
 static void __init rest_init(void) {
   create_kernel_thread(kernel_init);
-  create_kernel_thread(kernel_demo);
-  //  create_kernel_thread(kernel_shell);
+  if (0)  create_kernel_thread(kernel_demo);
+  create_kernel_thread(kernel_shell);
 }
 
 static void __init health_check(void) {

@@ -46,6 +46,7 @@ void uart_input_char(char ch) {
   }
 }
 
+#if 0
 char inputc() {
   char ch;
   if (register_uart_input_c(current_task->pid, &ch) < 0)
@@ -58,3 +59,4 @@ char inputc() {
   }
   return ch;
 }
+#endif

@@ -1,7 +1,7 @@
 
 src_dir := ../../init
 
-objects	:= test.o shell.o shell_test.o shell_handler_test.o
+objects	:= test.o shell.o shell-test.o shell_handler-test.o
 
 all: $(BUILTIN)
 
