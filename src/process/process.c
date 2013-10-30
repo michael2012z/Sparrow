@@ -42,6 +42,7 @@ static struct task_struct *create_launch_kernel_task() {
 	return NULL;
 
   task->sched_en.state = PROCESS_STATE_RUNNING;
+  task->sched_en.blocking_pid = -1;
   task->stack = (void *)&init_thread_union;
 
   task->pid = pid;
@@ -83,7 +84,7 @@ int create_kernel_thread(int (*fn)(void *)) {
 	return -1;
 
   task->sched_en.state = PROCESS_STATE_READY;
-
+  task->sched_en.blocking_pid = -1;
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
   task->pid = pid;
@@ -121,6 +122,7 @@ int create_user_thread(int (*fn)(char *), char *elf_file_name, char **parameters
   struct task_struct *task = NULL;
   struct pt_regs *regs = NULL;
   struct thread_info *thread = NULL;
+  int i = 0;
 
   pid = allocate_pid();
   if (pid < 0)
@@ -133,7 +135,7 @@ int create_user_thread(int (*fn)(char *), char *elf_file_name, char **parameters
 	return -1;
 
   task->sched_en.state = PROCESS_STATE_READY;
-
+  task->sched_en.blocking_pid = -1;
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
   task->pid = pid;
@@ -146,11 +148,20 @@ int create_user_thread(int (*fn)(char *), char *elf_file_name, char **parameters
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: pid = %x, mm.pgd = %x\n", __func__, pid, task->mm.pgd);
   printk(PR_SS_MM, PR_LVL_DBG7, "%s: *mm.pgd = %x\n", __func__, *((unsigned long *)task->mm.pgd));
 
+  task->elf_file_name = (char *)kmalloc(strlen(elf_file_name) + 1);
+  memcpy(task->elf_file_name, elf_file_name, strlen(elf_file_name) + 1);
+  for(i = 0; i < 4; i++)
+	if (parameters[i]) {
+	  task->parameters[i] = (char *)kmalloc(strlen(parameters[i]) + 1);
+	  memcpy(task->parameters[i], parameters[i], strlen(parameters[i]) + 1);	  
+	}
+	  
+
   INIT_LIST_HEAD(&(task->sched_en.queue_entry));
 
   /* populate initial content of stack */
   regs = task_pt_regs(task);
-  arm_create_user_thread(fn, elf_file_name, regs);
+  arm_create_user_thread(fn, task->elf_file_name, regs);
   regs->ARM_r0 = 0;
   regs->ARM_sp = 0; /* this is user-space sp, don't need to set it */
 	
@@ -179,6 +190,7 @@ int create_process(struct file *filep) {
 	return -1;
 
   task->sched_en.state = PROCESS_STATE_READY;
+  task->sched_en.blocking_pid = -1;
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
   task->pid = pid;

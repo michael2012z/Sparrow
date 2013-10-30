@@ -65,7 +65,7 @@ char inputc() {
     }
   }
   if (6 == i) {
-    static char *ch_p = "elf /bin/demo_4\n";
+    static char *ch_p = "elf /demo_5\n";
     if (0 != *ch_p)
       return *(ch_p++);
     else {
@@ -73,7 +73,7 @@ char inputc() {
     }
   }
   if (7 == i) {
-    static char *ch_p = "elfs /bin/demo_7\n";
+    static char *ch_p = "elfs /demo_5\n";
     if (0 != *ch_p)
       return *(ch_p++);
     else {

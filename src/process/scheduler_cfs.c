@@ -60,12 +60,14 @@ static bool need_to_reschedule_cfs (struct task_struct *p) {
   
   first_en = cfs_queue_find_first();
   if (NULL == first_en)
-	return true;
+	return false;
 
   printk(PR_SS_PROC, PR_LVL_DBG6, "%s, first: pid = %d, vruntime = %d\n", __func__, container_of(first_en, struct task_struct, sched_en)->pid, first_en->vruntime);
   
   if (PROCESS_STATE_READY == first_en->state)
 	return true;
+  else if (PROCESS_STATE_WAITING == first_en->state)
+	return false;
   else if (first_en->vruntime < calculate_vruntime(task_en))
 	return true;
   else 
@@ -81,9 +83,14 @@ static struct task_struct * pick_next_task_cfs () {
 	return NULL;
   else {
 	task_en->continuous_ticks = 0;
-	if (PROCESS_STATE_READY == task_en->state)
+	if (PROCESS_STATE_READY == task_en->state) {
 	  task_en->state = PROCESS_STATE_RUNNING;
-	return container_of(task_en, struct task_struct, sched_en);
+	  return container_of(task_en, struct task_struct, sched_en);
+	} else if (PROCESS_STATE_WAITING == task_en->state) {
+	  cfs_queue_enqueue(task_en);
+	  return NULL;
+	} else
+	  return container_of(task_en, struct task_struct, sched_en);
   }
 }
 

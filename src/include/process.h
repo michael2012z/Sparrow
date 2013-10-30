@@ -47,6 +47,8 @@ struct task_struct {
   struct mm_struct mm;
   int pid;
   struct timespec start_time;
+  char *elf_file_name;
+  char *parameters[4];
   struct sched_entity sched_en;
 };
 

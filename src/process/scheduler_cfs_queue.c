@@ -22,7 +22,7 @@ void cfs_queue_enqueue (struct sched_entity *en) {
    * else: insert by vruntime.
    **/
   if (PROCESS_STATE_READY == en->state) {
-	list_add(&en->queue_entry, head->next);
+	list_add(&en->queue_entry, queue);
   } else if (PROCESS_STATE_RUNNING == en->state) {
 	printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
 	list_for_each(pos, head) {
@@ -30,6 +30,8 @@ void cfs_queue_enqueue (struct sched_entity *en) {
 	  current = list_entry(pos, struct sched_entity, queue_entry);
 	  if (PROCESS_STATE_READY == current->state)
 		continue;
+	  else if (PROCESS_STATE_WAITING == current->state)
+		break;
 	  else if (en->vruntime < current->vruntime) {
 		printk(PR_SS_PROC, PR_LVL_DBG6, "%s 2\n", __func__);
 		break;
@@ -97,12 +99,13 @@ void cfs_queue_dump() {
   struct sched_entity *current;
   struct task_struct* task = NULL;
 
-  printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
-  printk(PR_SS_PROC, PR_LVL_DBG6, "%s: queue size: %d\n", __func__, cfs_queue_size());
+  printk(PR_SS_INI, PR_LVL_DBG6, "%s\n", __func__);
+  printk(PR_SS_INI, PR_LVL_DBG6, "%s\n", __func__);
+  printk(PR_SS_INI, PR_LVL_DBG6, "%s: queue size: %d\n", __func__, cfs_queue_size());
   list_for_each(pos, head) {
 	current = list_entry(pos, struct sched_entity, queue_entry);
 	task = 	container_of(current, struct task_struct, sched_en);
-	printk(PR_SS_PROC, PR_LVL_DBG6, "%s: pid: %d, vruntime: %d \n", __func__, task->pid, current->vruntime);
+	printk(PR_SS_INI, PR_LVL_DBG6, "%s: pid: %d, state: %d, vruntime: %d \n", __func__, task->pid, current->state, current->vruntime);
   }
   return;
 }
