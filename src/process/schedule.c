@@ -91,7 +91,22 @@ void schedule() {
 
   if (NULL == current_task) while(1);
 
-  scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
+  if (PROCESS_STATE_DEAD == current_task->sched_en.state) {
+	int waiting_pid = current_task->sched_en.blocked_pid;
+	if (-1 != waiting_pid) {
+	  struct task_struct *waiting_task = find_task_by_pid(waiting_pid);
+	  if (waiting_task) {
+		dequeue_task(waiting_task);
+		waiting_task->sched_en.state = PROCESS_STATE_READY;
+		waiting_task->sched_en.blocking_pid = -1;
+		enqueue_task(waiting_task, sched_enqueue_flag_timeout);
+	  }
+	}
+
+	// TODO: clean current zombie task
+	current_task = NULL;
+  } else
+	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
 
   scheduler->dump();
 

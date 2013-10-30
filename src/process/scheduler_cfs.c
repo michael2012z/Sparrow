@@ -55,6 +55,10 @@ static bool need_to_reschedule_cfs (struct task_struct *p) {
   struct sched_entity* first_en = NULL;
   printk(PR_SS_PROC, PR_LVL_DBG6, "%s, current: pid = %d, continuous_ticks = %d\n", __func__, p->pid, task_en->continuous_ticks);
   printk(PR_SS_PROC, PR_LVL_DBG6, "%s, current: pid = %d, vruntime = %d\n", __func__, p->pid, task_en->vruntime);
+
+  if (PROCESS_STATE_DEAD == task_en->state)
+	return true;
+  
   if (task_en->continuous_ticks < TASK_LEAST_CONTINUOUS_TICKS_CFS)
 	return false;
   

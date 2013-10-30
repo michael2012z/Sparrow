@@ -73,7 +73,7 @@ char inputc() {
     }
   }
   if (7 == i) {
-    static char *ch_p = "elfs /demo_5\n";
+    static char *ch_p = "elfs /demo_7\n";
     if (0 != *ch_p)
       return *(ch_p++);
     else {

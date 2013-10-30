@@ -20,9 +20,11 @@ void on_timer() {
 
   jiffies++;
 
+  /*
   if ((1 == g_debug_flag) && (2 == current_task->pid)) {
 	print_memory_byte(STACK_TOP-64, STACK_TOP);
   }
+  */
 
   if (is_scheduler_ready()){
 	/* Update current on-going task ticks. */
