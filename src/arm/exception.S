@@ -626,7 +626,7 @@ ENTRY(vector_swi)
 	b do_invalid_swi
 ENDPROC(vector_swi)
 
-	.equ NR_syscalls,5
+	.equ NR_syscalls,6
 		
 	.type	sys_call_table, #object
 ENTRY(sys_call_table)
@@ -634,8 +634,8 @@ ENTRY(sys_call_table)
 	.long sys_print
 	.long sys_brk
 	.long sys_sleep
-	.long sys_inputc		
-
+	.long sys_inputc
+	.long sys_exit
 
 		
 vector_fiq:

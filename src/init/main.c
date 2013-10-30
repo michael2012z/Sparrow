@@ -50,6 +50,7 @@ static int __init kernel_init(void *unused) {
   while(1) {
 	int i = 0;
 	for (i = 0; i < 1024; i++){}
+	//	return 0;
 	continue;
 	printk(PR_SS_INI, PR_LVL_INF, "%s\n", __func__);
   }

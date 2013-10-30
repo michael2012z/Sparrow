@@ -99,13 +99,12 @@ void cfs_queue_dump() {
   struct sched_entity *current;
   struct task_struct* task = NULL;
 
-  printk(PR_SS_INI, PR_LVL_DBG6, "%s\n", __func__);
-  printk(PR_SS_INI, PR_LVL_DBG6, "%s\n", __func__);
-  printk(PR_SS_INI, PR_LVL_DBG6, "%s: queue size: %d\n", __func__, cfs_queue_size());
+  printk(PR_SS_PROC, PR_LVL_DBG6, "%s\n", __func__);
+  printk(PR_SS_PROC, PR_LVL_DBG6, "%s: queue size: %d\n", __func__, cfs_queue_size());
   list_for_each(pos, head) {
 	current = list_entry(pos, struct sched_entity, queue_entry);
 	task = 	container_of(current, struct task_struct, sched_en);
-	printk(PR_SS_INI, PR_LVL_DBG6, "%s: pid: %d, state: %d, vruntime: %d \n", __func__, task->pid, current->state, current->vruntime);
+	printk(PR_SS_PROC, PR_LVL_DBG6, "%s: pid: %d, state: %d, vruntime: %d \n", __func__, task->pid, current->state, current->vruntime);
   }
   return;
 }

@@ -38,6 +38,8 @@ asm(	".pushsection .text\n"
 "	.popsection");
 
 void kernel_thread_exit(void) {
+  printk(PR_SS_INI, PR_LVL_ERR, "%s: ---------------------------------------------\n", __func__); 
+  while(1);
 }
 
 void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs)

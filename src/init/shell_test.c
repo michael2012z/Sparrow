@@ -65,7 +65,7 @@ char inputc() {
     }
   }
   if (6 == i) {
-    static char *ch_p = "elf /demo_5\n";
+    static char *ch_p = "elf /demo_7\n";
     if (0 != *ch_p)
       return *(ch_p++);
     else {

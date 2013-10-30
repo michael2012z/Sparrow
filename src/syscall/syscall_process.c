@@ -13,3 +13,8 @@ long sys_sleep(int msec) {
   return 0;
 }
 
+long sys_exit(int code) {
+  printk(PR_SS_IRQ, PR_LVL_DBG6, "%s: code = %x\n", __func__, code);
+  while(1);
+  return 0;
+}
