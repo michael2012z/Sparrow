@@ -81,7 +81,7 @@ char inputc() {
     }
   }
   if (8 == i) {
-    static char *ch_p = "elfa /bin/demo_7\n";
+    static char *ch_p = "elfa /demo_5\n";
     if (0 != *ch_p)
       return *(ch_p++);
     else {

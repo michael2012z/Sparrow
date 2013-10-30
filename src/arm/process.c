@@ -51,6 +51,18 @@ void arm_create_kernel_thread(int (*fn)(void *), void *arg, struct pt_regs *regs
    	regs->ARM_cpsr = regs->ARM_r7 | PSR_I_BIT;
 }
 
+void arm_create_user_thread(int (*fn)(char *), void *arg, struct pt_regs *regs)
+{
+	memset(regs, 0, sizeof(regs));
+	regs->ARM_r4 = (unsigned long)arg;
+	regs->ARM_r5 = (unsigned long)fn;
+	regs->ARM_r6 = (unsigned long)kernel_thread_exit;
+	regs->ARM_r7 = SVC_MODE | PSR_ENDSTATE | PSR_ISETSTATE;
+	regs->ARM_pc = (unsigned long)kernel_thread_helper;
+   	regs->ARM_cpsr = regs->ARM_r7 | PSR_I_BIT;
+}
+
+
 
 void cpu_idle() {
   printk(PR_SS_INI, PR_LVL_INF, "cpu_idle() \n");
