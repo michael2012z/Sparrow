@@ -5,6 +5,7 @@
 #include <process.h>
 #include <mm.h>
 #include <string.h>
+#include <exception.h>
 
 extern unsigned long jiffies;
 extern struct sched_class *scheduler;
@@ -38,7 +39,9 @@ void handle_cmd_elfs(char *primary_parameter, char **secondary_parameters) {
 	current_task->sched_en.waiting_type = PROCESS_WAITING_TYPE_THREAD;
 	current_task->sched_en.blocking_pid = pid;
 	scheduler->dump();
+	exception_disable();
 	schedule();
+	exception_enable();
   }
   return;
 }
