@@ -5,6 +5,7 @@
 #include <string.h>
 #include <printk.h>
 #include "elf.h"
+#include <exception.h>
 
 extern unsigned long kernel_pgd;
 extern struct list_head *task_list;
@@ -62,6 +63,7 @@ void initialize_process() {
   create_launch_kernel_task();
   init_kernel_task = scheduler->pick_next_task();
   current_task = init_kernel_task;
+  process_cleaner_init();
 }
 
 
@@ -227,3 +229,35 @@ void run_kernel_process(char *init_filename)
   arm_kernel_execve(init_filename, NULL, NULL);
 }
 
+
+
+/* process cleaner */
+static struct list_head* zombie_queue=NULL;
+
+void destroy_user_thread(struct task_struct *task) {
+    list_add_tail(&task->sched_en.queue_entry, zombie_queue);
+}
+
+void process_cleaner_init() {
+  zombie_queue = kmalloc(sizeof(struct list_head));
+  INIT_LIST_HEAD(zombie_queue);
+}
+
+int process_cleaner(void *unused) {
+  while(1) {
+	struct list_head *first;
+	struct sched_entity *en;
+	struct task_struct* task;
+	while(!list_empty(zombie_queue)) {
+	  first = zombie_queue->next;
+	  list_del(first);
+	  en = container_of(first, struct sched_entity, queue_entry);
+	  task = container_of(en, struct task_struct, sched_en);
+	  // delete task data
+	}
+	exception_disable();
+	schedule();
+	exception_enable();
+  }
+  return -1;
+}

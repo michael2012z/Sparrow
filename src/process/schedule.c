@@ -102,8 +102,7 @@ void schedule() {
 		enqueue_task(waiting_task, sched_enqueue_flag_timeout);
 	  }
 	}
-
-	// TODO: clean current zombie task
+	destroy_user_thread(current_task);
 	current_task = NULL;
   } else
 	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);

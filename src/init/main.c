@@ -66,6 +66,7 @@ static int __init kernel_demo(void *unused) {
 
 static void __init rest_init(void) {
   create_kernel_thread(kernel_init);
+  create_kernel_thread(process_cleaner);
   if (0)  create_kernel_thread(kernel_demo);
   create_kernel_thread(kernel_shell);
 }

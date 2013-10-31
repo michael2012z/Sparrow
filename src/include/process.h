@@ -121,6 +121,11 @@ int execute_binary(struct task_struct *task, struct file *filep);
 void destroy_process(struct task_struct *task);
 void run_kernel_process(char *init_filename);
 
+void destroy_user_thread(struct task_struct *task);
+void process_cleaner_init();
+int process_cleaner(void *unused);
+
+
 bool is_scheduler_ready();
 void update_task_on_tick();
 bool check_should_schedule();
