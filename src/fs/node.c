@@ -145,22 +145,26 @@ vfs_node* vfs_find_in_node(vfs_node *node, char *name) {
 }
 
 void vfs_print_dir(vfs_node *dir) {
-  if (VFS_NODE_TYPE_DIR == dir->type)
-	printk(PR_SS_FS, PR_LVL_DBG0, "DIR: name = %s\n", dir->name);
-  else
-	printk(PR_SS_FS, PR_LVL_DBG0, "Node is not a DIR.\n");
+  if (VFS_NODE_TYPE_DIR == dir->type) {
+	if (root_vfs_node == dir)
+	  printu(" / \n");
+	else
+	  printu("%s\n", dir->name);
+  }
 }
 
 void vfs_print_file(vfs_node *file) {
   if (VFS_NODE_TYPE_FILE == file->type)
-	printk(PR_SS_FS, PR_LVL_DBG0, "FILE: name = %s, size = %d, addr = 0x%x\n", file->name, file->file.size, (unsigned int)file->file.addr);
-  else
-	printk(PR_SS_FS, PR_LVL_DBG0, "Node is not a FILE.\n");
+	printu("%s   size = %d   addr = 0x%x\n", file->name, file->file.size, (unsigned int)file->file.addr);
 }
 
 static void vfs_print_indent(int indent) {
-  while (indent-- > 0)
-    printk(PR_SS_FS, PR_LVL_DBG0, " ");
+  printu("  ");
+  if (indent > 0) {
+	while ((indent---1) > 0)
+	  printu("     ");
+	printu(" |-- ");
+  }
 }
 
 static void _vfs_print_node_re(vfs_node *node, int indent) {
@@ -186,3 +190,8 @@ static void _vfs_print_node_re(vfs_node *node, int indent) {
 void vfs_print_node_re(vfs_node *node) {
   _vfs_print_node_re(node, 0);
 }
+
+void print_fs_tree() {
+  vfs_print_node_re(root_vfs_node);
+}
+

@@ -6,6 +6,7 @@
 #include <mm.h>
 #include <string.h>
 #include <exception.h>
+#include <vfs.h>
 
 extern unsigned long jiffies;
 extern struct sched_class *scheduler;
@@ -62,6 +63,12 @@ void handle_cmd_elfa(char *primary_parameter, char **secondary_parameters) {
 }
 
 void handle_cmd_ls(char *primary_parameter, char **secondary_parameters) {
+  print_fs_tree();
+  return;
+}
+
+void handle_cmd_tree(char *primary_parameter, char **secondary_parameters) {
+  print_fs_tree();
   return;
 }
 

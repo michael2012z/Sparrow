@@ -53,6 +53,7 @@
  *   DBG3 -- Program actions
  *   DBG5 -- Schedule actions
  *   DBG6 -- Schedule algorithm
+ *   DBG7 -- Schedule queue handling
  *
  * IRQ:
  *   DBG0 -- IRQ setup

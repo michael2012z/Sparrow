@@ -87,6 +87,7 @@ int register_file_system(struct file_system_type *type);
 int unregister_file_system(struct file_system_type *type);
 int mount_file_system(char *name);
 int unmount_file_system();
+void print_fs_tree();
 
 /* Node Management */
 vfs_node *vfs_new_node(vfs_node_type type);

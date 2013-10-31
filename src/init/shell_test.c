@@ -8,6 +8,7 @@ char* test_cmds[] = {
   "help\n",
   "help ls\n",
   "ls\n",
+  "tree\n",
   "elf /bin/demo_4\n",
   "elf /bin/demo_7 abc def\n",
   "    abcdefg  \n",
@@ -89,6 +90,14 @@ char inputc() {
     }
   }
   if (9 == i) {
+    static char *ch_p = "tree \n";
+    if (0 != *ch_p)
+      return *(ch_p++);
+    else {
+      i++;
+    }
+  }
+  if (10 == i) {
     static char *ch_p = " asdffds \n";
     if (0 != *ch_p)
       return *(ch_p++);

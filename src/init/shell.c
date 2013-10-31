@@ -75,6 +75,8 @@ static int find_command_id(char *cmd) {
 	  ret = SHELL_COMMAND_ID_ELFA;
 	else if (0 == strcmp(cmd, "ls"))
 	  ret = SHELL_COMMAND_ID_LS;
+	else if (0 == strcmp(cmd, "tree"))
+	  ret = SHELL_COMMAND_ID_TREE;
 	else if (0 == strcmp(cmd, "jiffies"))
 	  ret = SHELL_COMMAND_ID_JIFFIES;
 	else if (0 == strcmp(cmd, "vruntime"))
@@ -167,6 +169,9 @@ int __init kernel_shell(void *unused) {
 	  break;
 	case SHELL_COMMAND_ID_LS:
 	  handle_cmd_ls(primary_parameter, secondary_parameters);
+	  break;
+	case SHELL_COMMAND_ID_TREE:
+	  handle_cmd_tree(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_JIFFIES:
 	  handle_cmd_jiffies(primary_parameter, secondary_parameters);

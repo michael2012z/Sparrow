@@ -83,6 +83,10 @@ void handle_cmd_ls(char *primary_parameter, char **secondary_parameters) {
   return;
 }
 
+void handle_cmd_tree(char *primary_parameter, char **secondary_parameters) {
+  return;
+}
+
 void handle_cmd_jiffies(char *primary_parameter, char **secondary_parameters) {
   CU_ASSERT((9 == test_id) || (10 == test_id));
   cmd_parameters_check(primary_parameter, secondary_parameters);

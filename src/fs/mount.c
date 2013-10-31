@@ -37,7 +37,6 @@ int mount_file_system(char *name) {
 	  return -2;
 	}
   }
-  vfs_print_node_re(root_vfs_node);
   return 0;
 }
 
@@ -49,3 +48,4 @@ int unmount_file_system() {
 	return 0;
   }
 }
+
