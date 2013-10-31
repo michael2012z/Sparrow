@@ -626,7 +626,7 @@ ENTRY(vector_swi)
 	b do_invalid_swi
 ENDPROC(vector_swi)
 
-	.equ NR_syscalls,6
+	.equ NR_syscalls,8
 		
 	.type	sys_call_table, #object
 ENTRY(sys_call_table)
@@ -636,7 +636,8 @@ ENTRY(sys_call_table)
 	.long sys_sleep
 	.long sys_inputc
 	.long sys_exit
-
+	.long sys_params
+	.long sys_random
 		
 vector_fiq:
 	b do_unsupported_exception

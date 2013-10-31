@@ -2,8 +2,10 @@
 #include <linkage.h>
 #include <printk.h>
 #include <process.h>
+#include <string.h>
 
 extern struct task_struct *current_task;
+extern unsigned long jiffies;
 
 long sys_reset(void) {
   printk(PR_SS_IRQ, PR_LVL_DBG6, "%s\n", __func__);
@@ -27,3 +29,31 @@ long sys_exit(int code) {
 
   return 0;
 }
+
+long sys_params(char *param1, char *param2, char *param3, char *param4) {
+  printk(PR_SS_IRQ, PR_LVL_DBG6, "%s: param1 = %x, param2 = %x, param3 = %x, param4 = %x\n", __func__, param1, param2, param3, param4);
+  if ((current_task->parameters[0]) && (param1))
+	memcpy(param1, current_task->parameters[0], strlen(current_task->parameters[0]) + 1);
+  if ((current_task->parameters[1]) && (param2))
+	memcpy(param2, current_task->parameters[1], strlen(current_task->parameters[1]) + 1);
+  if ((current_task->parameters[2]) && (param3))
+	memcpy(param3, current_task->parameters[2], strlen(current_task->parameters[2]) + 1);
+  if ((current_task->parameters[3]) && (param4))
+	memcpy(param4, current_task->parameters[3], strlen(current_task->parameters[3]) + 1);
+
+  return 0;
+}
+
+unsigned long sys_random() {
+  static unsigned long seed = 0;
+
+  if (0 == seed)
+	seed = jiffies;
+
+  seed *= jiffies;
+
+  seed %= 32768;
+  
+  return seed;
+}
+
