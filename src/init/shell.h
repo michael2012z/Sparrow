@@ -12,7 +12,8 @@
 #define SHELL_COMMAND_ID_TREE		5
 #define SHELL_COMMAND_ID_JIFFIES	6
 #define SHELL_COMMAND_ID_CAT		7
-#define SHELL_COMMAND_ID_HELP		8
+#define SHELL_COMMAND_ID_KMSG		8
+#define SHELL_COMMAND_ID_HELP		9
 
 
 int __init kernel_shell(void *unused);
@@ -24,6 +25,7 @@ void handle_cmd_ls(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_tree(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_jiffies(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_cat(char *primary_parameter, char **secondary_parameters);
+void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_help(char *primary_parameter, char **secondary_parameters);
 
 

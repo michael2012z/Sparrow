@@ -81,6 +81,8 @@ static int find_command_id(char *cmd) {
 	  ret = SHELL_COMMAND_ID_JIFFIES;
 	else if (0 == strcmp(cmd, "cat"))
 	  ret = SHELL_COMMAND_ID_CAT;
+	else if (0 == strcmp(cmd, "kmsg"))
+	  ret = SHELL_COMMAND_ID_KMSG;
 	else if (0 == strcmp(cmd, "help"))
 	  ret = SHELL_COMMAND_ID_HELP;
 	else
@@ -178,6 +180,9 @@ int __init kernel_shell(void *unused) {
 	  break;
 	case SHELL_COMMAND_ID_CAT:
 	  handle_cmd_cat(primary_parameter, secondary_parameters);
+	  break;
+	case SHELL_COMMAND_ID_KMSG:
+	  handle_cmd_kmsg(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_HELP:
 	  handle_cmd_help(primary_parameter, secondary_parameters);

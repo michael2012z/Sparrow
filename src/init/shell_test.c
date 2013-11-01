@@ -122,6 +122,14 @@ char inputc() {
     }
   }
   if (13 == i) {
+    static char *ch_p = "kmsg \n";
+    if (0 != *ch_p)
+      return *(ch_p++);
+    else {
+      i++;
+    }
+  }
+  if (14 == i) {
     static char *ch_p = " asdffds \n";
     if (0 != *ch_p)
       return *(ch_p++);

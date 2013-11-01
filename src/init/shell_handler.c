@@ -100,6 +100,11 @@ void handle_cmd_cat(char *primary_parameter, char **secondary_parameters) {
   return;
 }
 
+void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters) {
+  printu("%s\n", __func__);
+  return;
+}
+
 void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
   return;
 }
