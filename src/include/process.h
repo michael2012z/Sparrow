@@ -29,7 +29,7 @@ struct sched_entity {
   int blocking_pid; /* the process I'm waiting for */
   int blocked_pid;  /* the process waiting for me */
   /* timeing data */
-  u64 exec_start;
+  u64 wake_up_jiffy; /* the target jiffy that task should be waken up */
   u64 sum_exec_runtime;
   u64 vruntime;
   u64 continuous_ticks;

@@ -15,7 +15,9 @@ long sys_reset(void) {
 
 long sys_sleep(int msec) {
   printk(PR_SS_IRQ, PR_LVL_DBG6, "%s: msec = %x\n", __func__, msec);
-  while(1);
+  current_task->sched_en.state = PROCESS_STATE_WAITING;
+  current_task->sched_en.waiting_type = PROCESS_WAITING_TYPE_TIME;
+  current_task->sched_en.wake_up_jiffy = jiffies + msec; /* simplity: I use jiffies as msec */
   return 0;
 }
 

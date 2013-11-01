@@ -58,8 +58,9 @@ static bool need_to_reschedule_cfs (struct task_struct *p) {
 
   if (PROCESS_STATE_DEAD == task_en->state)
 	return true;
-  
-  if (task_en->continuous_ticks < TASK_LEAST_CONTINUOUS_TICKS_CFS)
+  else if (PROCESS_STATE_WAITING == task_en->state)
+	return true;
+  else if (task_en->continuous_ticks < TASK_LEAST_CONTINUOUS_TICKS_CFS)
 	return false;
   
   first_en = cfs_queue_find_first();

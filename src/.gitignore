@@ -1,2 +1,5 @@
 # cscope files
 cscope.*
+*.o
+*.so
+*.log
