@@ -19,7 +19,6 @@ extern int g_debug_flag;
 void on_timer() {
 
   jiffies++;
-  printk(PR_SS_INI, PR_LVL_DBG5, "%s, jiffies = %d\n", __func__, jiffies);
 
   /*
   if ((1 == g_debug_flag) && (2 == current_task->pid)) {

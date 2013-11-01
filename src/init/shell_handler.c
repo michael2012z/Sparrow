@@ -77,7 +77,26 @@ void handle_cmd_jiffies(char *primary_parameter, char **secondary_parameters) {
   return;
 }
 
-void handle_cmd_vruntime(char *primary_parameter, char **secondary_parameters) {
+void handle_cmd_cat(char *primary_parameter, char **secondary_parameters) {
+  struct file file;
+  char *ch;
+  vfs_node* file_node;
+
+  if (NULL == primary_parameter)
+	return;
+
+  file_node = vfs_find_node(primary_parameter);
+  if (NULL == file_node) {
+	printu("file %s not found\n", primary_parameter);
+  } else {  
+	file.buf = file_node->file.addr;
+	file.size = file_node->file.size;
+	
+	ch = file.buf;
+	while(ch < ((char *)file.buf + file.size))
+	  printu("%c", *(ch++));
+	printu("\n");
+  }
   return;
 }
 

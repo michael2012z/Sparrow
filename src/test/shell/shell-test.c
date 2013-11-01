@@ -18,8 +18,8 @@ char* test_cmds[15] = {
   "ls\n",
   "jiffies\n",
   "    jiffies  \n",
-  "vruntime\n",
-  " vruntime                    \n",
+  "cat\n",
+  " cat                    \n",
   "help\n",
   "    help    ls  \n",
 };

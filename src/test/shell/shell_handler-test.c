@@ -93,7 +93,7 @@ void handle_cmd_jiffies(char *primary_parameter, char **secondary_parameters) {
   return;
 }
 
-void handle_cmd_vruntime(char *primary_parameter, char **secondary_parameters) {
+void handle_cmd_cat(char *primary_parameter, char **secondary_parameters) {
   CU_ASSERT((11 == test_id) || (12 == test_id));
   cmd_parameters_check(primary_parameter, secondary_parameters);
   return;

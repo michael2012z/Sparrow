@@ -79,8 +79,8 @@ static int find_command_id(char *cmd) {
 	  ret = SHELL_COMMAND_ID_TREE;
 	else if (0 == strcmp(cmd, "jiffies"))
 	  ret = SHELL_COMMAND_ID_JIFFIES;
-	else if (0 == strcmp(cmd, "vruntime"))
-	  ret = SHELL_COMMAND_ID_VRUNTIME;
+	else if (0 == strcmp(cmd, "cat"))
+	  ret = SHELL_COMMAND_ID_CAT;
 	else if (0 == strcmp(cmd, "help"))
 	  ret = SHELL_COMMAND_ID_HELP;
 	else
@@ -176,8 +176,8 @@ int __init kernel_shell(void *unused) {
 	case SHELL_COMMAND_ID_JIFFIES:
 	  handle_cmd_jiffies(primary_parameter, secondary_parameters);
 	  break;
-	case SHELL_COMMAND_ID_VRUNTIME:
-	  handle_cmd_vruntime(primary_parameter, secondary_parameters);
+	case SHELL_COMMAND_ID_CAT:
+	  handle_cmd_cat(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_HELP:
 	  handle_cmd_help(primary_parameter, secondary_parameters);

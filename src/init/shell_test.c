@@ -114,6 +114,14 @@ char inputc() {
     }
   }
   if (12 == i) {
+    static char *ch_p = "cat /ListFS/Makefile\n";
+    if (0 != *ch_p)
+      return *(ch_p++);
+    else {
+      i++;
+    }
+  }
+  if (13 == i) {
     static char *ch_p = " asdffds \n";
     if (0 != *ch_p)
       return *(ch_p++);
