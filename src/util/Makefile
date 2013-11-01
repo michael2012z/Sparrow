@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= printk.o string.o stringx.o date.o
+objects	:= printk.o string.o stringx.o date.o ring_buffer.o
 
 all: $(BUILTIN)
 
