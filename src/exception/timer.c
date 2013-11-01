@@ -19,6 +19,7 @@ extern int g_debug_flag;
 void on_timer() {
 
   jiffies++;
+  printk(PR_SS_INI, PR_LVL_DBG5, "%s, jiffies = %d\n", __func__, jiffies);
 
   /*
   if ((1 == g_debug_flag) && (2 == current_task->pid)) {
@@ -28,7 +29,7 @@ void on_timer() {
 
   if (is_scheduler_ready()){
 	/* Update current on-going task ticks. */
-	update_task_on_tick();
+	update_task_on_tick(jiffies);
 	/* Check left time slices,
 	 * reschedule if time slices is up.
 	 */

@@ -98,6 +98,22 @@ char inputc() {
     }
   }
   if (10 == i) {
+    static char *ch_p = "elfs /demo_8 \n";
+    if (0 != *ch_p)
+      return *(ch_p++);
+    else {
+      i++;
+    }
+  }
+  if (11 == i) {
+    static char *ch_p = "elfs /demo_9 abc 123 9 c\n";
+    if (0 != *ch_p)
+      return *(ch_p++);
+    else {
+      i++;
+    }
+  }
+  if (12 == i) {
     static char *ch_p = " asdffds \n";
     if (0 != *ch_p)
       return *(ch_p++);

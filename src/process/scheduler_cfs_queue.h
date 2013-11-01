@@ -8,6 +8,7 @@ struct sched_entity* cfs_queue_find_first ();
 struct sched_entity* cfs_queue_dequeue_first ();
 struct sched_entity* cfs_queue_get_nth_entity(int index);
 int cfs_queue_size ();
+void cfs_queue_wake_up_sleeping(unsigned long jiffy);
 void cfs_queue_dump ();
 
 #endif /* _SCHEDULER_CFS_QUEUE_H_ */

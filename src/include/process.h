@@ -74,6 +74,7 @@ struct sched_class {
   struct task_struct * (*pick_next_task) ();
   void (*task_tick) (struct task_struct *p);
   struct task_struct * (*find_task_by_pid) (int pid);
+  void (*wake_up_sleeping) (unsigned long jiffy);
   void (*dump) ();
 };
 
@@ -127,7 +128,7 @@ int process_cleaner(void *unused);
 
 
 bool is_scheduler_ready();
-void update_task_on_tick();
+void update_task_on_tick(unsigned long jiffy);
 bool check_should_schedule();
 void enqueue_task(struct task_struct *task, enum sched_enqueue_flag flag);
 void dequeue_task(struct task_struct *task);

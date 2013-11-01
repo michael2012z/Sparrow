@@ -459,6 +459,8 @@ ENDPROC(ret_to_user)
 ENTRY(ret_from_syscall)
 	disable_irq				@ disable interrupts
 	str	r0, [sp, #S_R0]		@ returned r0
+	bl check_and_schedule	
+	mov	why, #0
 	b ret_to_user
 ENDPROC(ret_from_syscall)
 

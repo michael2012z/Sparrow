@@ -8,6 +8,7 @@ void my_free(void *ptr);
 void *malloc(int size);
 void free(void *ptr);
 void exit(int code);
+void sleep(int msec);
 void params(char* param1, char* param2, char* param3, char* param4);
 int random();
 #endif

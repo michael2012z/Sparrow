@@ -94,6 +94,24 @@ struct sched_entity* cfs_queue_get_nth_entity(int index) {
   return NULL;
 }
 
+void cfs_queue_wake_up_sleeping(unsigned long jiffy) {
+  struct list_head *pos = NULL, *head = queue;
+  struct sched_entity *current;
+
+ retry:
+  head = queue;
+  list_for_each(pos, head) {
+	current = list_entry(pos, struct sched_entity, queue_entry);
+	if ((PROCESS_STATE_WAITING == current->state) &&(PROCESS_WAITING_TYPE_TIME == current->waiting_type))
+	  if (jiffy >= current->wake_up_jiffy) {
+		current->state = PROCESS_STATE_READY;
+		cfs_queue_dequeue(current);
+		cfs_queue_enqueue(current);
+		goto retry;
+	  }
+  }
+}
+
 void cfs_queue_dump() {
   struct list_head *pos = NULL, *head = queue;
   struct sched_entity *current;

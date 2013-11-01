@@ -130,6 +130,10 @@ static struct task_struct * find_task_by_pid_cfs(int pid) {
   return NULL;
 }
 
+static void wake_up_sleeping_cfs (unsigned long jiffy) {
+  cfs_queue_wake_up_sleeping(jiffy);
+}
+
 const struct sched_class sched_class_cfs = {
   .init = scheduler_init_cfs,
   .enqueue_task		= enqueue_task_cfs,
@@ -139,5 +143,6 @@ const struct sched_class sched_class_cfs = {
   .pick_next_task		= pick_next_task_cfs,
   .task_tick		= task_tick_cfs,
   .find_task_by_pid	= find_task_by_pid_cfs,
+  .wake_up_sleeping = wake_up_sleeping_cfs,
   .dump = dump_cfs,
 };

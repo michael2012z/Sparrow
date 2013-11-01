@@ -55,9 +55,10 @@ void dequeue_task(struct task_struct *task) {
   scheduler->dequeue_task(task);
 }
 
-void update_task_on_tick() {
+void update_task_on_tick(unsigned long jiffy) {
   if (NULL != current_task)
 	scheduler->task_tick(current_task);
+  scheduler->wake_up_sleeping(jiffy);
 }
 
 void check_and_schedule() {
