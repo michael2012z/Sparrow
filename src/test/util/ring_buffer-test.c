@@ -201,13 +201,11 @@ static void ring_buffer_presure_test(struct ring_buffer *ring, int repeat) {
 	write_read = random()%2;
 	if (write_read == 0) { /* write */
 	  count = random()%64;
-	  printf("count = %d\n", count);
 	  while(count--)
 		ring_buffer_put_char(ring, 'x');
 	  ring_buffer_check(ring);
 	} else { /* read */
 	  count = random()%64;
-	  printf(" count= %d\n", count);
 	  while(count--)
 		ring_buffer_get_char(ring);
 	  ring_buffer_check(ring);
@@ -239,6 +237,33 @@ static void test_case_12(void) {
   return;
 }
 
+static void test_case_13(void) {
+  /* ring_buffer_copy */
+  struct ring_buffer *ring = kernel_ring_buffer;
+  int i = 0;
+  ring_buffer_reset(ring);
+  for(i = 0; i < 7*1024; i++) {
+	ring_buffer_put_char(ring, 'c');
+  }
+
+  for(i = 0; i < 2*1024; i++) {
+	ring_buffer_get_char(ring);
+	ring_buffer_check(ring);	
+  }
+
+  ring_buffer_reset(user_ring_buffer);
+  ring_buffer_copy(user_ring_buffer, ring);
+  ring = user_ring_buffer;
+
+  ring_buffer_check(ring);	
+  CU_ASSERT(ring->start == ring->upper);
+  CU_ASSERT(ring->end == (ring->upper + 2*1024));
+  CU_ASSERT(ring->circled == 0);
+
+  return;
+}
+
+
 static CU_TestInfo test_cases_array[] = {
   {"Ring Buffer: test_case_01", test_case_01},
   {"Ring Buffer: test_case_02", test_case_02},
@@ -252,6 +277,7 @@ static CU_TestInfo test_cases_array[] = {
   {"Ring Buffer: test_case_10", test_case_10},
   {"Ring Buffer: test_case_11", test_case_11},
   {"Ring Buffer: test_case_12", test_case_12},
+  {"Ring Buffer: test_case_13", test_case_13},
 };
 
 CU_TestInfo* get_ring_buffer_test_cases_array() {
