@@ -1,7 +1,7 @@
-
+CFLAGS	+= -I../../util
 src_dir := ../../util
 
-objects	:= stringx.o date.o printk.o
+objects	:= stringx.o date.o printk.o ring_buffer.o ring_buffer-test.o test.o
 
 all: $(BUILTIN)
 

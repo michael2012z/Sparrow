@@ -2,11 +2,12 @@
 #include <string.h>
 #include <CUnit/Basic.h>
 
-#define TEST_CUITES_COUNT 4
+#define TEST_CUITES_COUNT 5
 extern CU_SuiteInfo fs_test_suite;
 extern CU_SuiteInfo mm_test_suite;
 extern CU_SuiteInfo glibc_test_suite;
 extern CU_SuiteInfo shell_test_suite;
+extern CU_SuiteInfo ring_buffer_test_suite;
 
 void fs_test_initialize();
 void fs_test_finalize();
@@ -16,17 +17,23 @@ void glibc_test_initialize();
 void glibc_test_finalize();
 void shell_test_initialize();
 void shell_test_finalize();
+void ring_buffer_test_initialize();
+void ring_buffer_test_finalize();
 
 void test_initialize() {
   fs_test_initialize();
   mm_test_initialize();
+  glibc_test_initialize();
   shell_test_initialize();
+  ring_buffer_test_initialize();
 }
 
 void test_finalize() {
   fs_test_finalize();
   mm_test_finalize();
+  glibc_test_finalize();
   shell_test_finalize();
+  ring_buffer_test_finalize();
 }
 
 
@@ -41,6 +48,7 @@ int main() {
   all_test_suites[i++] = mm_test_suite;
   all_test_suites[i++] = glibc_test_suite;
   all_test_suites[i++] = shell_test_suite;
+  all_test_suites[i++] = ring_buffer_test_suite;
   all_test_suites[i++] = (CU_SuiteInfo)CU_SUITE_INFO_NULL;
 
   if (CUE_SUCCESS != CU_initialize_registry())

@@ -1,17 +1,31 @@
+#ifndef __ARCH_X86__
 #include <type.h>
 #include <linkage.h>
 #include <mm.h>
+#else
+#include <stdlib.h>
+#endif
 #include "ring_buffer.h"
 
 struct ring_buffer *kernel_ring_buffer = NULL;
 struct ring_buffer *user_ring_buffer = NULL;
 
 struct ring_buffer *create_ring_buffer() {
+#ifndef __ARCH_X86__
   struct ring_buffer *ring = (struct ring_buffer *)kmalloc(sizeof(struct ring_buffer));
+#else
+  struct ring_buffer *ring = (struct ring_buffer *)malloc(sizeof(struct ring_buffer));
+#endif
+
   if (NULL == ring)
 	return NULL;
 
+#ifndef __ARCH_X86__
   ring->upper = (char *)kmalloc(RING_BUFFER_SIZE);
+#else
+  ring->upper = (char *)malloc(RING_BUFFER_SIZE);
+#endif
+
   if (NULL == ring->upper)
 	return NULL;
   else {
@@ -19,12 +33,18 @@ struct ring_buffer *create_ring_buffer() {
 	ring->start = ring->upper;
 	ring->end = ring->upper;
 	ring->circled = 0;
-	return 0;
+	return ring;
   }
 }
 
+void ring_buffer_reset(struct ring_buffer *ring) {
+  ring->start = ring->upper;
+  ring->end = ring->upper;
+  ring->circled = 0;
+}
+
 void ring_buffer_put_char(struct ring_buffer *ring, char ch) {
-if (0 == ring->circled) { /* no circle */
+  if (0 == ring->circled) { /* no circle */
 	*(ring->end++) = ch;
 	if (ring->end >= ring->lower) {
 	  ring->end = ring->upper;
