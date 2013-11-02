@@ -3,6 +3,8 @@
 
 #ifdef __ARCH_X86__
 #include <stdio.h>
+#else
+#include "ring_buffer.h"
 #endif
 
 typedef char * va_list;
@@ -70,9 +72,14 @@ static void __put_char(char *p,int num){
     printf("%c", *p++);
 }
 #else
+extern int ring_buffer_enabled;
+extern struct ring_buffer *user_ring_buffer;
 static void __put_char(char *p,int num){
 	while(*p&&num--){
-	  *(volatile unsigned int *)_debug_output_io=*p++;
+	  if (ring_buffer_enabled)
+		ring_buffer_put_char(user_ring_buffer, *p++);
+	  else
+		*(volatile unsigned int *)_debug_output_io=*p++;
 	  /*	  *(volatile unsigned int *)0xef005020=*p++; */
 	};
 }

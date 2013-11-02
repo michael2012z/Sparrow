@@ -6,9 +6,26 @@
 #include <stdlib.h>
 #endif
 #include "ring_buffer.h"
+#include <printk.h>
 
 struct ring_buffer *kernel_ring_buffer = NULL;
 struct ring_buffer *user_ring_buffer = NULL;
+
+int ring_buffer_enabled = 0;
+
+void ring_buffer_init() {
+  kernel_ring_buffer = create_ring_buffer();
+  if (NULL == kernel_ring_buffer) {
+	printk(PR_SS_INI, PR_LVL_ERR, "%s: kernel ring buffer init failure\n", __func__);
+	while(1);
+  }
+  user_ring_buffer = create_ring_buffer();
+  if (NULL == user_ring_buffer) {
+	printk(PR_SS_INI, PR_LVL_ERR, "%s: user ring buffer init failure\n", __func__);
+	while(1);
+  }
+  ring_buffer_enabled = 1;
+}
 
 struct ring_buffer *create_ring_buffer() {
 #ifndef __ARCH_X86__
