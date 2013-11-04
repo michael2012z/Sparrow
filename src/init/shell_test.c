@@ -15,7 +15,8 @@ char* test_cmds[] = {
 };
 
 char inputc() {
-  static int i = 0;
+    static int i = 0;
+  //  static int i = 14;
 
   if (0 == i) {
     static char *ch_p = "jiffies\n";

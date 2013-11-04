@@ -68,11 +68,12 @@ static void __init vic_enable(void *base)
   if ((unsigned long)base == VA_VIC0)
 	vic_unmask_irq(IRQ_TIMER4_VIC);
   else if ((unsigned long)base == VA_VIC1) {
-   	return;
 	vic_unmask_irq(IRQ_UART0);
+	/*
 	vic_unmask_irq(IRQ_UART1);
 	vic_unmask_irq(IRQ_UART2);
 	vic_unmask_irq(IRQ_UART3);
+	*/
   }
 }
 

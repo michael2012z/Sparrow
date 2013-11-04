@@ -58,7 +58,7 @@ s3c6410_uart_interrupt(int irq, void *dev_id)
 	  uart_input_char(ch);
 	  
 	}
-  } else if (0x10 == irq) { /* data received */
+  } else if (0x12 == irq) { /* data received */
 	/* not handled */
   }
 
@@ -109,6 +109,9 @@ static void s3c_irq_uart_unmask(unsigned int irq)
 	unsigned int regs = s3c_irq_uart_base(irq);
 	unsigned int bit = s3c_irq_uart_bit(irq);
 	u32 reg;
+
+	if (0x12 == irq)
+	  return;
 
 	reg = __raw_readl(regs + S3C64XX_UINTM);
 	reg &= ~(1 << bit);
@@ -161,7 +164,7 @@ static void __init s3c_init_uart_irq(struct s3c_uart_irq *uirq)
 	unsigned int irq;
 	int offs;
 
-	printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: reg_base = %x\n", __func__, reg_base);
+	//	printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: reg_base = %x\n", __func__, reg_base);
 
 	/* mask all interrupts at the start. */
 	__raw_writel(reg_base + S3C64XX_UINTM, 0xf);
@@ -182,25 +185,24 @@ void __init s3c_init_uart_irqs() {
   struct s3c_uart_irq *irq = uart_irqs;
   unsigned int nr_irqs = ARRAY_SIZE(uart_irqs);
 
-  if (1) return;
-
-  printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: irq = %x, nr_irqs = %x\n", __func__, irq, nr_irqs);
+  //  printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: irq = %x, nr_irqs = %x\n", __func__, irq, nr_irqs);
 
   for (; nr_irqs > 0; nr_irqs--, irq++)
 	s3c_init_uart_irq(irq);
 
-  printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: finish\n", __func__);
+  //  printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: finish\n", __func__);
 }
 
 static void __init s3c6410_uart_setup() {
   /* setup UART0 only*/
   unsigned int regs = uart_irqs[0].regs;
-
-  __raw_writel(regs + S3C64XX_UCON, 0x781);
+  __raw_writel(regs + S3C64XX_UINTM, 0xf);
+  __raw_writel(regs + S3C64XX_UCON, 0x785);
   __raw_writel(regs + S3C64XX_ULCON, 0x7);
   __raw_writel(regs + S3C64XX_UFCON, 0x17);
   __raw_writel(regs + S3C64XX_UFCON, 0x11);
-  __raw_writel(regs + S3C64XX_UCON, 0x381);
+  __raw_writel(regs + S3C64XX_UCON, 0x785);
+  __raw_writel(regs + S3C64XX_UCON, 0x385);
   __raw_writel(regs + S3C64XX_ULCON, 0x3);
   __raw_writel(regs + S3C64XX_UBRDIV, 0x23);
   __raw_writel(regs + S3C64XX_UMCON, 0x0);
@@ -210,15 +212,18 @@ static void __init s3c6410_uart_setup() {
 }
 
 void __init arm_init_uart() {
-  if (1) return;
   s3c6410_uart_setup();
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE0);
+  /*
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE1);
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE2);
   s3c_irq_uart_unmask(IRQ_S3CUART_BASE3);
+  */
   /* unmask all interrupts at the start. */
-  __raw_writel(S3C_VA_UART0 + S3C64XX_UINTM, 0x0);
-  __raw_writel(S3C_VA_UART1 + S3C64XX_UINTM, 0x0);
-  __raw_writel(S3C_VA_UART2 + S3C64XX_UINTM, 0x0);
-  __raw_writel(S3C_VA_UART3 + S3C64XX_UINTM, 0x0);
+  __raw_writel(S3C_VA_UART0 + S3C64XX_UINTM, 0xe);
+  /*
+  __raw_writel(S3C_VA_UART1 + S3C64XX_UINTM, 0xf);
+  __raw_writel(S3C_VA_UART2 + S3C64XX_UINTM, 0xf);
+  __raw_writel(S3C_VA_UART3 + S3C64XX_UINTM, 0xf);
+  */
 }
