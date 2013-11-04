@@ -104,9 +104,9 @@ int __init kernel_shell(void *unused) {
 
   printk(PR_SS_INI, PR_LVL_DBG5, "%s: kernel shell started\n", __func__);
   printu("\n");
-  printu("****************************************\n");
-  printu("      Sparrow OS default shell\n");
-  printu("****************************************\n");
+  printu("**********************************************\n");
+  printu("         Sparrow OS default shell\n");
+  printu("**********************************************\n");
   printu("\n");
 
   do {
@@ -114,7 +114,7 @@ int __init kernel_shell(void *unused) {
 	  cmd_line[i] = 0;
 	i = 0;
 
-	printu("$: ");
+	printu("[sparrow] $: ");
 	/* fetch user input, char by char */
 	do { /* ENTER indicates the end of a command line */
 	  ch = inputc();
