@@ -3,6 +3,7 @@
 #include <uart.h>
 #include <printk.h>
 #include <process.h>
+#include <exception.h>
 
 int uart_registered_pid = -1;
 char *uart_registerd_ch = NULL;
@@ -46,7 +47,6 @@ void uart_input_char(char ch) {
   }
 }
 
-#if 0
 char inputc() {
   char ch;
   if (register_uart_input_c(current_task->pid, &ch) < 0)
@@ -55,8 +55,9 @@ char inputc() {
 	/* change state as waiting */
 	/* schedule */
 	current_task->sched_en.state = PROCESS_STATE_WAITING;
+	exception_disable();
 	schedule();
+	exception_enable();
   }
   return ch;
 }
-#endif

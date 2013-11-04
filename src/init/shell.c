@@ -114,14 +114,14 @@ int __init kernel_shell(void *unused) {
 	  cmd_line[i] = 0;
 	i = 0;
 
-	printu("$: _");
+	printu("$: ");
 	/* fetch user input, char by char */
 	do { /* ENTER indicates the end of a command line */
 	  ch = inputc();
 	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: char %c was received\n", __func__, ch);
 	  cmd_line[i] = ch;
 	  i++;
-	  printu("\b%c_", ch);
+	  printu("%c", ch);
 	  if (i >= 256)
 		break;
 	} while('\n' != ch);

@@ -31,7 +31,6 @@ void handle_cmd_elfs(char *primary_parameter, char **secondary_parameters) {
 	int pid = -1;
 	struct task_struct* new_task = NULL;
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %s\n", __func__, primary_parameter);
-	scheduler->dump();
 	pid = create_user_thread(user_thread_seed, primary_parameter, secondary_parameters);
 	// change current process state to waiting
 	new_task = find_task_by_pid(pid);
@@ -39,7 +38,6 @@ void handle_cmd_elfs(char *primary_parameter, char **secondary_parameters) {
 	current_task->sched_en.state = PROCESS_STATE_WAITING;
 	current_task->sched_en.waiting_type = PROCESS_WAITING_TYPE_THREAD;
 	current_task->sched_en.blocking_pid = pid;
-	scheduler->dump();
 	exception_disable();
 	schedule();
 	exception_enable();

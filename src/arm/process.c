@@ -37,8 +37,11 @@ asm(	".pushsection .text\n"
 "	.size	kernel_thread_helper, . - kernel_thread_helper\n"
 "	.popsection");
 
+extern struct task_struct *current_task;
+
 void kernel_thread_exit(void) {
   printk(PR_SS_INI, PR_LVL_ERR, "%s: ---------------------------------------------\n", __func__); 
+  current_task->sched_en.state = PROCESS_STATE_DEAD;
   while(1);
 }
 
@@ -111,12 +114,17 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
   struct pt_regs* regs = &current_task->regs;
   int ret;
   struct file exe_file;
-  vfs_node* file = vfs_find_node(filename);  
+  vfs_node* file;
+
+  file = vfs_find_node(filename);
+  if (NULL == file)
+	goto out;
 
   exe_file.buf = file->file.addr;
   exe_file.size = file->file.size;
 
   memset(regs, 0, sizeof(struct pt_regs));
+
   ret = execute_binary(current_task, &exe_file);
   if (ret < 0)
 	goto out;
