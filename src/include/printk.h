@@ -63,6 +63,27 @@
  *   DBG6 -- System Call
  */
 
+extern int log_type_ini;
+extern int log_type_fs;
+extern int log_type_mm;
+extern int log_type_proc;
+extern int log_type_irq;
+
+extern int log_level_err;
+extern int log_level_inf;
+extern int log_level_wrn;
+extern int log_level_0;
+extern int log_level_1;
+extern int log_level_2;
+extern int log_level_3;
+extern int log_level_4;
+extern int log_level_5;
+extern int log_level_6;
+extern int log_level_7;
+extern int log_level_8;
+extern int log_level_9;
+
+
 void printk(int a, int b, const char *fmt, ...);
 void printu(const char *fmt, ...);
 void prints(char *string, int length);

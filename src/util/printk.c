@@ -277,6 +277,26 @@ void printk_enable() {
   printk_disabled_flag = 0;
 }
 
+int log_type_ini = 1;
+int log_type_fs = 0;
+int log_type_mm = 0;
+int log_type_proc = 0;
+int log_type_irq = 0;
+
+int log_level_err = 1;
+int log_level_inf = 1;
+int log_level_wrn = 1;
+int log_level_0 = 0;
+int log_level_1 = 0;
+int log_level_2 = 0;
+int log_level_3 = 0;
+int log_level_4 = 0;
+int log_level_5 = 0;
+int log_level_6 = 0;
+int log_level_7 = 0;
+int log_level_8 = 0;
+int log_level_9 = 0;
+
 void printk(int ss, int level, const char *fmt, ...)
 {
 	va_list args;

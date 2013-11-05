@@ -14,7 +14,9 @@
 #define SHELL_COMMAND_ID_CAT		7
 #define SHELL_COMMAND_ID_KMSG		8
 #define SHELL_COMMAND_ID_PS			9
-#define SHELL_COMMAND_ID_HELP		10
+#define SHELL_COMMAND_ID_KILL		10
+#define SHELL_COMMAND_ID_LOG		11
+#define SHELL_COMMAND_ID_HELP		12
 
 
 int __init kernel_shell(void *unused);
@@ -28,6 +30,8 @@ void handle_cmd_jiffies(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_cat(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_ps(char *primary_parameter, char **secondary_parameters);
+void handle_cmd_kill(char *primary_parameter, char **secondary_parameters);
+void handle_cmd_log(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_help(char *primary_parameter, char **secondary_parameters);
 
 
