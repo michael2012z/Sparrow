@@ -103,6 +103,10 @@ void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters) {
   return;
 }
 
+void handle_cmd_ps(char *primary_parameter, char **secondary_parameters) {
+  return;
+}
+
 void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
   CU_ASSERT((13 == test_id) || (14 == test_id));
   cmd_parameters_check(primary_parameter, secondary_parameters);

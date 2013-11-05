@@ -108,7 +108,7 @@ void schedule() {
   } else
 	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
 
-  scheduler->dump();
+  //  scheduler->dump();
 
   next_task = scheduler->pick_next_task();
 

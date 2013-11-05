@@ -117,12 +117,12 @@ void cfs_queue_dump() {
   struct sched_entity *current;
   struct task_struct* task = NULL;
 
-  printk(PR_SS_PROC, PR_LVL_DBG7, "%s\n", __func__);
-  printk(PR_SS_PROC, PR_LVL_DBG7, "%s: queue size: %d\n", __func__, cfs_queue_size());
+  printu("total %d threads: \n(state: 1/ready, 2/running, 3/waiting, 4/dead)\n", cfs_queue_size());
   list_for_each(pos, head) {
 	current = list_entry(pos, struct sched_entity, queue_entry);
 	task = 	container_of(current, struct task_struct, sched_en);
-	printk(PR_SS_PROC, PR_LVL_DBG7, "%s: pid: %d, state: %d, vruntime: %d \n", __func__, task->pid, current->state, current->vruntime);
+	printu("  pid: %d, state: %d, vruntime: %d\n", task->pid, current->state, current->vruntime);
+	//printu("  pid: %d, state: %d, vruntime: %d, file: %s\n", task->pid, current->state, current->vruntime, ((NULL == task->elf_file_name)?("null"):(task->elf_file_name)));
   }
   return;
 }

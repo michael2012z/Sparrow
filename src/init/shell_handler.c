@@ -10,6 +10,8 @@
 #include <uart.h>
 #include <ring_buffer.h>
 
+extern struct sched_class *scheduler;
+
 extern unsigned long jiffies;
 extern struct sched_class *scheduler;
 extern struct task_struct *current_task;
@@ -105,6 +107,11 @@ void handle_cmd_cat(char *primary_parameter, char **secondary_parameters) {
 void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters) {
   ring_buffer_copy(user_ring_buffer, kernel_ring_buffer);
   uart0_tx_start();
+  return;
+}
+
+void handle_cmd_ps(char *primary_parameter, char **secondary_parameters) {
+  scheduler->dump();
   return;
 }
 

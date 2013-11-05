@@ -71,6 +71,9 @@ void arm_create_user_thread(int (*fn)(char *), void *arg, struct pt_regs *regs)
 
 void cpu_idle() {
   printk(PR_SS_INI, PR_LVL_INF, "cpu_idle() \n");
+  current_task->sched_en.state = PROCESS_STATE_WAITING;
+  current_task->sched_en.waiting_type = PROCESS_WAITING_TYPE_TIME;
+  current_task->sched_en.wake_up_jiffy = 0xfffff000; /* never wake up */
   while(1) {asm("nop\n");}
   /* Should call cpu founction:
 ENTRY(cpu_v6_do_idle)
