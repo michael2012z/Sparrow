@@ -14,6 +14,10 @@ void init_uart() {
   arm_init_uart();
 }
 
+void uart0_tx_start() {
+  arm_uart0_tx_start();
+}
+
 int register_uart_input_c (int pid, char *ch_p) {
   if (uart_registered_pid == -1) {
 	uart_registered_pid = pid;

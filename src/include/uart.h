@@ -55,7 +55,8 @@ struct s3c_uart_irq {
 
 
 void __init s3c_init_uart_irqs();
-
+void uart0_tx_start();
+void arm_uart0_tx_start();
 void arm_init_uart();
 void init_uart();
 int register_uart_input_c (int pid, char *ch_p);

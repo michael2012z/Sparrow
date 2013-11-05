@@ -1,11 +1,17 @@
+#include <linkage.h>
 #include <string.h>
 #include <printk.h>
 
 #ifdef __ARCH_X86__
 #include <stdio.h>
 #else
-#include "ring_buffer.h"
+#include <ring_buffer.h>
 #endif
+
+#include <uart.h>
+
+extern struct ring_buffer *kernel_ring_buffer;
+extern struct ring_buffer *user_ring_buffer;
 
 typedef char * va_list;
 #define _INTSIZEOF(n)   ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) )
@@ -67,14 +73,18 @@ static char print_buf[1024];
 void * _debug_output_io = (void *)0xef005020; /* This initial value is the physical address, meaningless. */
  
 #ifdef __ARCH_X86__
-static void __put_char(char *p,int num){
+static void __put_char_u(char *p,int num){
+  while(*p&&num--)
+    printf("%c", *p++);
+}
+static void __put_char_k(char *p,int num){
   while(*p&&num--)
     printf("%c", *p++);
 }
 #else
 extern int ring_buffer_enabled;
 extern struct ring_buffer *user_ring_buffer;
-static void __put_char(char *p,int num){
+static void __put_char_u(char *p,int num){
 	while(*p&&num--){
 	  if (ring_buffer_enabled)
 		ring_buffer_put_char(user_ring_buffer, *p++);
@@ -83,6 +93,16 @@ static void __put_char(char *p,int num){
 	  /*	  *(volatile unsigned int *)0xef005020=*p++; */
 	};
 }
+static void __put_char_k(char *p,int num){
+	while(*p&&num--){
+	  if (ring_buffer_enabled)
+		ring_buffer_put_char(kernel_ring_buffer, *p++);
+	  else
+		*(volatile unsigned int *)_debug_output_io=*p++;
+	  /*	  *(volatile unsigned int *)0xef005020=*p++; */
+	};
+}
+
 #endif
 
 char *number(char *str, int num,int base,unsigned int flags){
@@ -348,28 +368,35 @@ void printk(int ss, int level, const char *fmt, ...)
 	i = vsnprintf (print_buf, sizeof(print_buf),fmt, args);
 	va_end (args);
 
-	__put_char (leading_lvl, 8);
-	__put_char (leading_ss, 8);
-	__put_char (print_buf,i);
+	__put_char_k (leading_lvl, 8);
+	__put_char_k (leading_ss, 8);
+	__put_char_k (print_buf,i);
 
 }
 
 /* output to user screen directly*/
 void printu(const char *fmt, ...)
 {
-	va_list args;
-	unsigned int i;
+  va_list args;
+  unsigned int i;
+  
+  va_start (args, fmt);
+  i = vsnprintf (print_buf, sizeof(print_buf),fmt, args);
+  va_end (args);
+  
+  __put_char_u (print_buf,i);
 
-	va_start (args, fmt);
-	i = vsnprintf (print_buf, sizeof(print_buf),fmt, args);
-	va_end (args);
-
-	__put_char (print_buf,i);
+#ifndef __ARCH_X86__
+  uart0_tx_start();
+#endif
 }
 
 /* print raw string to screen directly */
 void prints(char *string, int length) {
-  __put_char (string, length);
+  __put_char_u (string, length);
+#ifndef __ARCH_X86__
+  uart0_tx_start();
+#endif
 }
 
 

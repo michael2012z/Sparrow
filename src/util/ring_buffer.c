@@ -5,7 +5,7 @@
 #else
 #include <stdlib.h>
 #endif
-#include "ring_buffer.h"
+#include <ring_buffer.h>
 #include <printk.h>
 
 struct ring_buffer *kernel_ring_buffer = NULL;

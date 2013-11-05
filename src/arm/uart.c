@@ -4,6 +4,7 @@
 #include <irq.h>
 #include <printk.h>
 #include <uart.h>
+#include <ring_buffer.h>
 
 static struct s3c_uart_irq uart_irqs[] = {
 	[0] = {
@@ -28,6 +29,8 @@ static struct s3c_uart_irq uart_irqs[] = {
 	},
 };
 
+extern int ring_buffer_enabled;
+extern struct ring_buffer *user_ring_buffer;
 /*
  * IRQ handler for the uart
  */
@@ -35,13 +38,16 @@ static irqreturn_t
 s3c6410_uart_interrupt(int irq, void *dev_id)
 {
   unsigned int uart_index = (irq - IRQ_S3CUART_BASE0)/4;
+  unsigned int regs;
+
   if (uart_index > 3)
     printk(PR_SS_IRQ, PR_LVL_DBG2, "%s, invalid uart irq: irq = %x, uart_index = %x\n", __func__, irq, uart_index);	
+
+  regs = uart_irqs[uart_index].regs;
   
   if (0x10 == irq) { /* data received */
 	int n, error;
 	char ch;
-	unsigned int regs = uart_irqs[uart_index].regs;
 
 	while(1) {
 	  n = __raw_readl(regs + S3C64XX_UFSTAT);
@@ -58,8 +64,14 @@ s3c6410_uart_interrupt(int irq, void *dev_id)
 	  uart_input_char(ch);
 	  
 	}
-  } else if (0x12 == irq) { /* data received */
-	/* not handled */
+  } else if (0x12 == irq) { /* data to transmit */
+	if (ring_buffer_enabled)
+	  while(!ring_buffer_empty(user_ring_buffer)) {
+		if (__raw_readl(regs + S3C64XX_UFSTAT)) /* if there is error */
+		  break;
+		else
+		  __raw_writel(regs + S3C64XX_UTXH, ring_buffer_get_char(user_ring_buffer));
+	  }
   }
 
   return IRQ_HANDLED;
@@ -116,6 +128,17 @@ static void s3c_irq_uart_unmask(unsigned int irq)
 	reg = __raw_readl(regs + S3C64XX_UINTM);
 	reg &= ~(1 << bit);
 	__raw_writel(regs + S3C64XX_UINTM, reg);
+}
+
+void arm_uart0_tx_start() {
+  unsigned int irq = 0x12;
+  unsigned int regs = s3c_irq_uart_base(irq);
+  unsigned int bit = s3c_irq_uart_bit(irq);
+  u32 reg;
+
+  reg = __raw_readl(regs + S3C64XX_UINTM);
+  reg &= ~(1 << bit);
+  __raw_writel(regs + S3C64XX_UINTM, reg);
 }
 
 static void s3c_irq_uart_ack(unsigned int irq)
