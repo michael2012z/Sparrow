@@ -308,23 +308,29 @@ void printk(int ss, int level, const char *fmt, ...)
 
 	switch (ss) {
 	case PR_SS_INI:
+	  if (0 == log_type_ini)
+		return;
 	  leading_ss = "INI] ";
 	  break;
 	case PR_SS_FS:
+	  if (0 == log_type_fs)
+		return;
 	  leading_ss = "FS] ";
-	  return;
 	  break;
 	case PR_SS_MM:
+	  if (0 == log_type_mm)
+		return;
 	  leading_ss = "MM] ";
-	  return;
 	  break;
 	case PR_SS_PROC:
+	  if (0 == log_type_proc)
+		return;
 	  leading_ss = "PROC] ";
-	  return;
 	  break;
 	case PR_SS_IRQ:
+	  if (0 == log_type_irq)
+		return;
 	  leading_ss = "IRQ] ";
-	  return;
 	  break;
 	default:
 	  return;
@@ -332,52 +338,69 @@ void printk(int ss, int level, const char *fmt, ...)
 
 	switch (level) {
 	case PR_LVL_INF:
+	  if (0 == log_level_inf)
+		return;
 	  leading_lvl = "[INFO-";
 	  break;
 	case PR_LVL_ERR:
+	  if (0 == log_level_err)
+		return;
 	  leading_lvl = "[ERR-";
 	  break;
 	case PR_LVL_WRN:
+	  if (0 == log_level_wrn)
+		return;
 	  leading_lvl = "[WRN-";
 	  break;
 	case PR_LVL_DBG0:
+	  if (0 == log_level_0)
+		return;
 	  leading_lvl = "[DBG0-";
-	  return;
 	  break;
 	case PR_LVL_DBG1:
+	  if (0 == log_level_1)
+		return;
 	  leading_lvl = "[DBG1-";
-	  return;
 	  break;
 	case PR_LVL_DBG2:
+	  if (0 == log_level_2)
+		return;
 	  leading_lvl = "[DBG2-";
 	  break;
 	case PR_LVL_DBG3:
+	  if (0 == log_level_3)
+		return;
 	  leading_lvl = "[DBG3-";
-	  return;
 	  break;
 	case PR_LVL_DBG4:
+	  if (0 == log_level_4)
+		return;
 	  leading_lvl = "[DBG4-";
-	  return;
 	  break;
 	case PR_LVL_DBG5:
+	  if (0 == log_level_5)
+		return;
 	  leading_lvl = "[DBG5-";
-	  return;
 	  break;
 	case PR_LVL_DBG6:
+	  if (0 == log_level_6)
+		return;
 	  leading_lvl = "[DBG6-";
-	  return;
 	  break;
 	case PR_LVL_DBG7:
+	  if (0 == log_level_7)
+		return;
 	  leading_lvl = "[DBG7-";
-	  return;
 	  break;
 	case PR_LVL_DBG8:
+	  if (0 == log_level_8)
+		return;
 	  leading_lvl = "[DBG8-";
-	  return;
 	  break;
 	case PR_LVL_DBG9:
+	  if (0 == log_level_9)
+		return;
 	  leading_lvl = "[DBG9-";
-	  return;
 	  break;
 	default:
 	  return;

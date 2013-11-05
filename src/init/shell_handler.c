@@ -105,7 +105,9 @@ void handle_cmd_cat(char *primary_parameter, char **secondary_parameters) {
 }
 
 void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters) {
+  exception_disable();
   ring_buffer_copy(user_ring_buffer, kernel_ring_buffer);
+  exception_enable();
   uart0_tx_start();
   return;
 }
