@@ -118,6 +118,23 @@ void handle_cmd_ps(char *primary_parameter, char **secondary_parameters) {
 }
 
 void handle_cmd_kill(char *primary_parameter, char **secondary_parameters) {
+  if (NULL == primary_parameter)
+	printu("invalid parameter\n");
+  else {
+	int pid;
+	struct task_struct *task;
+	pid = atoi(primary_parameter);
+	if (pid >= 0) {
+	  task = find_task_by_pid(pid);
+	  if (NULL != task) {
+		task->sched_en.state = PROCESS_STATE_DEAD;
+		printu("process %d killed\n", pid);
+	  }
+	  else
+		printu("process not found\n");
+	} else
+	  printu("process not found\n");
+  }
   return;
 }
 
