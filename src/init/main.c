@@ -83,6 +83,8 @@ static void __init health_check(void) {
 
 void __init start_kernel(void) {
 
+  printk(PR_SS_INI, PR_LVL_INF, "Sparrow OS, by Michael Z\n");
+
   printk(PR_SS_INI, PR_LVL_INF, "Enter start_kernel().\n");
 
   store_registers();

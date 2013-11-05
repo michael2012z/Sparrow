@@ -68,6 +68,20 @@ struct sched_entity* cfs_queue_dequeue_first () {
   return first_en;
 }
 
+struct task_struct *cfs_queue_find_task_by_pid(int pid) {
+  struct list_head *pos = NULL, *head = queue;
+  struct sched_entity *current;
+  struct task_struct* task = NULL;
+
+  list_for_each(pos, head) {
+    current = list_entry(pos, struct sched_entity, queue_entry);
+    task = container_of(current, struct task_struct, sched_en);
+    if (pid == task->pid)
+      return task;
+  }
+  return NULL;
+}
+
 int cfs_queue_size () {
   struct list_head *pos = NULL, *head = queue;
   int count = 0;
@@ -78,20 +92,6 @@ int cfs_queue_size () {
 	  count++;
   }
   return count;
-}
-
-struct sched_entity* cfs_queue_get_nth_entity(int index) {
-  struct list_head *pos = NULL, *head = queue;
-  struct sched_entity *current;
-
-  list_for_each(pos, head) {
-	current = list_entry(pos, struct sched_entity, queue_entry);
-	if (index == 0)
-	  return current;
-	else 
-	  index--;
-  }
-  return NULL;
 }
 
 void cfs_queue_wake_up_sleeping(unsigned long jiffy) {

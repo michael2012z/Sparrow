@@ -140,163 +140,166 @@ void handle_cmd_kill(char *primary_parameter, char **secondary_parameters) {
 
 void handle_cmd_log(char *primary_parameter, char **secondary_parameters) {
   if ((NULL != primary_parameter) &&
-	  (NULL != secondary_parameters[0]) && 
-	  (NULL == secondary_parameters[1]) && 
-	  (NULL == secondary_parameters[2]) && 
-	  (NULL == secondary_parameters[3])) {
-	int n, i;
-	/* clean all log type and level */
-	log_type_ini = 0;
-	log_type_fs = 0;
-	log_type_mm = 0;
-	log_type_proc = 0;
-	log_type_irq = 0;
-	log_level_err = 0;
-	log_level_inf = 0;
-	log_level_wrn = 0;
-	log_level_0 = 0;
-	log_level_1 = 0;
-	log_level_2 = 0;
-	log_level_3 = 0;
-	log_level_4 = 0;
-	log_level_5 = 0;
-	log_level_6 = 0;
-	log_level_7 = 0;
-	log_level_8 = 0;
-	log_level_9 = 0;
+      (NULL != secondary_parameters[0]) && 
+      (NULL == secondary_parameters[1]) && 
+      (NULL == secondary_parameters[2]) && 
+      (NULL == secondary_parameters[3])) {
+    int n, i;
+    /* clean all log type and level */
+    log_type_ini = 0;
+    log_type_fs = 0;
+    log_type_mm = 0;
+    log_type_proc = 0;
+    log_type_irq = 0;
+    log_level_err = 0;
+    log_level_inf = 0;
+    log_level_wrn = 0;
+    log_level_0 = 0;
+    log_level_1 = 0;
+    log_level_2 = 0;
+    log_level_3 = 0;
+    log_level_4 = 0;
+    log_level_5 = 0;
+    log_level_6 = 0;
+    log_level_7 = 0;
+    log_level_8 = 0;
+    log_level_9 = 0;
+    
+    n = strlen(primary_parameter);
+    for (i = 0; i < n; i++)
+      switch (primary_parameter[i]) {
+      case 'i':
+	log_type_ini = 1;
+	break;
+      case 'm':
+	log_type_mm = 1;
+	break;
+      case 'p':
+	log_type_proc = 1;
+	break;
+      case 'q':
+	log_type_irq = 1;
+	break;
+      case 'f':
+	log_type_fs = 1;
+	break;
+      default:
+	printu("wrong log type: %c\n", primary_parameter[i]);
+	break;
+      }
+    n = strlen(secondary_parameters[0]);
+    for (i = 0; i < n; i++)
+      switch (secondary_parameters[0][i]) {
+      case 'w':
+	log_level_wrn = 1;
+	break;
+      case 'e':
+	log_level_err = 1;
+	break;
+      case 'n':
+	log_level_inf = 1;
+	break;
+      case '0':
+	log_level_0 = 1;
+	break;
+      case '1':
+	log_level_1 = 1;
+	break;
+      case '2':
+	log_level_2 = 1;
+	break;
+      case '3':
+	log_level_3 = 1;
+	break;
+      case '4':
+	log_level_4 = 1;
+	break;
+      case '5':
+	log_level_5 = 1;
+	break;
+      case '6':
+	log_level_6 = 1;
+	break;
+      case '7':
+	log_level_7 = 1;
+	break;
+      case '8':
+	log_level_8 = 1;
+	break;
+      case '9':
+	log_level_9 = 1;
+	break;
+      default:
+	printu("wrong log level: %c\n", secondary_parameters[0][i]);
+	break;
+      }
 
-	printu("pri_p = %s, sec_p = %s\n", primary_parameter, secondary_parameters[0]);
-
-	n = strlen(primary_parameter);
-	for (i = 0; i < n; i++)
-	  switch (primary_parameter[i]) {
-	  case 'i':
-		log_type_ini = 1;
-		break;
-	  case 'm':
-		log_type_mm = 1;
-		break;
-	  case 'p':
-		log_type_proc = 1;
-		break;
-	  case 'q':
-		log_type_irq = 1;
-		break;
-	  case 'f':
-		log_type_fs = 1;
-		break;
-	  default:
-		printu("wrong log type: %c\n", primary_parameter[i]);
-		break;
-	  }
-	n = strlen(secondary_parameters[0]);
-	for (i = 0; i < n; i++)
-	  switch (secondary_parameters[0][i]) {
-	  case 'w':
-		log_level_wrn = 1;
-		break;
-	  case 'e':
-		log_level_err = 1;
-		break;
-	  case 'n':
-		log_level_inf = 1;
-		break;
-	  case '0':
-		log_level_0 = 1;
-		break;
-	  case '1':
-		log_level_1 = 1;
-		break;
-	  case '2':
-		log_level_2 = 1;
-		break;
-	  case '3':
-		log_level_3 = 1;
-		break;
-	  case '4':
-		log_level_4 = 1;
-		break;
-	  case '5':
-		log_level_5 = 1;
-		break;
-	  case '6':
-		log_level_6 = 1;
-		break;
-	  case '7':
-		log_level_7 = 1;
-		break;
-	  case '8':
-		log_level_8 = 1;
-		break;
-	  case '9':
-		log_level_9 = 1;
-		break;
-	  default:
-		printu("wrong log level: %c\n", secondary_parameters[0][i]);
-		break;
-	  }
-  } else if ((NULL == primary_parameter) &&
-			 (NULL == secondary_parameters[0]) && 
-			 (NULL == secondary_parameters[1]) && 
-			 (NULL == secondary_parameters[2]) && 
-			 (NULL == secondary_parameters[3])) {
-	char buf[16] = {0};
-	int i = 0;
-
-	for (i = 0; i < 16; i++)
-	  buf[i] = '\0';
-	
-	i = 0;
-	/* check log type */
-	if (1 == log_type_ini)
-	  buf[i++] = 'i';
-	if (1 == log_type_mm)
-	  buf[i++] = 'm';
-	if (1 == log_type_proc)
-	  buf[i++] = 'p';
-	if (1 == log_type_irq)
-	  buf[i++] = 'q';
-	if (1 == log_type_fs)
-	  buf[i++] = 'f';
-	printu("  type : %s\n", buf);
-
-	
-	for (i = 0; i < 16; i++)
-	  buf[i] = '\0';
-
-	i = 0;
-	/* check log level */
-	if (1 == log_level_wrn)
-	  buf[i++] = 'w';
-	if (1 == log_level_inf)
-	  buf[i++] = 'n';
-	if (1 == log_level_err)
-	  buf[i++] = 'e';
-	if (1 == log_level_0)
-	  buf[i++] = '0';
-	if (1 == log_level_1)
-	  buf[i++] = '1';
-	if (1 == log_level_2)
-	  buf[i++] = '2';
-	if (1 == log_level_3)
-	  buf[i++] = '3';
-	if (1 == log_level_4)
-	  buf[i++] = '4';
-	if (1 == log_level_5)
-	  buf[i++] = '5';
-	if (1 == log_level_6)
-	  buf[i++] = '6';
-	if (1 == log_level_7)
-	  buf[i++] = '7';
-	if (1 == log_level_8)
-	  buf[i++] = '8';
-	if (1 == log_level_9)
-	  buf[i++] = '9';
-	printu("  level: %s\n", buf);
-
+    primary_parameter = NULL;
+    secondary_parameters[0] = NULL;
+  } 
+  
+  if ((NULL == primary_parameter) &&
+      (NULL == secondary_parameters[0]) && 
+      (NULL == secondary_parameters[1]) && 
+      (NULL == secondary_parameters[2]) && 
+      (NULL == secondary_parameters[3])) {
+    char buf[16] = {0};
+    int i = 0;
+    
+    for (i = 0; i < 16; i++)
+      buf[i] = '\0';
+    
+    i = 0;
+    /* check log type */
+    if (1 == log_type_ini)
+      buf[i++] = 'i';
+    if (1 == log_type_mm)
+      buf[i++] = 'm';
+    if (1 == log_type_proc)
+      buf[i++] = 'p';
+    if (1 == log_type_irq)
+      buf[i++] = 'q';
+    if (1 == log_type_fs)
+      buf[i++] = 'f';
+    printu("  type : %s\n", buf);
+    
+    
+    for (i = 0; i < 16; i++)
+      buf[i] = '\0';
+    
+    i = 0;
+    /* check log level */
+    if (1 == log_level_wrn)
+      buf[i++] = 'w';
+    if (1 == log_level_inf)
+      buf[i++] = 'n';
+    if (1 == log_level_err)
+      buf[i++] = 'e';
+    if (1 == log_level_0)
+      buf[i++] = '0';
+    if (1 == log_level_1)
+      buf[i++] = '1';
+    if (1 == log_level_2)
+      buf[i++] = '2';
+    if (1 == log_level_3)
+      buf[i++] = '3';
+    if (1 == log_level_4)
+      buf[i++] = '4';
+    if (1 == log_level_5)
+      buf[i++] = '5';
+    if (1 == log_level_6)
+      buf[i++] = '6';
+    if (1 == log_level_7)
+      buf[i++] = '7';
+    if (1 == log_level_8)
+      buf[i++] = '8';
+    if (1 == log_level_9)
+      buf[i++] = '9';
+    printu("  level: %s\n", buf);
+    
   } else
-	printu("wrong number of parameters\n");
-
+    printu("wrong number of parameters\n");
+  
   return;
 }
 
