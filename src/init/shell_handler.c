@@ -7,10 +7,14 @@
 #include <string.h>
 #include <exception.h>
 #include <vfs.h>
+#include <uart.h>
+#include <ring_buffer.h>
 
 extern unsigned long jiffies;
 extern struct sched_class *scheduler;
 extern struct task_struct *current_task;
+extern struct ring_buffer *kernel_ring_buffer;
+extern struct ring_buffer *user_ring_buffer;
 
 static int user_thread_seed(char *elf_file_name) {
   if (elf_file_name) {
@@ -99,7 +103,8 @@ void handle_cmd_cat(char *primary_parameter, char **secondary_parameters) {
 }
 
 void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters) {
-  printu("%s\n", __func__);
+  ring_buffer_copy(user_ring_buffer, kernel_ring_buffer);
+  uart0_tx_start();
   return;
 }
 
