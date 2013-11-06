@@ -6,7 +6,8 @@ void main() {
   char *param2 = (char *)malloc(16);
   char *param3 = (char *)malloc(16);
   char *param4 = (char *)malloc(16);
-  
+  int i = 0, r;
+
   param1[0] = '\0';
   param2[0] = '\0';
   param3[0] = '\0';
@@ -17,5 +18,11 @@ void main() {
   printf("param2 = %s\n", param2);
   printf("param3 = %s\n", param3);
   printf("param4 = %s\n", param4);
+
+  for(i = 0; i < 5; i++) {
+	r = random();
+	printf("random() = %d\n", r);
+  }
+
   exit(0);
 }

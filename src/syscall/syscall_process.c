@@ -46,16 +46,16 @@ long sys_params(char *param1, char *param2, char *param3, char *param4) {
   return 0;
 }
 
+unsigned long noise = 0; /* random seed */
 unsigned long sys_random() {
-  static unsigned long seed = 0;
 
-  if (0 == seed)
-	seed = jiffies;
+  if (0 == noise)
+	noise = jiffies;
 
-  seed *= jiffies;
+  noise *= jiffies;
 
-  seed %= 32768;
+  noise %= 32768;
   
-  return seed;
+  return noise;
 }
 
