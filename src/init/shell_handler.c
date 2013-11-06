@@ -304,6 +304,94 @@ void handle_cmd_log(char *primary_parameter, char **secondary_parameters) {
 }
 
 void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
+  int i = 0;
+  for (i = 0; i < 4; i++)
+	if (NULL != secondary_parameters[i]) {
+	  printu("wrong number of parameters\n");
+	  return;
+	}
+
+  if (NULL == primary_parameter) {
+	printu("Usage: help <command>\n");
+	printu("Get help of all shell commands or specified command.\n");
+	printu("Supported commands:\n");
+	printu("    elfs <file> [parameters...]       execute ELF format file in synchronized mode\n");
+	printu("    elfa <file> [parameters...]       execute ELF format file in asynchronized mode\n");
+	printu("    elf  <file> [parameters...]       same as 'elfs' command\n");
+	printu("    tree                              display tree view of file system\n");
+	printu("    ls                                same as 'tree' command\n");
+	printu("    jiffies                           display jiffies/ticks since system start\n");
+	printu("    cat  <file>                       dump content of specified file\n");
+	printu("    kmsg                              dump kernel log\n");
+	printu("    ps                                display live process information\n");
+	printu("    kill <pid >                       terminate specified process\n");
+	printu("    log  [type] [level]               enable kernel log types and levels\n");
+	printu("    help [command]                    print help information\n");
+  } else {
+	char *cmd = primary_parameter;
+	if (0 == strcmp(cmd, "elf")) {
+	  printu("Usage: elf <file> [param1] [param2] [param3] [param4]\n");
+	  printu("Execute ELF format file in synchronized mode.\n");
+	} else if (0 == strcmp(cmd, "elfs")) {
+	  printu("Usage: elfs <file> [param1] [param2] [param3] [param4]\n");
+	  printu("Execute ELF format file in synchronized mode.\n");
+	} else if (0 == strcmp(cmd, "elfa")) {
+	  printu("Usage: elfa <file> [param1] [param2] [param3] [param4]\n");
+	  printu("Execute ELF format file in asynchronized mode.\n");
+	} else if (0 == strcmp(cmd, "ls")) {
+	  printu("Usage: ls\n");
+	  printu("Display tree view of file system.\n");
+	} else if (0 == strcmp(cmd, "tree")) {
+	  printu("Usage: tree\n");
+	  printu("Display tree view of file system.\n");
+	} else if (0 == strcmp(cmd, "jiffies")) {
+	  printu("Usage: jiffies\n");
+	  printu("Display jiffies/ticks since system start.\n");
+	} else if (0 == strcmp(cmd, "cat")) {
+	  printu("Usage: cat <file>\n");
+	  printu("Dump content of specified file.\n");
+	} else if (0 == strcmp(cmd, "kmsg")) {
+	  printu("Usage: kmsg\n");
+	  printu("Dump kernel log to screen.\n");
+	} else if (0 == strcmp(cmd, "ps")) {
+	  printu("Usage: ps\n");
+	  printu("Display live process information.\n");
+	} else if (0 == strcmp(cmd, "kill")) {
+	  printu("Usage: kill <pid>\n");
+	  printu("Terminate specified process by PID.\n");
+	} else if (0 == strcmp(cmd, "log")) {
+	  printu("Usage: log [log types] [log levels]\n");
+	  printu("Enable kernel log types and levels, or display enabled log if no parameter.\n");
+	  printu("Supported log type:\n");
+	  printu("  i - initialization\n");
+	  printu("  m - memory management\n");
+	  printu("  p - process management\n");
+	  printu("  q - interrupt(IRQ) handling\n");
+	  printu("  f - file system management\n");
+	  printu("Supported log level:\n");
+	  printu("  e - error\n");
+	  printu("  w - warning\n");
+	  printu("  n - information\n");
+	  printu("  0 - level 0\n");
+	  printu("  1 - level 1\n");
+	  printu("  2 - level 2\n");
+	  printu("  3 - level 3\n");
+	  printu("  4 - level 4\n");
+	  printu("  5 - level 5\n");
+	  printu("  6 - level 6\n");
+	  printu("  7 - level 7\n");
+	  printu("  8 - level 8\n");
+	  printu("  9 - level 9\n");
+	  printu("  Read user manual for content of each log level\n");
+	  printu("Example: log ipq we261\n");
+	} else if (0 == strcmp(cmd, "help")) {
+	  printu("Usage: help [command]\n");
+	  printu("Print help information.\n");
+	} else {
+	  printu("unknown command\n");
+	}
+  }
+
   return;
 }
 
