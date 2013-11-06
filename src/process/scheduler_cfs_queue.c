@@ -117,12 +117,11 @@ void cfs_queue_dump() {
   struct sched_entity *current;
   struct task_struct* task = NULL;
 
-  printu("total %d threads: \n(state: 1/ready, 2/running, 3/waiting, 4/dead)\n", cfs_queue_size());
+  printu("totally %d threads: \n(state: 1/ready, 2/running, 3/waiting, 4/dead)\n", cfs_queue_size());
   list_for_each(pos, head) {
 	current = list_entry(pos, struct sched_entity, queue_entry);
-	task = 	container_of(current, struct task_struct, sched_en);
-	printu("  pid: %d, state: %d, vruntime: %d\n", task->pid, current->state, current->vruntime);
-	//printu("  pid: %d, state: %d, vruntime: %d, file: %s\n", task->pid, current->state, current->vruntime, ((NULL == task->elf_file_name)?("null"):(task->elf_file_name)));
+	task = container_of(current, struct task_struct, sched_en);
+	printu("  pid: %d,  state: %d,  vruntime: %d,  file: %s\n", task->pid, current->state, (int)current->vruntime, task->elf_file_name?task->elf_file_name:"null");
   }
   return;
 }
