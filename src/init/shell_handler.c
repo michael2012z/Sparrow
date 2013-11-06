@@ -58,6 +58,7 @@ void handle_cmd_elf(char *primary_parameter, char **secondary_parameters) {
 
 void handle_cmd_elfa(char *primary_parameter, char **secondary_parameters) {
   if (NULL == primary_parameter) {
+	printu("executable file not specified\n");
 	// print help
   } else {
 	printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %s\n", __func__, primary_parameter);

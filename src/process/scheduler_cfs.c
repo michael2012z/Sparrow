@@ -90,6 +90,7 @@ static struct task_struct * pick_next_task_cfs () {
 	task_en->continuous_ticks = 0;
 	if (PROCESS_STATE_READY == task_en->state) {
 	  task_en->state = PROCESS_STATE_RUNNING;
+	  task_en->vruntime = min_vruntime;
 	  return container_of(task_en, struct task_struct, sched_en);
 	} else if (PROCESS_STATE_WAITING == task_en->state) {
 	  cfs_queue_enqueue(task_en);

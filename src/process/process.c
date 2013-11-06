@@ -44,6 +44,7 @@ static struct task_struct *create_launch_kernel_task() {
 
   task->elf_file_name = NULL;
   task->sched_en.state = PROCESS_STATE_RUNNING;
+  task->sched_en.blocked_pid = -1;
   task->sched_en.blocking_pid = -1;
   task->stack = (void *)&init_thread_union;
 
@@ -88,6 +89,7 @@ int create_kernel_thread(int (*fn)(void *)) {
 
   task->elf_file_name = NULL;
   task->sched_en.state = PROCESS_STATE_READY;
+  task->sched_en.blocked_pid = -1;
   task->sched_en.blocking_pid = -1;
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
@@ -140,6 +142,7 @@ int create_user_thread(int (*fn)(char *), char *elf_file_name, char **parameters
 
   task->elf_file_name = NULL;
   task->sched_en.state = PROCESS_STATE_READY;
+  task->sched_en.blocked_pid = -1;
   task->sched_en.blocking_pid = -1;
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
@@ -196,6 +199,7 @@ int create_process(struct file *filep) {
 
   task->elf_file_name = NULL;
   task->sched_en.state = PROCESS_STATE_READY;
+  task->sched_en.blocked_pid = -1;
   task->sched_en.blocking_pid = -1;
   task->stack = (void *)kmalloc(PAGE_SIZE*2);
 
