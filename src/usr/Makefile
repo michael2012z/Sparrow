@@ -1,7 +1,7 @@
 
 CFLAGS:= -I../sdk/glibc/inc
 
-DEMOS := demo_1 demo_2 demo_3 demo_4 demo_5 demo_6 demo_7 demo_8 demo_9
+DEMOS := demo_1 demo_2 demo_3 demo_4 demo_5 demo_6 demo_7 demo_8 demo_9 sudoku
 LISTFS:= ListFS.fs
 
 all: $(LISTFS)
@@ -47,6 +47,11 @@ demo_9: demo_9.c ../sdk/glibc/lib/glibc.so
 	$(CC) $(CFLAGS) -nostdlib -c demo_9.c -o demo_9.o
 	$(CC) -nostdlib demo_9.o ../sdk/glibc/lib/glibc.so -o demo_9 -lgcc
 	cp -f demo_9 ./fs_root/fs/
+
+sudoku: sudoku.c ../sdk/glibc/lib/glibc.so
+	$(CC) $(CFLAGS) -nostdlib -c sudoku.c -o sudoku.o
+	$(CC) -nostdlib sudoku.o ../sdk/glibc/lib/glibc.so -o sudoku -lgcc
+	cp -f sudoku ./fs_root/fs/
 
 ListFS.fs:
 	python ListFSArchiver.py
