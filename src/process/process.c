@@ -256,11 +256,21 @@ int process_cleaner(void *unused) {
 	struct sched_entity *en;
 	struct task_struct* task;
 	while(!list_empty(zombie_queue)) {
+	  int i;
 	  first = zombie_queue->next;
 	  list_del(first);
 	  en = container_of(first, struct sched_entity, queue_entry);
 	  task = container_of(en, struct task_struct, sched_en);
 	  // delete task data
+	  if (task->stack)
+		kfree(task->stack);
+	  if (task->elf_file_name)
+		kfree(task->elf_file_name);
+	  for (i = 0; i < 4; i++)
+		if (task->parameters[i])
+		  kfree(task->parameters[i]);
+
+	  kfree(task);
 	}
 	exception_disable();
 	schedule();
