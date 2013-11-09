@@ -6,7 +6,12 @@
 
 /* We assume the IRQ_TIMER0..IRQ_TIMER4 range is continuous. */
 
-static void s3c_irq_timer_mask(unsigned int irq)
+static void vic_timer_irq_handle(unsigned int irq) {
+  unsigned int timer_irq = irq - IRQ_TIMER0_VIC + IRQ_TIMER0;
+  generic_handle_irq(timer_irq);  
+}
+
+static void timer_irq_mask(unsigned int irq)
 {
 	unsigned int reg = __raw_readl(S3C64XX_TINT_CSTAT);
 	reg &= 0x1f;  /* mask out pending interrupts */
@@ -14,7 +19,7 @@ static void s3c_irq_timer_mask(unsigned int irq)
 	__raw_writel(S3C64XX_TINT_CSTAT, reg);
 }
 
-static void s3c_irq_timer_unmask(unsigned int irq)
+static void timer_irq_unmask(unsigned int irq)
 {
 	unsigned int reg = __raw_readl(S3C64XX_TINT_CSTAT);
 	reg &= 0x1f;  /* mask out pending interrupts */
@@ -22,7 +27,7 @@ static void s3c_irq_timer_unmask(unsigned int irq)
 	__raw_writel(S3C64XX_TINT_CSTAT, reg);
 }
 
-static void s3c_irq_timer_ack(unsigned int irq)
+static void timer_irq_ack(unsigned int irq)
 {
 	unsigned int reg = __raw_readl(S3C64XX_TINT_CSTAT);
 	reg &= 0x1f;
@@ -30,15 +35,15 @@ static void s3c_irq_timer_ack(unsigned int irq)
 	__raw_writel(S3C64XX_TINT_CSTAT, reg);
 }
 
-static struct irq_chip s3c_irq_timer = {
-	.name		= "s3c-timer",
-	.mask		= s3c_irq_timer_mask,
-	.unmask		= s3c_irq_timer_unmask,
-	.ack		= s3c_irq_timer_ack,
-};
+static void timer_irq_handle(unsigned int irq)
+{
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, irq = %d\n", __func__, irq);
+  on_timer();
+}
 
 
-static void __init s3c6410_timer_setup(int timer_irq) {
+
+static void __init timer_setup(int timer_irq) {
   unsigned long tcon, tcfg0, tcfg1, tcnt;
 
   printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, timer_irq = %d\n", __func__, timer_irq);
@@ -73,48 +78,31 @@ static void __init s3c6410_timer_setup(int timer_irq) {
 }
 
 
-/*
- * IRQ handler for the timer
- */
-static irqreturn_t
-s3c6410_timer_interrupt(int irq, void *dev_id)
+static void __init timer_irq_init(unsigned int parent_irq, unsigned int timer_irq)
 {
-  /*
-	timer_tick();
-  */
-  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s, irq = %d\n", __func__, irq);
-  on_timer();
-  return IRQ_HANDLED;
+  struct irq_handler *handler;
+
+  /* main irq handler */
+  handler = irq_to_handler(parent_irq);
+  handler->handle = vic_timer_irq_handle;
+
+  /* sub irq handler */
+  handler = irq_to_handler(timer_irq);
+  handler->irq = timer_irq;
+  handler->mask = timer_irq_mask;
+  handler->ack = timer_irq_ack;
+  handler->handle = timer_irq_handle;
+  handler->unmask = timer_irq_unmask;
 }
 
-static struct irqaction s3c6410_timer_irq = {
-	.name		= "S3C6410 Timer Tick",
-	.flags		= IRQF_DISABLED | IRQF_TIMER | IRQF_IRQPOLL,
-	.handler	= s3c6410_timer_interrupt,
-};
-
-
-/**
- * s3c_init_vic_timer_irq() - initialise timer irq chanined off VIC.\
- * @parent_irq: The parent IRQ on the VIC for the timer.
- * @timer_irq: The IRQ to be used for the timer.
- *
- * Register the necessary IRQ chaining and support for the timer IRQs
- * chained of the VIC.
- */
-void __init s3c_init_timer_irq(unsigned int parent_irq, unsigned int timer_irq)
-{
-  struct irq_desc *parent_desc = irq_to_desc(parent_irq);
-
-  parent_desc->handler_data = (void *)timer_irq;
-
-  set_irq_chip(timer_irq, &s3c_irq_timer);
-  set_irq_handler(timer_irq, handle_level_irq);
-  setup_irq(timer_irq, &s3c6410_timer_irq);
+void __init timer_irq_inits() {
+  timer_irq_init(IRQ_TIMER0_VIC, IRQ_TIMER0);
+  timer_irq_init(IRQ_TIMER1_VIC, IRQ_TIMER1);
+  timer_irq_init(IRQ_TIMER2_VIC, IRQ_TIMER2);
+  timer_irq_init(IRQ_TIMER3_VIC, IRQ_TIMER3);
 }
-
 
 void __init arm_init_timer() {
-  s3c6410_timer_setup(IRQ_TIMER4);
-  s3c_irq_timer_unmask(IRQ_TIMER4);
+  timer_setup(IRQ_TIMER4);
+  timer_irq_unmask(IRQ_TIMER4);
 }

@@ -89,7 +89,7 @@ tsk	.req	r9		@ current thread_info
 /*
  * Interrupt handling.  Preserves r7, r8, r9
  */
-	.macro	irq_handler
+	.macro	handle_irq
 	get_irqnr_preamble r5, lr
 1:	get_irqnr_and_base r0, r6, r5, lr
 	movne	r1, sp
@@ -299,7 +299,7 @@ ENDPROC(__pabt_invalid)
 	.align	5
 __irq_svc:
 	svc_entry
-	irq_handler
+	handle_irq
 	bl check_and_schedule
 	ldr	r4, [sp, #S_PSR]		@ irqs are already disabled
 	svc_exit r4				@ return from exception
@@ -311,7 +311,7 @@ ENDPROC(__irq_svc)
 __irq_usr:
 	usr_entry
 	get_thread_info tsk
-	irq_handler
+	handle_irq
 	bl check_and_schedule	
 	mov	why, #0
 	b	ret_to_user

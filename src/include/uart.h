@@ -5,10 +5,10 @@
  * use the space between the ISA and S3C main interrupts. Note, these
  * are not in the same order as the S3C24XX series! */
 
-#define IRQ_S3CUART_BASE0	(16)
-#define IRQ_S3CUART_BASE1	(20)
-#define IRQ_S3CUART_BASE2	(24)
-#define IRQ_S3CUART_BASE3	(28)
+#define IRQ_S3CUART_BASE0	(64)
+#define IRQ_S3CUART_BASE1	(68)
+#define IRQ_S3CUART_BASE2	(72)
+#define IRQ_S3CUART_BASE3	(76)
 
 #define UART_IRQ_RXD		(0)
 #define UART_IRQ_ERR		(1)

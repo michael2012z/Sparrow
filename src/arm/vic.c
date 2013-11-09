@@ -3,27 +3,27 @@
 #include <irq.h>
 #include "vic.h"
 
-/**
- * vic_init2 - common initialisation code
- * @base: Base of the VIC.
- *
- * Common initialisation code for registeration
- * and resume.
-*/
 static void vic_init2(void *base)
 {
 	int i;
-
 	for (i = 0; i < 16; i++) {
 		void *reg = base + VIC_VECT_CNTL0 + (i * 4);
 		__raw_writel(reg, VIC_VECT_CNTL_ENABLE | i);
 	}
 }
 
+static void* get_vic_base(unsigned int irq) {
+  if (irq < (IRQ_VIC0_BASE + 32))
+	return (void *)VA_VIC0;
+  else if (irq < (IRQ_VIC1_BASE + 32))
+	return (void *)VA_VIC1;
+  else 
+	return (void *)0;
+}
 
 static void vic_ack_irq(unsigned int irq)
 {
-	void *base = get_irq_chip_data(irq);
+	void *base = get_vic_base(irq);
 	irq &= 31;
 	__raw_writel(base + VIC_INT_ENABLE_CLEAR, 1 << irq);
 	/* moreover, clear the soft-triggered, in case it was the reason */
@@ -32,26 +32,23 @@ static void vic_ack_irq(unsigned int irq)
 
 static void vic_mask_irq(unsigned int irq)
 {
-	void *base = get_irq_chip_data(irq);
+	void *base = get_vic_base(irq);
 	irq &= 31;
 	__raw_writel(base + VIC_INT_ENABLE_CLEAR, 1 << irq);
 }
 
 static void vic_unmask_irq(unsigned int irq)
 {
-	void *base = get_irq_chip_data(irq);
+	void *base = get_vic_base(irq);
 	irq &= 31;
 	__raw_writel(base + VIC_INT_ENABLE, 1 << irq);
 }
 
-#define vic_set_wake 0
-
-static struct irq_chip vic_chip = {
-	.name		= "VIC",
-	.ack		= vic_ack_irq,
-	.mask		= vic_mask_irq,
-	.unmask		= vic_unmask_irq,
-};
+/* default irq handler, to be replaced */
+static void vic_handle_irq(unsigned int irq)
+{
+  return;
+}
 
 static void __init vic_disable(void *base)
 {
@@ -77,18 +74,19 @@ static void __init vic_enable(void *base)
   }
 }
 
-static void __init vic_set_irq_sources(void *base,
-				unsigned int irq_start, unsigned int vic_sources)
+static void __init vic_set_irq_sources(void *base, unsigned int irq_start, unsigned int vic_sources)
 {
 	unsigned int i;
 
 	for (i = 0; i < 32; i++) {
 		if (vic_sources & (1 << i)) {
 			unsigned int irq = irq_start + i;
-
-			set_irq_chip(irq, &vic_chip);
-			set_irq_chip_data(irq, base);
-			set_irq_handler(irq, handle_level_irq);
+			struct irq_handler *handler = irq_to_handler(irq);
+			handler->irq = i;
+			handler->mask = vic_mask_irq;
+			handler->ack = vic_ack_irq;
+			handler->handle = vic_handle_irq;
+			handler->unmask = vic_unmask_irq;
 		}
 	}
 }
@@ -100,10 +98,8 @@ static void __init vic_set_irq_sources(void *base,
  * @vic_sources: bitmask of interrupt sources to allow
  * @resume_sources: bitmask of interrupt sources to allow for resume
  */
-void __init vic_init(void *base, unsigned int irq_start,
-		     unsigned int vic_sources)
+void __init vic_init(void *base, unsigned int irq_start, unsigned int vic_sources)
 {
-	/* Disable all interrupts initially. */
 	vic_disable(base);
 
 	vic_init2(base);

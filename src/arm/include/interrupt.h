@@ -50,7 +50,7 @@
 #define VA_VIC1			(S3C_VA_IRQ + 0x100000)
 
 
-#define S3C_IRQ_OFFSET	(32)
+#define S3C_IRQ_OFFSET	(0)
 
 #define S3C_IRQ(x)	((x) + S3C_IRQ_OFFSET)
 
@@ -138,7 +138,7 @@
 #define IRQ_TC			IRQ_PENDN
 #define IRQ_ADC			S3C64XX_IRQ_VIC1(31)
 
-#define S3C64XX_TIMER_IRQ(x)	S3C_IRQ(64 + (x))
+#define S3C64XX_TIMER_IRQ(x)	S3C_IRQ(80 + (x))
 
 #define IRQ_TIMER0		S3C64XX_TIMER_IRQ(0)
 #define IRQ_TIMER1		S3C64XX_TIMER_IRQ(1)
@@ -147,10 +147,9 @@
 #define IRQ_TIMER4		S3C64XX_TIMER_IRQ(4)
 
 #ifndef __ASSEMBLY__
-void __init vic_init(void *base, unsigned int irq_start,
-					 unsigned int vic_sources);
-void __init s3c_init_timer_irq(unsigned int parent_irq, unsigned int timer_irq);
-
+void __init vic_init(void *base, unsigned int irq_start, unsigned int vic_sources);
+void __init timer_irq_inits();
+void __init uart_irq_inits();
 void arm_init_irq();
 #endif
 

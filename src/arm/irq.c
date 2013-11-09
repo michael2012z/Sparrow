@@ -64,10 +64,10 @@ static void __init s3c6410_init_irq(void)
   vic_init((void *)VA_VIC1, IRQ_VIC1_BASE, vic1_valid);
 
   /* initialize timer irq */
-  s3c_init_timer_irq(IRQ_TIMER4_VIC, IRQ_TIMER4);
+  timer_irq_inits();
 
   /* initialize uart irq */
-  s3c_init_uart_irqs();
+  uart_irq_inits();
 
 }
 
