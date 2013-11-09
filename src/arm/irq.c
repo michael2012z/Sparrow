@@ -66,9 +66,10 @@ static void __init s3c6410_init_irq(void)
   /* initialize timer irq */
   timer_irq_inits();
 
+  //  printk(PR_SS_IRQ, PR_LVL_INF, "%s: initialising interrupts 3\n", __func__);
+
   /* initialize uart irq */
   uart_irq_inits();
-
 }
 
 

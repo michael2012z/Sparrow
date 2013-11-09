@@ -19,11 +19,11 @@ SECTIONS
  . = ALIGN(8);
  *(.text)
  }
- . = ALIGN(16384);
+ . = ALIGN(4096);
  __data_loc = .;
  .data : AT(__data_loc) {
  _data = .; /* address in memory */
- . = ALIGN(16384); *(.data..init_task)
+ . = ALIGN(4096); *(.data..init_task)
  }
  . = ALIGN(0);
   __bss_start = .; 

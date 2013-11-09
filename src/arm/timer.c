@@ -8,6 +8,7 @@
 
 static void vic_timer_irq_handle(unsigned int irq) {
   unsigned int timer_irq = irq - IRQ_TIMER0_VIC + IRQ_TIMER0;
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: irq = %d, timer_irq = %d\n", __func__, irq, timer_irq);
   generic_handle_irq(timer_irq);  
 }
 
@@ -84,6 +85,7 @@ static void __init timer_irq_init(unsigned int parent_irq, unsigned int timer_ir
 
   /* main irq handler */
   handler = irq_to_handler(parent_irq);
+  handler->irq = parent_irq;
   handler->handle = vic_timer_irq_handle;
 
   /* sub irq handler */
@@ -96,10 +98,13 @@ static void __init timer_irq_init(unsigned int parent_irq, unsigned int timer_ir
 }
 
 void __init timer_irq_inits() {
+  /*
   timer_irq_init(IRQ_TIMER0_VIC, IRQ_TIMER0);
   timer_irq_init(IRQ_TIMER1_VIC, IRQ_TIMER1);
   timer_irq_init(IRQ_TIMER2_VIC, IRQ_TIMER2);
   timer_irq_init(IRQ_TIMER3_VIC, IRQ_TIMER3);
+  */
+  timer_irq_init(IRQ_TIMER4_VIC, IRQ_TIMER4);
 }
 
 void __init arm_init_timer() {

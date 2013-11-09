@@ -44,7 +44,7 @@ static void uart_irq_handle(unsigned int irq)
 
   regs = uart_irqs[uart_index].regs;
   
-  if (0x10 == irq) { /* data received */
+  if (UART_IRQ_RXD == (irq & 0x0f)) { /* data received */
 	int n, error;
 	char ch;
 
@@ -63,7 +63,7 @@ static void uart_irq_handle(unsigned int irq)
 	  uart_input_char(ch);
 	  
 	}
-  } else if (0x12 == irq) { /* data to transmit */
+  } else if (UART_IRQ_TXD == (irq & 0x0f)) { /* data to transmit */
 	if (ring_buffer_enabled)
 	  while(!ring_buffer_empty(user_ring_buffer)) {
 		if (__raw_readl(regs + S3C64XX_UFSTAT)) /* if there is error */
@@ -103,6 +103,7 @@ static void uart_irq_unmask(unsigned int irq)
 	unsigned int bit = uart_irq_bitmap(irq);
 	u32 reg;
 
+	/* unmask of TXD irqs are triggered by print */
 	if (UART_IRQ_TXD == (irq & 0x0f))
 	  return;
 
@@ -112,7 +113,7 @@ static void uart_irq_unmask(unsigned int irq)
 }
 
 void arm_uart0_tx_start() {
-  unsigned int irq = 0x12;
+  unsigned int irq = IRQ_S3CUART_BASE0 + UART_IRQ_TXD;
   unsigned int regs = uart_irq_base(irq);
   unsigned int bit = uart_irq_bitmap(irq);
   u32 reg;
@@ -141,7 +142,7 @@ static void vic_uart_irq_handle(unsigned int irq)
   pend = __raw_readl(uirq->regs + S3C64XX_UINTP);
   base = uirq->base_irq;
   
-  //  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: pend = %x, base = %x\n", __func__, pend, base);
+  //  printk(PR_SS_IRQ, PR_LVL_DBG2, "%s: irq = %d, pend = %x, base = %x\n", __func__, irq, pend, base);
   
   if (pend & (1 << 0))
 	generic_handle_irq(base);
@@ -155,36 +156,36 @@ static void vic_uart_irq_handle(unsigned int irq)
 
 static void __init uart_irq_init(struct s3c_uart_irq *uirq)
 {
-	struct irq_handler *handler = irq_to_handler(uirq->parent_irq);
-	unsigned int reg_base = uirq->regs;
-	unsigned int irq;
-	int offs;
-
-	//	printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: reg_base = %x\n", __func__, reg_base);
-
-	/* replace main irq handle function */
-	handler->handle = vic_uart_irq_handle;
-
-	/* mask all interrupts at the start. */
-	__raw_writel(reg_base + S3C64XX_UINTM, 0xf);
-
-	/* set each sub irq handler under main */
-	for (offs = 0; offs < 3; offs++) {
-	  handler = irq_to_handler(irq);
-	  irq = uirq->base_irq + offs;
-	  handler->irq = irq;
-	  handler->mask = uart_irq_mask;
-	  handler->ack = uart_irq_ack;
-	  handler->handle = uart_irq_handle;
-	  handler->unmask = uart_irq_unmask;
-	}
+  struct irq_handler *handler;
+  unsigned int irq;
+  int offs;
+  
+  printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: parent_irq = %d, base_irq = %d\n", __func__, uirq->parent_irq, uirq->base_irq);
+  
+  /* replace main irq handle function */
+  handler = irq_to_handler(uirq->parent_irq);;
+  handler->handle = vic_uart_irq_handle;
+  
+  /* mask all interrupts at the start. */
+  __raw_writel(uirq->regs + S3C64XX_UINTM, 0xf);
+  
+  /* set each sub irq handler under main */
+  for (offs = 0; offs < 3; offs++) {
+	irq = uirq->base_irq + offs;
+	handler = irq_to_handler(irq);
+	handler->irq = irq;
+	handler->mask = uart_irq_mask;
+	handler->ack = uart_irq_ack;
+	handler->handle = uart_irq_handle;
+	handler->unmask = uart_irq_unmask;
+  }
 }
 
 void __init uart_irq_inits() {
   struct s3c_uart_irq *irq = uart_irqs;
   unsigned int nr_irqs = ARRAY_SIZE(uart_irqs);
 
-  //  printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: irq = %x, nr_irqs = %x\n", __func__, irq, nr_irqs);
+  printk(PR_SS_IRQ, PR_LVL_DBG0, "%s: irq = %x, nr_irqs = %x\n", __func__, irq, nr_irqs);
 
   for (; nr_irqs > 0; nr_irqs--, irq++)
 	uart_irq_init(irq);

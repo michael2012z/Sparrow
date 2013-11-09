@@ -281,13 +281,13 @@ int log_type_ini = 1;
 int log_type_fs = 0;
 int log_type_mm = 0;
 int log_type_proc = 0;
-int log_type_irq = 1;
+int log_type_irq = 0;
 
 int log_level_err = 1;
 int log_level_inf = 1;
 int log_level_wrn = 1;
-int log_level_0 = 1;
-int log_level_1 = 1;
+int log_level_0 = 0;
+int log_level_1 = 0;
 int log_level_2 = 0;
 int log_level_3 = 0;
 int log_level_4 = 0;

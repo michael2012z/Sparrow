@@ -18,6 +18,8 @@ struct irq_handler *irq_to_handler(unsigned int irq)
 extern unsigned long noise; /* random seed */
 void generic_handle_irq(unsigned int irq) {
   struct irq_handler *handler = irq_to_handler(irq);
+
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: irq = %d\n", __func__, irq);
   
   if (irq < 64)
 	noise++;

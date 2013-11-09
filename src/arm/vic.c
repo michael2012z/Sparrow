@@ -2,6 +2,7 @@
 #include <interrupt.h>
 #include <irq.h>
 #include "vic.h"
+#include <printk.h>
 
 static void vic_init2(void *base)
 {
@@ -25,6 +26,9 @@ static void vic_ack_irq(unsigned int irq)
 {
 	void *base = get_vic_base(irq);
 	irq &= 31;
+
+	printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: base = %x, irq = %d\n", __func__, (unsigned int)base, irq);
+
 	__raw_writel(base + VIC_INT_ENABLE_CLEAR, 1 << irq);
 	/* moreover, clear the soft-triggered, in case it was the reason */
 	__raw_writel(base + VIC_INT_SOFT_CLEAR, 1 << irq);
@@ -34,6 +38,7 @@ static void vic_mask_irq(unsigned int irq)
 {
 	void *base = get_vic_base(irq);
 	irq &= 31;
+	printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: base = %x, irq = %d\n", __func__, (unsigned int)base, irq);
 	__raw_writel(base + VIC_INT_ENABLE_CLEAR, 1 << irq);
 }
 
@@ -41,12 +46,14 @@ static void vic_unmask_irq(unsigned int irq)
 {
 	void *base = get_vic_base(irq);
 	irq &= 31;
+	printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: base = %x, irq = %d\n", __func__, (unsigned int)base, irq);
 	__raw_writel(base + VIC_INT_ENABLE, 1 << irq);
 }
 
 /* default irq handler, to be replaced */
 static void vic_handle_irq(unsigned int irq)
 {
+  printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: irq = %d\n", __func__, irq);
   return;
 }
 
