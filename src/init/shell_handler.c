@@ -32,21 +32,27 @@ static int user_thread_seed(char *elf_file_name) {
 
 void handle_cmd_elfs(char *primary_parameter, char **secondary_parameters) {
   if (NULL == primary_parameter) {
-	// print help
+	printu("executable file not specified\n");
   } else {
-	int pid = -1;
-	struct task_struct* new_task = NULL;
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %s\n", __func__, primary_parameter);
-	pid = create_user_thread(user_thread_seed, primary_parameter, secondary_parameters);
-	// change current process state to waiting
-	new_task = find_task_by_pid(pid);
-	new_task->sched_en.blocked_pid = current_task->pid;
-	current_task->sched_en.state = PROCESS_STATE_WAITING;
-	current_task->sched_en.waiting_type = PROCESS_WAITING_TYPE_THREAD;
-	current_task->sched_en.blocking_pid = pid;
-	exception_disable();
-	schedule();
-	exception_enable();
+	vfs_node* file;
+	file = vfs_find_node(primary_parameter);
+	if (NULL == file)
+	  printu("file not exist\n");
+	else {
+	  int pid = -1;
+	  struct task_struct* new_task = NULL;
+	  printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %s\n", __func__, primary_parameter);
+	  pid = create_user_thread(user_thread_seed, primary_parameter, secondary_parameters);
+	  // change current process state to waiting
+	  new_task = find_task_by_pid(pid);
+	  new_task->sched_en.blocked_pid = current_task->pid;
+	  current_task->sched_en.state = PROCESS_STATE_WAITING;
+	  current_task->sched_en.waiting_type = PROCESS_WAITING_TYPE_THREAD;
+	  current_task->sched_en.blocking_pid = pid;
+	  exception_disable();
+	  schedule();
+	  exception_enable();
+	}
   }
   return;
 }
@@ -61,8 +67,12 @@ void handle_cmd_elfa(char *primary_parameter, char **secondary_parameters) {
 	printu("executable file not specified\n");
 	// print help
   } else {
-	printk(PR_SS_INI, PR_LVL_DBG5, "%s: primary_parameter = %s\n", __func__, primary_parameter);
-	create_user_thread(user_thread_seed, primary_parameter, secondary_parameters);
+	vfs_node* file;
+	file = vfs_find_node(primary_parameter);
+	if (NULL == file)
+	  printu("file not exist\n");
+	else
+	  create_user_thread(user_thread_seed, primary_parameter, secondary_parameters);
   }
   return;
 }

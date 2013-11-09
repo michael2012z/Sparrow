@@ -40,7 +40,7 @@ asm(	".pushsection .text\n"
 extern struct task_struct *current_task;
 
 void kernel_thread_exit(void) {
-  printk(PR_SS_INI, PR_LVL_ERR, "%s: ---------------------------------------------\n", __func__); 
+  printk(PR_SS_PROC, PR_LVL_DBG2, "%s: pid = %x\n", __func__, current_task->pid); 
   current_task->sched_en.state = PROCESS_STATE_DEAD;
   while(1);
 }
