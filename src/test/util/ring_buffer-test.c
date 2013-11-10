@@ -70,7 +70,6 @@ static void test_case_04(void) {
   ring_buffer_reset(ring);
   for(i = 0; i < RING_BUFFER_SIZE; i++) {
 	ring_buffer_put_char(ring, 'c');
-	ring_buffer_check(ring);	
   }
   CU_ASSERT(ring->start == (ring->upper));
   CU_ASSERT(ring->end == (ring->upper));
@@ -78,7 +77,6 @@ static void test_case_04(void) {
 
   for(i = 0; i < RING_BUFFER_SIZE; i++) {
 	ring_buffer_get_char(ring);
-	ring_buffer_check(ring);	
   }
   CU_ASSERT(ring->start == (ring->upper));
   CU_ASSERT(ring->end == (ring->upper));
@@ -94,16 +92,16 @@ static void test_case_05(void) {
   ring_buffer_reset(ring);
   for(i = 0; i < 5*1024; i++) {
 	ring_buffer_put_char(ring, 'c');
-	ring_buffer_check(ring);	
   }
+  ring_buffer_check(ring);	
   CU_ASSERT(ring->start == (ring->upper + 1024));
   CU_ASSERT(ring->end == (ring->upper + 1024));
   CU_ASSERT(ring->circled == 1);
 
   for(i = 0; i < 2*1024; i++) {
 	ring_buffer_get_char(ring);
-	ring_buffer_check(ring);	
   }
+  ring_buffer_check(ring);	
   CU_ASSERT(ring->start == (ring->upper + 3*1024));
   CU_ASSERT(ring->end == (ring->upper + 1024));
   CU_ASSERT(ring->circled == 1);
@@ -118,16 +116,16 @@ static void test_case_06(void) {
   ring_buffer_reset(ring);
   for(i = 0; i < 5*1024; i++) {
 	ring_buffer_put_char(ring, 'c');
-	ring_buffer_check(ring);	
   }
+  ring_buffer_check(ring);	
   CU_ASSERT(ring->start == (ring->upper + 1024));
   CU_ASSERT(ring->end == (ring->upper + 1024));
   CU_ASSERT(ring->circled == 1);
 
   for(i = 0; i < 3*1024; i++) {
 	ring_buffer_get_char(ring);
-	ring_buffer_check(ring);	
   }
+  ring_buffer_check(ring);	
   CU_ASSERT(ring->start == (ring->upper));
   CU_ASSERT(ring->end == (ring->upper + 1024));
   CU_ASSERT(ring->circled == 0);
@@ -142,7 +140,6 @@ static void test_case_07(void) {
   ring_buffer_reset(ring);
   for(i = 0; i < 5*1024; i++) {
 	ring_buffer_put_char(ring, 'c');
-	ring_buffer_check(ring);	
   }
   CU_ASSERT(ring->start == (ring->upper + 1024));
   CU_ASSERT(ring->end == (ring->upper + 1024));
@@ -150,7 +147,6 @@ static void test_case_07(void) {
 
   for(i = 0; i < 4*1024; i++) {
 	ring_buffer_get_char(ring);
-	ring_buffer_check(ring);	
   }
   CU_ASSERT(ring->start == (ring->upper + 1024));
   CU_ASSERT(ring->end == (ring->upper + 1024));
@@ -166,7 +162,6 @@ static void test_case_08(void) {
   ring_buffer_reset(ring);
   for(i = 0; i < 5*1024; i++) {
 	ring_buffer_put_char(ring, 'c');
-	ring_buffer_check(ring);	
   }
   CU_ASSERT(ring->start == (ring->upper + 1024));
   CU_ASSERT(ring->end == (ring->upper + 1024));
@@ -174,7 +169,6 @@ static void test_case_08(void) {
 
   for(i = 0; i < 6*1024; i++) {
 	ring_buffer_get_char(ring);
-	ring_buffer_check(ring);	
   }
   CU_ASSERT(ring->start == (ring->upper + 1024));
   CU_ASSERT(ring->end == (ring->upper + 1024));
@@ -203,14 +197,13 @@ static void ring_buffer_presure_test(struct ring_buffer *ring, int repeat) {
 	  count = random()%64;
 	  while(count--)
 		ring_buffer_put_char(ring, 'x');
-	  ring_buffer_check(ring);
 	} else { /* read */
 	  count = random()%64;
 	  while(count--)
 		ring_buffer_get_char(ring);
-	  ring_buffer_check(ring);
 	}
   }
+  ring_buffer_check(ring);
 
   count = RING_BUFFER_SIZE;
   while(count--)
@@ -248,7 +241,6 @@ static void test_case_13(void) {
 
   for(i = 0; i < 2*1024; i++) {
 	ring_buffer_get_char(ring);
-	ring_buffer_check(ring);	
   }
 
   ring_buffer_reset(user_ring_buffer);

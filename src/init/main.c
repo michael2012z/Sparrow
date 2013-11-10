@@ -11,6 +11,7 @@
 #include <head.h>
 #include <setup.h>
 #include "shell.h"
+#include "logo.h"
 
 extern struct task_struct *current_task;
 
@@ -29,7 +30,7 @@ void __init store_registers() {
   asm("mov %0, r8\n"
 	  : "=r"(_kernel_end)
 	  : );
-  printk(PR_SS_INI, PR_LVL_INF, "kernel_end = %x\n", _kernel_end);
+  //  printk(PR_SS_INI, PR_LVL_INF, "kernel_end = %x\n", _kernel_end);
 }
 
 extern struct file_system_type listfs_file_system_type;
@@ -82,26 +83,30 @@ static void __init health_check(void) {
 }
 
 void __init start_kernel(void) {
+  int i;
+  printu("\n  Sparrow OS, by Michael Z\n");
 
-  printk(PR_SS_INI, PR_LVL_INF, "Sparrow OS, by Michael Z\n");
-
-  printk(PR_SS_INI, PR_LVL_INF, "Enter start_kernel().\n");
-
+  /* print logo */
+  printu("\n");
+  for (i = 0; i < sizeof(logo_l)/sizeof(char *); i++)
+    printu("%s", logo_l[i]);
+  printu("\n");
+  
   store_registers();
 
   cpu_init();
 
-  printk(PR_SS_INI, PR_LVL_INF, "Enter registers stored.\n");
+  printu("  CPU initialized.\n");
 
   exception_disable();
-  printk(PR_SS_INI, PR_LVL_INF, "Enter irq diabled.\n");
+  printu("  IRQ diabled.\n");
 
   health_check();
-  printk(PR_SS_INI, PR_LVL_INF, "Passed health check.\n");
+  printu("  Health check passed.\n");
 
   mm_init();
 
-  printk(PR_SS_INI, PR_LVL_INF, "MM initialization finish.\n");
+  printu("  Memory initialized.\n");
 
   exception_init();
 
@@ -113,35 +118,30 @@ void __init start_kernel(void) {
 
   mount_file_system("ListFS");
 
-  printk(PR_SS_INI, PR_LVL_INF, "FS initialization finish.\n");
+  printu("  File system initialized.\n");
 
   initialize_process();
 
-  printk(PR_SS_INI, PR_LVL_INF, "Process initialization finish.\n");
+  printu("  Process initialized.\n");
 
   rest_init();
-
-  printk(PR_SS_INI, PR_LVL_INF, "Will enable IRQ.\n");
+  printu("  Starting deamons.\n");
 
   init_IRQ();
+
   init_timer();
+  printu("  Timer initialized.\n");
+
   init_uart();
+  printu("  UART initialized.\n");
 
   ring_buffer_init();
+  printu("  Ring-buffer initialized.\n");
 
   exception_enable();
-  printk(PR_SS_INI, PR_LVL_INF, "IRQ initialization finish.\n");
+  printu("  IRQ enabled.\n");
 
-  printk(PR_SS_INI, PR_LVL_INF, "Kernel is running ...\n");
-
-  /*
-  while(1) {
-	//	int i = 0;
-	//	for (i = 0; i < 65535 ; i++){}
-	printk(PR_SS_INI, PR_LVL_INF, "%s : Kernel is running ...\n", __func__);
-	//schedule();
-  }
-  */
+  printu("  Kernel is up.\n");
 
   cpu_idle();
 }

@@ -110,9 +110,9 @@ int __init kernel_shell(void *unused) {
 
   printk(PR_SS_INI, PR_LVL_DBG5, "%s: kernel shell started\n", __func__);
   printu("\n");
-  printu("**********************************************\n");
-  printu("         Sparrow OS default shell\n");
-  printu("**********************************************\n");
+  printu("********************************************************************************\n");
+  printu("                        Sparrow OS default shell\n");
+  printu("********************************************************************************\n");
   printu("\n");
 
   do {
