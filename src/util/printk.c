@@ -19,9 +19,6 @@ typedef char * va_list;
 #define va_arg(ap,t) ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) )
 #define va_end(ap)    ( ap = (va_list)0 )
 
-const char *digits="0123456789abcdef";
-char numbers[68];
-
 static char print_buf[1024];
 
 #define FORMAT_TYPE_MASK	0xff00
@@ -106,6 +103,9 @@ static void __put_char_k(char *p,int num){
 #endif
 
 char *number(char *str, int num,int base,unsigned int flags){
+const char *digits="0123456789abcdef";
+char numbers[68];
+
 	int i=0;
 	int sign=0;
 	

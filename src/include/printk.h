@@ -89,8 +89,6 @@ void printk(int a, int b, const char *fmt, ...);
 void printu(const char *fmt, ...);
 void prints(char *string, int length);
 void print_memory_byte (unsigned long start, unsigned long end);
-void test_printk(void);
-
 void printk_disable();
 void printk_enable();
 
