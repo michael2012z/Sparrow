@@ -21,9 +21,6 @@ void schedule_initialize() {
 
 static void switch_pgd(unsigned long pgd, int pid) {
   /* The second parameter is context id, we don't support it. */
-  //  printk(PR_SS_MM, PR_LVL_DBG9, "%s: pid = %d: dump page table level 1:\n", __func__, pid);  
-  //print_memory_byte(pgd, pgd + 4*PAGE_SIZE);
-  //while(1);
   cpu_v6_switch_mm(__virt_to_phys(pgd), 0);
 }
 
@@ -40,10 +37,7 @@ context_switch(struct task_struct *prev,
 {
   register unsigned long sp asm ("sp");
   printk(PR_SS_PROC, PR_LVL_DBG5, "%s, sp = %x\n", __func__, sp);
-  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, prev = %x, next = %x\n", __func__, prev, next);  
-  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, prev.pgd = %x, next.pgd = %x\n", __func__, prev->mm.pgd, next->mm.pgd);  
   switch_pgd(next->mm.pgd, next->pid);
-  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, sp = %x\n", __func__, sp);
   switch_to(prev, next);
 }
 

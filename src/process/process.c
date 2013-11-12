@@ -10,7 +10,6 @@
 extern unsigned long kernel_pgd;
 extern struct task_struct *current_task;
 extern struct sched_class *scheduler;
-
 struct task_struct *init_kernel_task = NULL;
 
 static struct task_struct *create_launch_kernel_task() {
