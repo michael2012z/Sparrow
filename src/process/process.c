@@ -8,25 +8,8 @@
 #include <exception.h>
 
 extern unsigned long kernel_pgd;
-extern struct list_head *task_list;
 extern struct task_struct *current_task;
 extern struct sched_class *scheduler;
-
-void process_test() {
-  struct file demo_1, demo_2;
-  int pid_1, pid_2;
-
-  demo_1.buf = (void *)0xc4040000;
-  demo_1.size = 33807;
-  demo_2.buf = (void *)0xc4080000;
-  demo_2.size = 33807;
-
-  pid_1 = create_process(&demo_1);
-  printk(PR_SS_PROC, PR_LVL_INF, "process %d created\n", pid_1);
-
-  pid_2 = create_process(&demo_2);
-  printk(PR_SS_PROC, PR_LVL_INF, "process %d created\n", pid_2);
-}
 
 struct task_struct *init_kernel_task = NULL;
 
@@ -185,41 +168,6 @@ int create_user_thread(int (*fn)(char *), char *elf_file_name, char **parameters
   return pid;
 }
 
-int create_process(struct file *filep) {
-  int pid;
-  struct task_struct *task = NULL;
-  pid = allocate_pid();
-  if (pid < 0)
-	return pid;
-  
-  task = (struct task_struct *)kmalloc(sizeof(struct task_struct));
-
-  if (NULL == task)
-	return -1;
-
-  task->elf_file_name = NULL;
-  task->sched_en.state = PROCESS_STATE_READY;
-  task->sched_en.blocked_pid = -1;
-  task->sched_en.blocking_pid = -1;
-  task->stack = (void *)kmalloc(PAGE_SIZE*2);
-
-  task->pid = pid;
-
-  printk(PR_SS_PROC, PR_LVL_DBG3, "%s process %d stack = %x\n", __func__, pid, task->stack);
-
-  INIT_LIST_HEAD(&(task->mm.mmap.list));
-  task->mm.pgd = (unsigned long)kmalloc(PAGE_SIZE * 4);
-  memcpy((void *)task->mm.pgd, (void *)kernel_pgd, PAGE_SIZE * 4);
-
-  INIT_LIST_HEAD(&(task->sched_en.queue_entry));
-
-  load_elf_binary(filep, &task->regs, &task->mm);
-
-  enqueue_task(task, sched_enqueue_flag_new);
-
-  return pid;
-}
-
 int execute_binary(struct task_struct *task, struct file *filep) {
   printk(PR_SS_PROC, PR_LVL_DBG3, "%s: current process: %d\n", __func__, task->pid);
   return load_elf_binary(filep, &(task->regs), &(task->mm));
@@ -230,12 +178,10 @@ void destroy_process(struct task_struct *task) {
   kfree(task);
 }
 
-
 void run_kernel_process(char *init_filename)
 {
   arm_kernel_execve(init_filename, NULL, NULL);
 }
-
 
 
 /* process cleaner */
