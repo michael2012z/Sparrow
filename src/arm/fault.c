@@ -17,14 +17,12 @@ static int do_unknown_fault(unsigned long addr, unsigned int fsr, struct pt_regs
 }
 
 /*
- * bad_mode handles the impossible case in the vectors.  If you see one of
- * these, then it's extremely serious, and could mean you have buggy hardware.
- * It never returns, and never tries to sync.  We hope that we can at least
- * dump out some state information...
+ * bad_mode handles the impossible case in the vectors.
  */
 void bad_mode(struct pt_regs *regs, int reason)
 {
-
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: you are not expected to be here, reason = %d\n", __func__, reason);
+  while(1);
 }
 
 
@@ -47,7 +45,6 @@ void __exception do_invalid_swi(unsigned int code)
 }
 
 
-int g_debug_flag = 0;
 /*
  * Dispatch a data abort to the relevant handler.
  */
@@ -66,7 +63,6 @@ void __exception do_DataAbort(unsigned long addr, unsigned int fsr, struct pt_re
 	break;
   }
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: return\n", __func__);
-  g_debug_flag = 1;
 }
 
 void __exception do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
@@ -105,7 +101,7 @@ void asm_dbg_nail() {
   register unsigned long _ARM_sp asm ("sp");
   register unsigned long _ARM_lr asm ("lr");
   register unsigned long _ARM_pc asm ("pc");
-  //  register unsigned long cpsr asm ("cpsr");
+
   printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r0       = %x\n", __func__, _ARM_r0);
   printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r1       = %x\n", __func__, _ARM_r1);
   printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_r2       = %x\n", __func__, _ARM_r2);
@@ -122,15 +118,6 @@ void asm_dbg_nail() {
   printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_sp       = %x\n", __func__, _ARM_sp);
   printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_lr       = %x\n", __func__, _ARM_lr);
   printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_pc       = %x\n", __func__, _ARM_pc);
-  //  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_cpsr     = %x\n", __func__, cpsr);
-  //  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_cpsr     = %x\n", __func__, cpsr);
-  //  printk(PR_SS_INI, PR_LVL_ERR, "%s: _ARM_ORIG_r0  = %x\n", __func__, _ARM_ORIG_r0);
-
-  // check pmd
-  //  pgd_t *pc_pgd = pgd_offset(((pgd_t *)current_task->mm.pgd), 0x8000);
-  //printk(PR_SS_INI, PR_LVL_ERR, "%s: pc pgd:     %x = %x\n", __func__, pc_pgd, *pc_pgd);  
-
-  //  print_regs(&current_task->regs);
 
   while(1);
 }

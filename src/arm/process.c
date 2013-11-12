@@ -1,3 +1,4 @@
+#include <type.h>
 #include <ptrace.h>
 #include <string.h>
 #include "head.h"
@@ -6,6 +7,14 @@
 #include <type.h>
 #include <process.h>
 #include <vfs.h>
+#include <init_task.h>
+#include <sched.h>
+
+/*
+ * Initial thread structure.
+ */
+union thread_union init_thread_union __init_task_data;
+
 
 void start_thread(struct pt_regs *regs, unsigned long pc, unsigned long sp) {
   //	unsigned long *stack = (unsigned long *)sp;
