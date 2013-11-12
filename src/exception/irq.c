@@ -11,9 +11,8 @@ void __init init_IRQ(void) {
 
 struct irq_handler *irq_to_handler(unsigned int irq)
 {
-	return (irq < NR_IRQS) ? all_irq_handler + irq : 0;
+  return (irq < NR_IRQS) ? all_irq_handler + irq : 0;
 }
-
 
 extern unsigned long noise; /* random seed */
 void generic_handle_irq(unsigned int irq) {
