@@ -17,15 +17,11 @@ union thread_union init_thread_union __init_task_data;
 
 
 void start_thread(struct pt_regs *regs, unsigned long pc, unsigned long sp) {
-  //	unsigned long *stack = (unsigned long *)sp;
   memset(regs->uregs, 0, sizeof(regs->uregs));
   regs->ARM_cpsr = USR_MODE;
   regs->ARM_cpsr |= PSR_ENDSTATE;
   regs->ARM_pc = pc & ~1;		/* pc */
   regs->ARM_sp = sp;		/* sp */
-  //	regs->ARM_r2 = stack[2];	/* r2 (envp) */
-  //	regs->ARM_r1 = stack[1];	/* r1 (argv) */
-  //	regs->ARM_r0 = stack[0];	/* r0 (argc) */
   return;
 }
 
@@ -51,6 +47,7 @@ extern struct task_struct *current_task;
 void kernel_thread_exit(void) {
   printk(PR_SS_PROC, PR_LVL_DBG2, "%s: pid = %x\n", __func__, current_task->pid); 
   current_task->sched_en.state = PROCESS_STATE_DEAD;
+  /* wait for being killed */
   while(1);
 }
 
@@ -84,14 +81,6 @@ void cpu_idle() {
   current_task->sched_en.waiting_type = PROCESS_WAITING_TYPE_TIME;
   current_task->sched_en.wake_up_jiffy = 0xfffff000; /* never wake up */
   while(1) {asm("nop\n");}
-  /* Should call cpu founction:
-ENTRY(cpu_v6_do_idle)
-	mov	r1, #0
-	mcr	p15, 0, r1, c7, c10, 4		@ DWB - WFI may enter a low-power mode
-	mcr	p15, 0, r1, c7, c0, 4		@ wait for interrupt
-	mov	pc, lr
-
-   */
 }
 
 void arm_health_check(void) {
@@ -154,9 +143,6 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
   printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
   printk(PR_SS_PROC, PR_LVL_DBG1, "%s: target SP value = %x\n", __func__, ((unsigned long)task_thread_info(current_task) + ((unsigned long)THREAD_START_SP - (unsigned long)sizeof(*regs))));
 
-  //  print_regs(regs);
-
-  //  while(1);
   /*
    * We were successful.  We won't be returning to our caller, but
    * instead to user space by manipulating the kernel stack.
@@ -168,7 +154,6 @@ int arm_kernel_execve(char *filename, char *const argv[], char *const envp[])
 	"mov	r8, #0\n\t"	/* not a syscall */
 	"mov	r9, %0\n\t"	/* thread structure */
 	"mov	sp, r0\n\t"	/* reposition stack pointer */
-	//	"bl asm_dbg_nail\n\t"
 	"b	ret_to_user"
 	:
 	: "r" (task_thread_info(current_task)),

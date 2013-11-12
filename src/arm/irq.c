@@ -5,29 +5,6 @@
 #include <printk.h>
 #include <uart.h>
 
-struct pt_regs *  __irq_regs;
-
-#define __verify_pcpu_ptr(ptr)	do {					\
-	const void *__vpp_verify = (typeof(ptr))0;		\
-	(void)__vpp_verify;						\
-} while (0)
-
-
-#define VERIFY_PERCPU_PTR(__p) ({			\
-	__verify_pcpu_ptr((__p));			\
-	(typeof(*(__p)) *)(__p);	\
-})
-
-#define __get_cpu_var(var)	(*VERIFY_PERCPU_PTR(&(var)))
-
-static inline struct pt_regs *set_irq_regs(struct pt_regs *new_regs)
-{
-	struct pt_regs *old_regs, **pp_regs = &__get_cpu_var(__irq_regs);
-
-	old_regs = *pp_regs;
-	*pp_regs = new_regs;
-	return old_regs;
-}
 
 /*
  * do_IRQ handles all hardware IRQ's.  Decoded IRQs should not
@@ -36,7 +13,6 @@ static inline struct pt_regs *set_irq_regs(struct pt_regs *new_regs)
  */
 void __exception asm_do_IRQ(unsigned int irq, struct pt_regs *regs)
 {
-  struct pt_regs *old_regs = set_irq_regs(regs);
   printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: %d\n", __func__, irq);
 
   if (irq >= NR_IRQS) {
@@ -44,8 +20,6 @@ void __exception asm_do_IRQ(unsigned int irq, struct pt_regs *regs)
   } else {
 	generic_handle_irq(irq);
   }
-
-  set_irq_regs(old_regs);
 
   printk(PR_SS_IRQ, PR_LVL_DBG1, "%s: %d return\n", __func__, irq);
 }
@@ -66,8 +40,6 @@ static void __init s3c6410_init_irq(void)
   /* initialize timer irq */
   timer_irq_inits();
 
-  //  printk(PR_SS_IRQ, PR_LVL_INF, "%s: initialising interrupts 3\n", __func__);
-
   /* initialize uart irq */
   uart_irq_inits();
 }
@@ -75,15 +47,5 @@ static void __init s3c6410_init_irq(void)
 
 void arm_init_irq() {
   s3c6410_init_irq();  
-}
-
-
-
-void __exception test_IRQ_1() {
-  printk(PR_SS_IRQ, PR_LVL_INF, "++++++++++++++++++ %s\n", __func__);
-}
-
-void __exception test_IRQ_2() {
-  printk(PR_SS_IRQ, PR_LVL_INF, "++++++++++++++++++ %s\n", __func__);
 }
 

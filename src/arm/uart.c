@@ -194,7 +194,7 @@ void __init uart_irq_inits() {
 }
 
 static void __init uart_setup() {
-  /* setup UART0 only*/
+  /* setup UART0 only, check processor data sheet for detail */
   unsigned int regs = uart_irqs[0].regs;
   __raw_writel(regs + S3C64XX_UINTM, 0xf);
   __raw_writel(regs + S3C64XX_UCON, 0x785);
@@ -219,7 +219,7 @@ void __init arm_init_uart() {
   uart_irq_unmask(IRQ_S3CUART_BASE2);
   uart_irq_unmask(IRQ_S3CUART_BASE3);
   */
-  /* unmask all interrupts at the start. */
+  /* unmask all interrupts at the start, except Rx */
   __raw_writel(S3C_VA_UART0 + S3C64XX_UINTM, 0xe);
   /*
   __raw_writel(S3C_VA_UART1 + S3C64XX_UINTM, 0xf);

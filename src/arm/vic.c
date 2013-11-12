@@ -98,12 +98,7 @@ static void __init vic_set_irq_sources(void *base, unsigned int irq_start, unsig
 	}
 }
 
-/**
- * vic_init - initialise a vectored interrupt controller
- * @base: iomem base address
- * @irq_start: starting interrupt number, must be muliple of 32
- * @vic_sources: bitmask of interrupt sources to allow
- * @resume_sources: bitmask of interrupt sources to allow for resume
+/* initialise a vectored interrupt controller
  */
 void __init vic_init(void *base, unsigned int irq_start, unsigned int vic_sources)
 {
