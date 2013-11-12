@@ -377,7 +377,7 @@ void pages_free(struct page* page) {
   }
 }
 
-
+#ifdef __ARCH_X86__
 void print_free_list() {
   int nr_free = 0, i = 0;
   
@@ -421,4 +421,4 @@ void print_frag_list() {
   printk(PR_SS_MM, PR_LVL_INFO, "total pages in frag list: %x\n", nr_free);
 
 }
-
+#endif

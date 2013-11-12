@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= mm.o map.o bootmem.o page_alloc.o slab_alloc.o page.o mmap.o alloc.o fault.o
+objects	:= mm.o map.o bootmem.o page_alloc.o slab_alloc.o page.o mmap.o alloc.o
 
 all: $(BUILTIN)
 

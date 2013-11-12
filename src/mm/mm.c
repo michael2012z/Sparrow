@@ -25,11 +25,6 @@ static inline void flush_pgd_entry(pgd_t *pgd)
   asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
     : : "r" (pgd) : "cc");
 
-  /* not enabled on s3c6410 by default
-  asm("mcr	p15, 1, %0, c15, c9, 1  @ L2 flush_pmd"
-      : : "r" (pgd) : "cc");
-  */
-
   dsb();
 }
 
@@ -163,8 +158,8 @@ extern void * _debug_output_io;
 
 static void map_debug_memory() {
   struct map_desc map;
-  map.physical = 0x7f005000 & PAGE_MASK;
-  map.virtual = 0xef005000 & PAGE_MASK;//(unsigned long)kmalloc(PAGE_SIZE);
+  map.physical = S3C_PA_UART & PAGE_MASK;
+  map.virtual = S3C_VA_UART & PAGE_MASK;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
 
@@ -183,14 +178,14 @@ static void map_debug_memory() {
 static void map_vic_memory() {
   struct map_desc map;
   /* VIC0 */
-  map.physical = 0x71200000;
-  map.virtual = 0xe1200000;
+  map.physical = PA_VIC0;
+  map.virtual = VA_VIC0;
   map.length = SECTION_SIZE;
   map.type = MAP_DESC_TYPE_SECTION;
   create_mapping(kernel_pgd, &map);
   /* VIC1 */
-  map.physical = 0x71300000;
-  map.virtual = 0xe1300000;
+  map.physical = PA_VIC1;
+  map.virtual = VA_VIC1;
   map.length = SECTION_SIZE;
   map.type = MAP_DESC_TYPE_SECTION;
   create_mapping(kernel_pgd, &map);
@@ -199,7 +194,7 @@ static void map_vic_memory() {
 
 static void map_timer_memory() {
   struct map_desc map;
-  map.physical = 0x7f006000;
+  map.physical = S3C6410_TIMER_PA;
   map.virtual = S3C6410_TIMER_BASE;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;

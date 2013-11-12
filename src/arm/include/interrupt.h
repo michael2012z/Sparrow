@@ -1,6 +1,8 @@
 #ifndef _ARM_INTERRUPT_H_
 #define _ARM_INTERRUPT_H_
 
+#define S3C6410_TIMER_PA		0x7f006000
+
 #define S3C6410_TIMER_BASE 		0xef006000
 #define S3C6410_TIMER_TCFG0 	(S3C6410_TIMER_BASE+0x00)
 #define S3C6410_TIMER_TCFG1 	(S3C6410_TIMER_BASE+0x04)
@@ -44,7 +46,8 @@
 #define S3C_VA_TIMER	S3C_ADDR(0x00300000)	/* timer block */
 #define S3C_VA_WATCHDOG	S3C_ADDR(0x00400000)	/* watchdog */
 
-#define S3C_VA_UART	0xef005000	/* UART */
+#define PA_VIC0			0x71200000
+#define PA_VIC1			0x71300000
 
 #define VA_VIC0			(S3C_VA_IRQ + 0x00)
 #define VA_VIC1			(S3C_VA_IRQ + 0x100000)

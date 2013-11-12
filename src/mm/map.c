@@ -13,10 +13,6 @@ static inline void clean_pgd_entry(pgd_t *pgd)
   asm("mcr	p15, 0, %0, c7, c10, 1	@ flush_pmd"
       : : "r" (pgd) : "cc");
 
-  /* not enabled on s3c6410 by default
-  asm("mcr	p15, 1, %0, c15, c9, 1  @ L2 flush_pmd"
-      : : "r" (pgd) : "cc");
-  */
 }
 
 void pgd_clear(pgd_t *pgdp) {

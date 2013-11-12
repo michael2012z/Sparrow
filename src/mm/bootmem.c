@@ -83,26 +83,3 @@ void bootmem_finalize() {
 	map_item[i] = (unsigned char)0x00;
   }
 }
-
-void bootmem_test() {
-
-  void *mem1, *mem2, *mem3, *mem4, *mem5;
-  int pages1 = 3, pages2 = 1, pages3 = 4, pages4 = 2, pages5 = 4;
-
-  mem1 = bootmem_alloc(pages1);
-  printk(PR_SS_MM, PR_LVL_DBG1, "mem1 = %x\n", mem1);
-  mem2 = bootmem_alloc(pages2);
-  printk(PR_SS_MM, PR_LVL_DBG1, "mem2 = %x\n", mem2);
-  mem3 = bootmem_alloc(pages3);
-  printk(PR_SS_MM, PR_LVL_DBG1, "mem3 = %x\n", mem3);
-  bootmem_free(mem2);
-  mem4 = bootmem_alloc(pages4);
-  printk(PR_SS_MM, PR_LVL_DBG1, "mem4 = %x\n", mem4);
-  bootmem_free(mem4);
-  bootmem_free(mem1);
-  mem5 = bootmem_alloc(pages5);
-  printk(PR_SS_MM, PR_LVL_DBG1, "mem5 = %x\n", mem5);
-  bootmem_free(mem3);
-  bootmem_free(mem5);
-}
-
