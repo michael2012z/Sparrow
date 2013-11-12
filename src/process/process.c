@@ -207,6 +207,7 @@ int process_cleaner(void *unused) {
 	  en = container_of(first, struct sched_entity, queue_entry);
 	  task = container_of(en, struct task_struct, sched_en);
 	  // delete task data
+	  free_pid(task->pid);
 	  if (task->stack)
 		kfree(task->stack);
 	  if (task->elf_file_name)
