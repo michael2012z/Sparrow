@@ -5,6 +5,7 @@
 #include "scheduler_cfs_queue.h"
 
 static struct list_head* queue=NULL;
+extern struct task_struct *current_task;
 
 void cfs_queue_init () {
   // initialize the queue
@@ -114,10 +115,12 @@ void cfs_queue_wake_up_sleeping(unsigned long jiffy) {
 
 void cfs_queue_dump() {
   struct list_head *pos = NULL, *head = queue;
-  struct sched_entity *current;
-  struct task_struct* task = NULL;
+  struct task_struct* task = current_task;
+  struct sched_entity *current = &current_task->sched_en;
 
-  printu("totally %d threads: \n(state: 1/ready, 2/running, 3/waiting, 4/dead)\n", cfs_queue_size());
+  /* note, current task is not in queue */
+  printu("totally %d threads: \n(state: 1/ready, 2/running, 3/waiting, 4/dead)\n", cfs_queue_size() + 1);
+  printu("  pid: %d,  state: %d,  vruntime: %d,  file: %s\n", task->pid, current->state, (int)current->vruntime, task->elf_file_name?task->elf_file_name:"null");
   list_for_each(pos, head) {
 	current = list_entry(pos, struct sched_entity, queue_entry);
 	task = container_of(current, struct task_struct, sched_en);
