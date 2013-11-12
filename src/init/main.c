@@ -125,7 +125,7 @@ void __init start_kernel(void) {
   printu("  Process initialized.\n");
 
   rest_init();
-  printu("  Starting deamons.\n");
+  printu("  Starting daemons.\n");
 
   init_IRQ();
 
