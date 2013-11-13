@@ -35,8 +35,6 @@ static void
 context_switch(struct task_struct *prev,
 	       struct task_struct *next)
 {
-  register unsigned long sp asm ("sp");
-  printk(PR_SS_PROC, PR_LVL_DBG5, "%s, sp = %x\n", __func__, sp);
   switch_pgd(next->mm.pgd, next->pid);
   switch_to(prev, next);
 }
@@ -102,8 +100,6 @@ void schedule() {
   } else
 	scheduler->enqueue_task(current_task, sched_enqueue_flag_timeout);
 
-  //  scheduler->dump();
-
   next_task = scheduler->pick_next_task();
 
   if (current_task)
@@ -126,6 +122,6 @@ void schedule() {
   }
 
   printk(PR_SS_PROC, PR_LVL_DBG5, "%s, context_switch %d <--> %d start\n", __func__, prev_task->pid, next_task->pid);  
-  if (1) context_switch(prev_task, next_task);
+  context_switch(prev_task, next_task);
   printk(PR_SS_PROC, PR_LVL_DBG5, "%s, context_switch %d <--> %d finish\n", __func__, prev_task->pid, next_task->pid);
 }
