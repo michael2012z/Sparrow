@@ -26,6 +26,7 @@ struct vm_area_struct {
   unsigned long vm_length;  /* content length */
   unsigned long vm_fileoffset;		/* Offset (within vm_file) in PAGE_SIZE
 								   units, *not* PAGE_CACHE_SIZE */
+  unsigned long memory;		/* real memory allocated by kernel */
   struct file * vm_file;		/* File we map to (can be NULL). */
 
   /* linked list of VM areas per task, sorted by address */

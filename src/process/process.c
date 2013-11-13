@@ -197,16 +197,18 @@ void process_cleaner_init() {
 
 int process_cleaner(void *unused) {
   while(1) {
-	struct list_head *first;
+	struct list_head *first, *head;
 	struct sched_entity *en;
 	struct task_struct* task;
 	while(!list_empty(zombie_queue)) {
 	  int i;
+	  struct vm_area_struct *vma;
+
 	  first = zombie_queue->next;
 	  list_del(first);
 	  en = container_of(first, struct sched_entity, queue_entry);
 	  task = container_of(en, struct task_struct, sched_en);
-	  // delete task data
+	  /* delete task data */
 	  free_pid(task->pid);
 	  if (task->stack)
 		kfree(task->stack);
@@ -216,6 +218,18 @@ int process_cleaner(void *unused) {
 		if (task->parameters[i])
 		  kfree(task->parameters[i]);
 
+	  /* free user space memory and vma */
+	  head = &(task->mm.mmap.list);
+	  while(!list_empty(head)) {
+		first = head->next;
+		list_del(first);
+		vma = container_of(first, struct vm_area_struct, list);
+		if (0 != vma->memory)
+		  kfree((void *)vma->memory);
+		kfree(vma);
+	  }
+
+	  /* free task struct */
 	  kfree(task);
 	}
 	exception_disable();

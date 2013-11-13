@@ -89,6 +89,7 @@ unsigned long do_mmap(struct mm_struct *mm, struct file *filep, unsigned long ad
   }
 
   vma->vm_mm = mm;
+  vma->memory = 0;
   /* align addr to get vma start */
   vma->vm_start = page_start(addr);  
   /* the offset from the beginning of the vma */

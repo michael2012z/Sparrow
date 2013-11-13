@@ -274,14 +274,6 @@ void map_fs_to_ram() {
 }
 
 
-
-
-
-
-
-
-
-
 /* map the page around addr */
 static int fix_page_fault(unsigned long mm_pgd, unsigned long addr, struct vm_area_struct *vma) {
   /* establish the mapping, 1 page each time */
@@ -290,7 +282,8 @@ static int fix_page_fault(unsigned long mm_pgd, unsigned long addr, struct vm_ar
 
   printk(PR_SS_IRQ, PR_LVL_DBG5, "%s:\n", __func__);
 
-  map.physical = __virt_to_phys((unsigned long)kmalloc(PAGE_SIZE));
+  vma->memory = (unsigned long)kmalloc(PAGE_SIZE);
+  map.physical = __virt_to_phys(vma->memory);
   map.virtual = aligned_addr;
   map.length = PAGE_SIZE;
   map.type = MAP_DESC_TYPE_PAGE;
