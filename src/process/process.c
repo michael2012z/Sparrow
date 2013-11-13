@@ -12,7 +12,7 @@ extern struct task_struct *current_task;
 extern struct sched_class *scheduler;
 struct task_struct *init_kernel_task = NULL;
 
-static struct task_struct *create_launch_kernel_task() {
+static struct task_struct *create_launch_kernel_task(char *name) {
   int pid;
   struct task_struct *task = NULL;
   pid = allocate_pid();
@@ -24,7 +24,8 @@ static struct task_struct *create_launch_kernel_task() {
   if (NULL == task)
 	return NULL;
 
-  task->elf_file_name = NULL;
+  task->elf_file_name = (char *)kmalloc(strlen(name) + 1);
+  memcpy(task->elf_file_name, name, strlen(name) + 1);
   task->sched_en.state = PROCESS_STATE_RUNNING;
   task->sched_en.blocked_pid = -1;
   task->sched_en.blocking_pid = -1;
@@ -44,7 +45,7 @@ static struct task_struct *create_launch_kernel_task() {
 void initialize_process() {
   initialize_pid();
   schedule_initialize();
-  create_launch_kernel_task();
+  create_launch_kernel_task("*init");
   init_kernel_task = scheduler->pick_next_task();
   current_task = init_kernel_task;
   process_cleaner_init();
@@ -53,7 +54,7 @@ void initialize_process() {
 
 void arm_start_kernel_thread(void) __asm__("arm_start_kernel_thread");
 
-int create_kernel_thread(int (*fn)(void *)) {
+int create_kernel_thread(int (*fn)(void *), char *name) {
   int pid;
   struct task_struct *task = NULL;
   struct pt_regs *regs = NULL;
@@ -69,7 +70,8 @@ int create_kernel_thread(int (*fn)(void *)) {
   if (NULL == task)
 	return -1;
 
-  task->elf_file_name = NULL;
+  task->elf_file_name = (char *)kmalloc(strlen(name) + 1);
+  memcpy(task->elf_file_name, name, strlen(name) + 1);
   task->sched_en.state = PROCESS_STATE_READY;
   task->sched_en.blocked_pid = -1;
   task->sched_en.blocking_pid = -1;

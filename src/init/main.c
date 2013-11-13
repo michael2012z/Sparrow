@@ -30,8 +30,8 @@ static void __init cpu_init() {
 }
 
 static void __init rest_init(void) {
-  create_kernel_thread(process_cleaner);
-  create_kernel_thread(kernel_shell);
+  create_kernel_thread(process_cleaner, "*cleaner");
+  create_kernel_thread(kernel_shell, "*shell");
 }
 
 static void __init health_check(void) {

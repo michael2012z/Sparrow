@@ -114,7 +114,7 @@ union thread_union {
 
 
 void initialize_process();
-int create_kernel_thread(int (*fn)(void *));
+int create_kernel_thread(int (*fn)(void *), char *name);
 int create_user_thread(int (*fn)(char *), char *elf_file_name, char **parameters);
 int execute_binary(struct task_struct *task, struct file *filep);
 void destroy_process(struct task_struct *task);
