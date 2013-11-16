@@ -43,7 +43,7 @@ struct task_struct {
   unsigned int flags;
   struct pt_regs regs;
   bool kernel_thread;
-  int priority;
+  unsigned int priority;/* 1 ~ 4, 1 for kernel daemons, 4 for normal applications */
   struct mm_struct mm;
   int pid;
   struct timespec start_time;

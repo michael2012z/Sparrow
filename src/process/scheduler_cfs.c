@@ -20,7 +20,7 @@ static void scheduler_init_cfs () {
 
 static u64 calculate_delta_vruntime(struct sched_entity *en) {
   struct task_struct* task = 	container_of(en, struct task_struct, sched_en);
-  return en->continuous_ticks + task->priority*2;
+  return en->continuous_ticks + task->priority;
 }
 
 static u64 calculate_vruntime(struct sched_entity *en) {

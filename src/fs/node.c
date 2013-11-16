@@ -155,7 +155,7 @@ void vfs_print_dir(vfs_node *dir) {
 
 void vfs_print_file(vfs_node *file) {
   if (VFS_NODE_TYPE_FILE == file->type)
-	printu("%s   size = %d   addr = 0x%x\n", file->name, file->file.size, (unsigned int)file->file.addr);
+	printu("%s   size = %d   addr = %x\n", file->name, file->file.size, (unsigned int)file->file.addr);
 }
 
 static void vfs_print_indent(int indent) {
