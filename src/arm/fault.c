@@ -10,6 +10,11 @@
 extern struct task_struct *current_task;
 
 
+void div0(void) {
+  printk(PR_SS_IRQ, PR_LVL_ERR, "%s: error: division by 0\n", __func__);
+  while(1);
+}
+
 static int do_unknown_fault(unsigned long addr, unsigned int fsr, struct pt_regs *regs) {
   printk(PR_SS_IRQ, PR_LVL_ERR, "%s: an unknown fault happened, fsr = %d\n", __func__, fsr);
   while(1);

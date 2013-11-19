@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= string.o printf.o malloc.o inputc.o stdlib.o
+objects	:= string.o printf.o malloc.o inputc.o stdlib.o fault.o libfunc.o
 
 all: $(GLIBCA)
 
@@ -10,6 +10,9 @@ $(GLIBCA): $(objects)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $<
+
+%.o: %.S
+	$(CC) $(AFLAGS) $<
 
 clean:
 	rm -f *.o $(GLIBCA)

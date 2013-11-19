@@ -23,7 +23,7 @@ export CC LD AR CFLAGS IFLAGS AFLAGS LFLAGS BUILTIN
 
 subdirs := arm/ init/ util/ mm/ exception/ process/ fs/ syscall/ test/ sdk/glibc usr/
 
-lklist	:= arm/head.o arm/built-in.o init/built-in.o util/built-in.o mm/built-in.o exception/built-in.o process/built-in.o fs/$(BUILTIN) syscall/$(BUILTIN)
+lklist	:= arm/head.o arm/libfunc.o arm/built-in.o init/built-in.o util/built-in.o mm/built-in.o exception/built-in.o process/built-in.o fs/$(BUILTIN) syscall/$(BUILTIN)
 
 .PHONY: $(subdirs)
 
@@ -33,7 +33,7 @@ vmlinux.o: ${subdirs}
 	$(LD) $(LFLAGS) -o $@ $(lklist)
 
 vmlinux: ${subdirs}
-	$(CC) -static -nostartfiles -nostdlib -T arm/vmlinux.lds $(lklist) -o vmlinux -lgcc
+	$(CC) -static -nostartfiles -nostdlib -T arm/vmlinux.lds $(lklist) -o vmlinux 
 
 $(subdirs):
 	$(MAKE) --directory=$@
