@@ -12,5 +12,4 @@ void main() {
   i = 0xaaaaaaaa;
   j = 0xcccccccc;
 
-  exit(0);
 }

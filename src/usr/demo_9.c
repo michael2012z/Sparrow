@@ -24,5 +24,4 @@ void main() {
 	printf("random() = %d\n", r);
   }
 
-  exit(0);
 }

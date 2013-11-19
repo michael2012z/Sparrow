@@ -22,7 +22,6 @@ void main() {
   sudoku_resolve();
   printf("\nresolved: \n");
   sudoku_dump();
-  exit(0);
 }
 
 void sudoku_dump() {

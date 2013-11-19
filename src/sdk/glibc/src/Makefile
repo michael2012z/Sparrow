@@ -1,7 +1,7 @@
 
 CFLAGS	+=  $(IFLAGS)
 
-objects	:= string.o printf.o malloc.o inputc.o stdlib.o fault.o libfunc.o
+objects	:= string.o printf.o malloc.o inputc.o stdlib.o fault.o libfunc.o start.o
 
 all: $(GLIBCA)
 
