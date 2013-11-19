@@ -16,7 +16,8 @@
 #define SHELL_COMMAND_ID_PS			9
 #define SHELL_COMMAND_ID_KILL		10
 #define SHELL_COMMAND_ID_LOG		11
-#define SHELL_COMMAND_ID_HELP		12
+#define SHELL_COMMAND_ID_RESET		12
+#define SHELL_COMMAND_ID_HELP		13
 
 
 int __init kernel_shell(void *unused);
@@ -32,6 +33,7 @@ void handle_cmd_kmsg(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_ps(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_kill(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_log(char *primary_parameter, char **secondary_parameters);
+void handle_cmd_reset(char *primary_parameter, char **secondary_parameters);
 void handle_cmd_help(char *primary_parameter, char **secondary_parameters);
 
 

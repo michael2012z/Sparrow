@@ -8,6 +8,16 @@
 
 #define PLC	"I"
 
+void arm_cpu_reset() {
+  asm("mov	r1, #0\n"
+	  "mcr	p15, 0, r1, c7, c0, 0		@ flush cache\n"
+	  "mcr	p15, 0, r1, c5, c0, 0		@ flush TLB\n"
+	  "mov	r1, #0x30\n"
+	  "mcr	p15, 0, r1, c1, c0, 0		@ turn off MMU etc\n"
+	  "ldr r0, =(0x50000000)\n"
+	  "mov	pc, r0\n");
+}
+
 struct stack {
 	u32 irq[3];
 	u32 abt[3];

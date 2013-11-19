@@ -9,6 +9,7 @@
 #include <vfs.h>
 #include <uart.h>
 #include <ring_buffer.h>
+#include <setup.h>
 
 extern struct sched_class *scheduler;
 
@@ -314,6 +315,11 @@ void handle_cmd_log(char *primary_parameter, char **secondary_parameters) {
   return;
 }
 
+void handle_cmd_reset(char *primary_parameter, char **secondary_parameters) {
+  printu("reseting ... \n");
+  arm_cpu_reset();
+}
+
 void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
   int i = 0;
   for (i = 0; i < 4; i++)
@@ -337,6 +343,7 @@ void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
 	printu("    ps                                display live process information\n");
 	printu("    kill <pid >                       terminate specified process\n");
 	printu("    log  [type] [level]               enable kernel log types and levels\n");
+	printu("    reset                             restart the system\n");
 	printu("    help [command]                    print help information\n");
   } else {
 	char *cmd = primary_parameter;
@@ -370,6 +377,9 @@ void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
 	} else if (0 == strcmp(cmd, "kill")) {
 	  printu("Usage: kill <pid>\n");
 	  printu("Terminate specified process by PID.\n");
+	} else if (0 == strcmp(cmd, "reset")) {
+	  printu("Usage: reset\n");
+	  printu("Restart the system.\n");
 	} else if (0 == strcmp(cmd, "log")) {
 	  printu("Usage: log [log types] [log levels]\n");
 	  printu("Enable kernel log types and levels, or display enabled log if no parameter.\n");

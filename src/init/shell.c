@@ -89,6 +89,8 @@ static int find_command_id(char *cmd) {
 	  ret = SHELL_COMMAND_ID_KILL;
 	else if (0 == strcmp(cmd, "log"))
 	  ret = SHELL_COMMAND_ID_LOG;
+	else if (0 == strcmp(cmd, "reset"))
+	  ret = SHELL_COMMAND_ID_RESET;
 	else if (0 == strcmp(cmd, "help"))
 	  ret = SHELL_COMMAND_ID_HELP;
 	else
@@ -198,6 +200,9 @@ int __init kernel_shell(void *unused) {
 	  break;
 	case SHELL_COMMAND_ID_LOG:
 	  handle_cmd_log(primary_parameter, secondary_parameters);
+	  break;
+	case SHELL_COMMAND_ID_RESET:
+	  handle_cmd_reset(primary_parameter, secondary_parameters);
 	  break;
 	case SHELL_COMMAND_ID_HELP:
 	  handle_cmd_help(primary_parameter, secondary_parameters);
