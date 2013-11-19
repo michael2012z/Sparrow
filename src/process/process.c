@@ -24,6 +24,7 @@ static struct task_struct *create_launch_kernel_task(char *name) {
   if (NULL == task)
 	return NULL;
 
+  task->priority = 1;
   task->elf_file_name = (char *)kmalloc(strlen(name) + 1);
   memcpy(task->elf_file_name, name, strlen(name) + 1);
   task->sched_en.state = PROCESS_STATE_RUNNING;
@@ -70,6 +71,7 @@ int create_kernel_thread(int (*fn)(void *), char *name) {
   if (NULL == task)
 	return -1;
 
+  task->priority = 1;
   task->elf_file_name = (char *)kmalloc(strlen(name) + 1);
   memcpy(task->elf_file_name, name, strlen(name) + 1);
   task->sched_en.state = PROCESS_STATE_READY;
@@ -124,6 +126,7 @@ int create_user_thread(int (*fn)(char *), char *elf_file_name, char **parameters
   if (NULL == task)
 	return -1;
 
+  task->priority = 4;
   task->elf_file_name = NULL;
   task->sched_en.state = PROCESS_STATE_READY;
   task->sched_en.blocked_pid = -1;
