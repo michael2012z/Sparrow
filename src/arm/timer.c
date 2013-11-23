@@ -68,7 +68,7 @@ static void __init timer_setup(int timer_irq) {
   __raw_writel(S3C6410_TIMER_TCON, tcon);
 
   /* write count value */
-  tcnt = 0x3000;
+  tcnt = 0x21ca;
   __raw_writel(S3C6410_TIMER_TCNTB4, tcnt);
 
   /* start the timer */
