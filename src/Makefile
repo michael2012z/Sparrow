@@ -27,13 +27,13 @@ lklist	:= arm/head.o arm/libfunc.o arm/built-in.o init/built-in.o util/built-in.
 
 .PHONY: $(subdirs)
 
-all: vmlinux.o vmlinux
+all: kernel.o kernel
 
-vmlinux.o: ${subdirs}
+kernel.o: ${subdirs}
 	$(LD) $(LFLAGS) -o $@ $(lklist)
 
-vmlinux: ${subdirs}
-	$(CC) -static -nostartfiles -nostdlib -T arm/vmlinux.lds $(lklist) -o vmlinux 
+kernel: ${subdirs}
+	$(CC) -static -nostartfiles -nostdlib -T arm/kernel.lds $(lklist) -o kernel 
 
 $(subdirs):
 	$(MAKE) --directory=$@
@@ -44,7 +44,7 @@ cscope:
 	cscope -bqk -i cscope.files
 
 clean:
-	rm -f vmlinux.o vmlinux 
+	rm -f kernel.o kernel 
 	for d in $(subdirs);	\
 		do	\
 			$(MAKE) --directory=$$d clean || exit 1;	\
