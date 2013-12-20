@@ -12,14 +12,14 @@ The author, I, am a software engineer working in Ericsson. If you need to contac
 
 Document:
 * [Chapter 01: Introduction](https://github.com/michael2012z/Sparrow/wiki/Chapter-01:-Introduction)
-* Chapter 02: Process
-* Chapter 03: MemoryManagement
-* Chapter 04: BootMemoryAllocator
-* Chapter 05: PageAllocator.ppt
-* Chapter 06: SlabAllocator
-* Chapter 07: UserSpace
-* Chapter 08: FileSystem
-* Chapter 09: Interrupt
-* Chapter 10: Tracing
-* Chapter 11: User Guide
-* Chapter 12: ProgrammingGuide
+* Chapter 02: User Guide
+* Chapter 03: Process
+* Chapter 04: Memory Management
+* Chapter 05: Boot Memory Allocator
+* Chapter 06: Page Allocator
+* Chapter 07: Slab Allocator
+* Chapter 08: User Space
+* Chapter 09: File System
+* Chapter 10: Interrupt
+* Chapter 11: Tracing
+* Chapter 12: Programming Guide
