@@ -13,7 +13,7 @@ The author, I, am a software engineer working in Ericsson. If you need to contac
 Document:
 * [Chapter 01: Introduction](https://github.com/michael2012z/Sparrow/wiki/Chapter-01:-Introduction)
 * [Chapter 02: User Guide](https://github.com/michael2012z/Sparrow/wiki/Chapter-02:-User-Guide)
-* [Chapter 02: User Guide (Demo)](https://github.com/michael2012z/Sparrow/wiki/Chapter-02:-User-Guide-(Demo))
+* [Chapter 02: User Guide (Demo)](https://github.com/michael2012z/Sparrow/wiki/Chapter-02:-User-Guide-(Demo\))
 * [Chapter 03: Process](https://github.com/michael2012z/Sparrow/wiki/Chapter-03:-Process)
 * Chapter 04: Memory Management
 * Chapter 05: Boot Memory Allocator
