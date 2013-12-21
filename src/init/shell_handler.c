@@ -332,8 +332,8 @@ void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
 	printu("Usage: help <command>\n");
 	printu("Get help of all shell commands or specified command.\n");
 	printu("Supported commands:\n");
-	printu("    elfs <file> [parameters...]       execute ELF format file in synchronized mode\n");
-	printu("    elfa <file> [parameters...]       execute ELF format file in asynchronized mode\n");
+	printu("    elfs <file> [parameters...]       execute ELF file in synchronized mode\n");
+	printu("    elfa <file> [parameters...]       execute ELF file in asynchronized mode\n");
 	printu("    elf  <file> [parameters...]       same as 'elfs' command\n");
 	printu("    tree                              display tree view of file system\n");
 	printu("    ls                                same as 'tree' command\n");
@@ -349,13 +349,13 @@ void handle_cmd_help(char *primary_parameter, char **secondary_parameters) {
 	char *cmd = primary_parameter;
 	if (0 == strcmp(cmd, "elf")) {
 	  printu("Usage: elf <file> [param1] [param2] [param3] [param4]\n");
-	  printu("Execute ELF format file in synchronized mode.\n");
+	  printu("Execute ELF file in synchronized mode.\n");
 	} else if (0 == strcmp(cmd, "elfs")) {
 	  printu("Usage: elfs <file> [param1] [param2] [param3] [param4]\n");
-	  printu("Execute ELF format file in synchronized mode.\n");
+	  printu("Execute ELF file in synchronized mode.\n");
 	} else if (0 == strcmp(cmd, "elfa")) {
 	  printu("Usage: elfa <file> [param1] [param2] [param3] [param4]\n");
-	  printu("Execute ELF format file in asynchronized mode.\n");
+	  printu("Execute ELF file in asynchronized mode.\n");
 	} else if (0 == strcmp(cmd, "ls")) {
 	  printu("Usage: ls\n");
 	  printu("Display tree view of file system.\n");
