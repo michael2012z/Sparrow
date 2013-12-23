@@ -16,9 +16,9 @@ Document:
 * [Chapter 02: User Guide (Demo)](https://github.com/michael2012z/Sparrow/wiki/Chapter-02:-User-Guide-(Demo\))
 * [Chapter 03: Process](https://github.com/michael2012z/Sparrow/wiki/Chapter-03:-Process)
 * [Chapter 04: Memory Management](https://github.com/michael2012z/Sparrow/wiki/Chapter-04:-Memory-Management)
-* Chapter 05: Boot Memory Allocator
-* Chapter 06: Page Allocator
-* Chapter 07: Slab Allocator
+* [Chapter 05: Boot Memory Allocator](https://github.com/michael2012z/Sparrow/wiki/Chapter-05:-Boot-Memory-Allocator)
+* [Chapter 06: Page Memory Allocator](https://github.com/michael2012z/Sparrow/wiki/Chapter-06:-Page-Memory-Allocator)
+* [Chapter 07: Slab Memory Allocator](https://github.com/michael2012z/Sparrow/wiki/Chapter-07:-Slab-Memory-Allocator)
 * Chapter 08: User Space
 * Chapter 09: File System
 * Chapter 10: Interrupt
