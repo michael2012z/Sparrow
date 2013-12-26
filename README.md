@@ -21,6 +21,6 @@ Document:
 * [Chapter 07: Slab Memory Allocator](https://github.com/michael2012z/Sparrow/wiki/Chapter-07:-Slab-Memory-Allocator)
 * [Chapter 08: User Space](https://github.com/michael2012z/Sparrow/wiki/Chapter-08:-User-Space)
 * [Chapter 09: File System](https://github.com/michael2012z/Sparrow/wiki/Chapter-09:-File-System)
-* Chapter 10: Interrupt
-* Chapter 11: Tracing
+* [Chapter 10: Interrupt Handling](https://github.com/michael2012z/Sparrow/wiki/Chapter-10:-Interrupt-Handling)
+* [Chapter 11: Tracing](https://github.com/michael2012z/Sparrow/wiki/Chapter-11:-Tracing)
 * Chapter 12: Programming Guide
