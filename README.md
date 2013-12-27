@@ -23,4 +23,4 @@ Document:
 * [Chapter 09: File System](https://github.com/michael2012z/Sparrow/wiki/Chapter-09:-File-System)
 * [Chapter 10: Interrupt Handling](https://github.com/michael2012z/Sparrow/wiki/Chapter-10:-Interrupt-Handling)
 * [Chapter 11: Tracing](https://github.com/michael2012z/Sparrow/wiki/Chapter-11:-Tracing)
-* Chapter 12: Programming Guide
+* [Chapter 12: Programming Guide](https://github.com/michael2012z/Sparrow/wiki/Chapter-12:-Programming-Guide)
